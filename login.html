@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClimateGuard | Login</title>
+  <link rel="icon" href="assets/logo.png" type="image/png" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css?v=2" />
+  <link rel="stylesheet" href="css/auth-enhancements.css" />
+  <script src="js/theme.js"></script>
+  <script src="js/api.js" type="module"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+<link rel="stylesheet" href="css/ui-enhancements.css?v=20260318">
+</head>
+
+<body class="login-page">
+  <div class="position-absolute top-0 start-0 p-3">
+    <a href="index.html" class="text-decoration-none d-flex align-items-center gap-2">
+      <img src="assets/logo.png?v=3" alt="Logo" width="40" height="40"
+        class="rounded-circle shadow-sm border border-success" />
+      <span class="fw-bold text-success fs-5">ClimateGuard</span>
+    </a>
+  </div>
+
+  <div class="auth-top-actions">
+    <button id="langToggleBtn" class="btn btn-sm btn-outline-success border-2 fw-bold"
+      style="border-radius: 20px; transition: all 0.3s ease;">Language</button>
+    <button id="themeToggleBtn" class="theme-toggle-btn" title="Switch to Dark Mode">
+      <i class="bi bi-moon-stars"></i>
+    </button>
+  </div>
+
+  <div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4 shadow auth-card login-card-style">
+      <h3 class="text-center mb-3"><span data-i18n="login-title">Login</span></h3>
+
+      <input type="text" id="loginName" class="form-control mb-3" placeholder="Full Name" data-i18n="full-name" />
+
+      <div class="input-group mb-3">
+        <input type="password" id="loginPassword" class="form-control" placeholder="Password" data-i18n="password" />
+        <button class="btn btn-outline-secondary" type="button" id="toggleLoginPassword">
+          <span id="loginEyeIcon">Show</span>
+        </button>
+      </div>
+
+      <button id="loginBtn" class="btn login-btn w-100 mb-2">
+        <span data-i18n="login-title">Login</span>
+      </button>
+
+      <div class="text-center">
+        <span data-i18n="new-user">New user?</span>
+        <a href="register.html"><span data-i18n="register-title">Register</span></a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import api from './js/api.js';
+
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      const name = document.getElementById('loginName').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      if (!name || !password) {
+        alert('Please enter your Full Name and Password');
+        return;
+      }
+
+      try {
+        const data = await api.login(name, password);
+        localStorage.setItem('currentUser', JSON.stringify(data.user));
+        localStorage.setItem('token', data.token);
+
+        window.location.href = 'index.html';
+      } catch (error) {
+        alert(error.message || 'Invalid credentials');
+      }
+    });
+
+    document.getElementById('toggleLoginPassword').addEventListener('click', function () {
+      const passwordInput = document.getElementById('loginPassword');
+      const eyeIcon = document.getElementById('loginEyeIcon');
+
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.textContent = 'Hide';
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.textContent = 'Show';
+      }
+    });
+  </script>
+
+  <script src="js/i18n.js?v=8" type="module"></script>
+  <script src="js/auth-ui.js"></script>
+<script src="js/ui-enhancements.js?v=20260318"></script>
+</body>
+
+</html>
+

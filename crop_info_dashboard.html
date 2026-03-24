@@ -1,0 +1,299 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClimateGuard | Crop Information Dashboard</title>
+  <link rel="icon" href="assets/logo.png" type="image/png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="manifest" href="manifest.json">
+  <script src="js/theme.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <style>
+    #map {
+      height: 500px;
+      width: 100%;
+      border-radius: 15px;
+      z-index: 1;
+    }
+
+    .map-section {
+      background: white;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      margin-bottom: 3rem;
+    }
+
+    .leaflet-interactive {
+      transition: fill-opacity 0.2s, stroke-width 0.2s;
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 300px;
+    }
+
+    .info-legend {
+      background: #ffffff;
+      padding: 10px 12px;
+      border-radius: 8px;
+      box-shadow: 0 0 14px rgba(0, 0, 0, 0.12);
+      font-size: 12px;
+      line-height: 1.4;
+      color: #1f2937;
+    }
+
+    .info-legend i {
+      width: 14px;
+      height: 14px;
+      display: inline-block;
+      margin-right: 8px;
+      border-radius: 2px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/ui-enhancements.css?v=20260318">
+</head>
+
+<body class="bg-light">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+    <div class="container">
+      <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="index.html"><img src="assets/logo.png?v=3"
+          alt="ClimateGuard Logo" width="40" height="40" class="rounded-circle shadow-sm"><span>ClimateGuard</span></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="navbar-nav me-auto">
+          <a class="nav-link" href="soil_dashboard.html" data-i18n="nav-soil">🟤 Soil Info</a>
+          <a class="nav-link active" href="crop_info_dashboard.html" data-i18n="nav-crop-info">🌱 Crop Info</a>
+
+
+          <a class="nav-link" href="forest_dashboard.html" data-i18n="nav-forest">🌲 Forest Info</a>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <button id="langToggleBtn" class="btn btn-sm btn-outline-light rounded-pill px-3 me-2"
+            style="font-size: 0.8rem; border-color: rgba(255,255,255,0.3);">Language</button>
+          <button id="themeToggleBtn" class="theme-toggle-btn" title="Switch to Dark Mode"><i
+              class="bi bi-moon-stars"></i></button>
+          <div class="dropdown">
+
+            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle hide-caret"
+              id="userProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="assets/user_avatar.png" alt="User" class="user-profile-img">
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-premium" aria-labelledby="userProfileDropdown">
+              <li>
+                <h6 class="dropdown-header-premium">User Account</h6>
+              </li>
+              <li id="loginMenuItem"><a class="dropdown-item dropdown-item-premium" href="login.html"><i
+                    class="bi bi-key me-2"></i>Login</a></li>
+              <li id="registerMenuItem"><a class="dropdown-item dropdown-item-premium" href="register.html"><i
+                    class="bi bi-person-plus me-2"></i>Register</a></li>
+              <li id="profileMenuItem" style="display:none;"><a class="dropdown-item dropdown-item-premium"
+                  href="profile.html"><i class="bi bi-person-circle me-2"></i>My Profile</a></li>
+              <li id="settingsMenuItem" style="display:none;"><a class="dropdown-item dropdown-item-premium"
+                  href="settings.html"><i class="bi bi-gear me-2"></i>Settings</a></li>
+              <li id="authDivider" style="display:none;">
+                <hr class="dropdown-divider opacity-10">
+              </li>
+              <li id="logoutMenuItem" style="display:none;"><a class="dropdown-item dropdown-item-premium text-danger"
+                  href="#" onclick="handleLogout()"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="container my-4">
+    <h3> <i class="bi bi-flower1"></i> <span data-i18n="crop-dashboard">Karnataka Crop Production</span></h3>
+    <p class="text-muted"> <span data-i18n="crop-desc-long">Explore crop production and district insights based on
+        recent data</span></p>
+  </div>
+  <div class="container">
+    <div class="map-section">
+      <div class="row align-items-center mb-3">
+        <div class="col-md-8">
+          <h4 class="fw-bold mb-1"> <span data-i18n="state-crop-dist">State Crop Distribution (Yield/Area)</span></h4>
+          <p class="text-muted small"> <span data-i18n="state-crop-desc">Interactive district-level crop production view
+              with
+              supporting analytics. Select a filter to view specific crops.</span></p>
+          <div class="mt-2">
+            <select id="seasonFilter" class="form-select form-select-sm d-inline-block w-auto me-2">
+              <option value="" data-i18n="All Seasons">All Seasons</option>
+              <option value="Kharif" data-i18n="Kharif">Kharif</option>
+              <option value="Rabi" data-i18n="Rabi">Rabi</option>
+              <option value="Summer" data-i18n="Summer">Summer</option>
+              <option value="Whole Year" data-i18n="Whole Year">Whole Year</option>
+            </select>
+            <select id="cropFilter" class="form-select form-select-sm d-inline-block w-auto">
+              <option value="" data-i18n="All Crops">All Crops</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-4 text-md-end"> <span
+            class="badge bg-success-subtle text-success border border-success-subtle p-2"> <i class="me-1">Map</i>
+            Interactive Visualization </span> </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-lg-9">
+          <div id="map"></div>
+        </div>
+        <div class="col-lg-3">
+          <div class="p-3 bg-light rounded shadow-sm h-100">
+            <h6 class="fw-bold mb-3 border-bottom pb-2"> <span data-i18n="crop-highlights">Crop Highlights</span>
+            </h6>
+            <p class="small mb-2"><b> <span data-i18n="total-crop-area">Total Cultivated Area</span></b>: <span
+                id="summaryTotalArea">Calculating...</span></p>
+            <p class="small mb-2"><b> <span data-i18n="total-crop-yield">Total Yield</span></b>: <span
+                id="summaryTotalYield">Calculating...</span></p>
+            <p class="small mb-2"><b> <span data-i18n="top-crop">Most Produced Crop</span></b>: <span
+                id="summaryTopCrop">Calculating...</span></p>
+            <p class="small mb-0"><b> <span data-i18n="data-year">Data Year</span></b>: <span
+                id="summaryDataYear">Various</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container mb-5">
+    <div class="row g-4">
+      <div class="col-12">
+        <div class="card h-100 shadow border-0 feature-card clickable-card">
+          <div class="card-body">
+            <h5 class="card-title fw-bold text-success mb-3"> <span data-i18n="all-crop-dist-title">Crop Production by
+                District</span></h5>
+            <div class="chart-wrap"> <canvas id="cropChart"></canvas> </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container mb-5">
+    <h4 class="fw-bold mb-3"> <span data-i18n="crop-insights">Crop Insights and Priorities</span></h4>
+    <p class="text-muted mb-4"> <span data-i18n="crop-insights-desc">Additional indicators to support planning, and
+        district-level distribution.</span></p>
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="card h-100 shadow-sm border-0 feature-card">
+          <div class="card-body">
+            <h6 class="fw-bold text-success mb-3"> <span data-i18n="production-snapshot">Production Snapshot</span></h6>
+            <div class="d-flex justify-content-between small mb-2"> <span class="text-muted"> <span
+                  data-i18n="districts-producing">Districts Producing</span></span> <span class="fw-bold"
+                id="metricDistricts">-</span> </div>
+            <div class="d-flex justify-content-between small mb-2"> <span class="text-muted"> <span
+                  data-i18n="high-yield">High-Yield Districts</span></span> <span class="fw-bold"
+                id="metricHighYield">-</span> </div>
+            <div class="d-flex justify-content-between small mb-2"> <span class="text-muted"> <span
+                  data-i18n="medium-yield">Medium-Yield Districts</span></span> <span class="fw-bold"
+                id="metricMediumYield">-</span> </div>
+            <div class="d-flex justify-content-between small"> <span class="text-muted"> <span
+                  data-i18n="low-yield">Lower-Yield Districts </span></span> <span class="fw-bold"
+                id="metricLowYield">-</span> </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card h-100 shadow-sm border-0 feature-card">
+          <div class="card-body">
+            <h6 class="fw-bold text-success mb-3"><span data-i18n="seasonal-focus">Seasonal Focus</span></h6>
+            <p class="small text-muted mb-2"><span data-i18n="typical-farming-periods">Typical farming periods in
+                Karnataka:</span></p>
+            <ul class="small text-muted mb-3">
+              <li><b><span data-i18n="kharif-monsoon">Kharif (Monsoon):</span></b> <span data-i18n="kharif-desc">June to
+                  October. Major crops: Rice, Maize, Cotton, Ragi.</span></li>
+              <li><b><span data-i18n="rabi-winter">Rabi (Winter):</span></b> <span data-i18n="rabi-desc">October to
+                  March. Major crops: Wheat, Jowar, Bengal Gram.</span></li>
+              <li><b><span data-i18n="summer-focus">Summer:</span></b> <span data-i18n="summer-desc">March to June.
+                  Irrigated crops.</span></li>
+            </ul>
+            <p class="small mb-0"><b><span data-i18n="note">Note:</span></b> <span data-i18n="rainfall-crucial">Rainfall
+                is crucial during the Kharif season.</span></p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card h-100 shadow-sm border-0 feature-card">
+          <div class="card-body">
+            <h6 class="fw-bold text-success mb-3"> <span data-i18n="top-crop-dist">Top Districts by Yield</span>
+            </h6>
+            <ul class="list-group list-group-flush" id="topCropDistrictsList">
+              <li class="list-group-item bg-transparent text-muted small"><span data-i18n="loading-district">Loading
+                  district ranking...</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container mb-5">
+    <h4 class="fw-bold mb-3"><span data-i18n="major-crops-overview">Major Crops Overview</span></h4>
+    <p class="text-muted mb-4"><span data-i18n="key-crops-cultivated">Key crops cultivated across Karnataka and their
+        details.</span></p>
+    <div class="row g-4" id="majorCropsContainer">
+      <!-- To be filled by JS -->
+    </div>
+  </div>
+  <div class="modal fade" id="cropModal" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold" id="cropModalLabel"><span data-i18n="crop-details">Crop Details</span></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body pt-0">
+          <div id="modalCropIcon" class="d-flex align-items-center justify-content-center mb-4 rounded"
+            style="font-size: 5rem; height: 200px; background: linear-gradient(135deg,#e8f5e9,#66bb6a);"></div>
+          <h3 id="modalCropTitle" class="fw-bold mb-3">Crop Name</h3>
+          <p id="modalCropDesc" class="text-muted">Description goes here.</p>
+          <div class="row g-3 mt-2">
+            <div class="col-md-6">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item bg-transparent"><b> <span data-i18n="top-regions">Top Districts:</span></b>
+                  <span id="modalCropDistricts"></span>
+                </li>
+                <li class="list-group-item bg-transparent"><b> <span data-i18n="water">Water Req:</span></b> <span
+                    id="modalCropWater"></span></li>
+                <li class="list-group-item bg-transparent"><b> <span data-i18n="season">Season:</span></b>
+                  <span id="modalCropSeason"></span>
+                </li>
+                <li class="list-group-item bg-transparent"><b> <span data-i18n="maturity">Est. Maturity:</span></b>
+                  <span id="modalCropMaturity"></span>
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <div class="card bg-light border-0 shadow-sm p-3 h-100">
+                <h6 class="fw-bold mb-2"><span data-i18n="farming-tip">Farming Tip</span></h6>
+                <p id="modalCropTip" class="small mb-0 text-muted"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="bg-success text-white text-center p-3 mt-5"> <span data-i18n="footer-crop-info">Â© 2026 ClimateGuard |
+      Crop Information</span></footer>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/profile_manager.js"></script>
+  <script src="js/i18n.js?v=11" type="module"></script>
+  <script src="js/crop_info.js?v=4"></script>
+  <script src="js/ui-enhancements.js?v=20260318"></script>
+</body>
+
+</html>

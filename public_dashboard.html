@@ -1,0 +1,1384 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClimateGuard | Public Dashboard</title>
+    <link rel="icon" href="assets/logo.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <script src="js/theme.js"></script>
+    <script type="module" src="js/i18n.js?v=8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link rel="stylesheet" href="css/ui-enhancements.css?v=20260318">
+</head>
+
+<body class="bg-light">
+
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="index.html"><img
+                    src="assets/logo.png?v=3" alt="ClimateGuard Logo" width="40" height="40"
+                    class="rounded-circle shadow-sm"><span>ClimateGuard</span></a>
+            <div class="navbar-nav me-auto">
+                <a class="nav-link" href="index.html"></a>
+                <a class="nav-link active" href="public_dashboard.html" data-i18n="public-safety">🚨 Public Safety</a>
+          <a class="nav-link" href="market_dashboard.html" data-i18n="market-prices">💰 Market Prices</a>
+
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button id="langToggleBtn" class="btn btn-sm btn-outline-light rounded-pill px-3 me-2"
+                    style="font-size: 0.8rem; border-color: rgba(255,255,255,0.3);">Language</button>
+                <button id="themeToggleBtn" class="theme-toggle-btn" title="Switch to Dark Mode"><i
+                        class="bi bi-moon-stars"></i></button>
+                <div class="dropdown">
+
+                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle hide-caret"
+                        id="userProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="assets/user_avatar.png" alt="User" class="user-profile-img">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-premium"
+                        aria-labelledby="userProfileDropdown">
+                        <li>
+                            <h6 class="dropdown-header-premium">User Account</h6>
+                        </li>
+                        <li id="loginMenuItem"><a class="dropdown-item dropdown-item-premium" href="login.html"><i
+                                    class="bi bi-key me-2"></i>Login</a></li>
+                        <li id="registerMenuItem"><a class="dropdown-item dropdown-item-premium" href="register.html"><i
+                                    class="bi bi-person-plus me-2"></i>Register</a></li>
+                        <li id="profileMenuItem" style="display:none;"><a class="dropdown-item dropdown-item-premium"
+                                href="profile.html"><i class="bi bi-person-circle me-2"></i>My Profile</a></li>
+                        <li id="settingsMenuItem" style="display:none;"><a class="dropdown-item dropdown-item-premium"
+                                href="settings.html"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                        <li id="authDivider" style="display:none;">
+                            <hr class="dropdown-divider opacity-10">
+                        </li>
+                        <li id="switchRoleItem" style="display:none;"><a class="dropdown-item dropdown-item-premium"
+                                href="farmer_dashboard.html" id="switchRoleLink"><span>🔄</span> Switch Role</a></li>
+                        <li id="authDivider2" style="display:none;">
+                            <hr class="dropdown-divider opacity-10">
+                        </li>
+                        <li id="logoutMenuItem" style="display:none;"><a
+                                class="dropdown-item dropdown-item-premium text-danger" href="#"
+                                onclick="handleLogout()"><span>🚪</span> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <script src="js/navigation.js"></script>
+    <script src="js/profile_manager.js"></script>
+    <script src="js/api.js" type="module"></script>
+
+    <script type="module">
+        import api from './js/api.js';
+
+        // District Persistence on Role Switch
+        (function preserveDistrict() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const district = (urlParams.get('district') || window.__navDistrict || '').trim();
+            const switchLink = document.getElementById('switchRoleLink');
+            if (district && switchLink) {
+                const currentHref = switchLink.getAttribute('href');
+                switchLink.setAttribute('href', `${currentHref}?district=${encodeURIComponent(district)}`);
+            }
+        })();
+    </script>
+
+    <div class="container my-4">
+        <h3 id="publicTitle">🚨 Public Safety</h3>
+        <p id="publicSubtitle" class="text-muted">Climate alerts and safety information</p>
+        <p id="publicCurrentDate" class="text-muted mb-0"></p>
+    </div>
+
+    <!-- Weather Stats Row -->
+    <div class="container">
+        <div class="row g-3">
+            <div class="col-md-3 col-6">
+                <div class="card shadow p-3 text-center">
+                    <h5> <span data-i18n="stat-temp">🌡️Temperature</span></h5>
+                    <h2 id="pubStatTemp">--</h2>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card shadow p-3 text-center">
+                    <h5><span data-i18n="stat-humidity">💧Humidity</span></h5>
+                    <h2 id="pubStatHumidity" class="text-primary">--</h2>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card shadow p-3 text-center">
+                    <h5><span data-i18n="stat-rainfall-mm">🌧️Rainfall (mm)</span></h5>
+                    <h2 id="pubStatRainfallMm" class="text-info">--</h2>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card shadow p-3 text-center">
+                    <h5><span data-i18n="stat-wind">💨Wind Speed</span></h5>
+                    <h2 id="pubStatWind" class="text-secondary">--</h2>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card shadow p-3 text-center">
+                    <h5><span data-i18n="stat-condition">☁️Condition</span></h5>
+                    <h2 id="pubStatWeather" style="font-size:1.1rem;">--</h2>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card shadow p-3 text-center">
+                    <h5 data-i18n="stat-risk">⚠️ Risk Level</h5>
+                    <h2 id="pubStatRisk" class="text-danger">--</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- District Safety Summary -->
+    <div class="container my-4">
+        <div class="card shadow p-4 border-start border-4 border-danger" id="districtSafetyCard" style="display:none;">
+            <div class="row">
+                <div class="col-md-12">
+                    <h5 class="fw-bold text-danger mb-3" data-i18n="dist-safety-profile">📍District Safety Profile
+                    </h5>
+                    <p id="districtSafetyText" class="mb-0 text-muted"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Visualizations -->
+    <div class="container my-4">
+        <h5 class="fw-bold mb-3" data-i18n="data-visualizations">📈Data Visualizations</h5>
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0" style="border-radius:12px;">
+                    <div class="card-body p-2">
+                        <h6 class="fw-bold text-muted mb-2" style="font-size: 0.85rem;">📈 3-Day Temp Trend</h6>
+                        <div style="height: 250px; position: relative; width: 100%;">
+                            <canvas id="pubTemp3DayChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0" style="border-radius:12px;">
+                    <div class="card-body p-2">
+                        <h6 class="fw-bold text-muted mb-2" style="font-size: 0.85rem;">📉 24-Hr Temp Trend</h6>
+                        <div style="height: 250px; position: relative; width: 100%;">
+                            <canvas id="pubTemp24HrChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0" style="border-radius:12px;">
+                    <div class="card-body p-2">
+                        <h6 class="fw-bold text-muted mb-2" style="font-size: 0.85rem;">🌧️ 3-Day Rain Forecast</h6>
+                        <div style="height: 250px; position: relative; width: 100%;">
+                            <canvas id="pubRain3DayChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0" style="border-radius:12px;">
+                    <div class="card-body p-2">
+                        <h6 class="fw-bold text-muted mb-2" style="font-size: 0.85rem;">💧 24-Hr Rain Forecast</h6>
+                        <div style="height: 250px; position: relative; width: 100%;">
+                            <canvas id="pubRain24HrChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advice to Public -->
+    <div class="container my-4">
+        <div class="row g-3">
+            <div class="col-12">
+                <h5 class="fw-bold mb-3" data-i18n="advice-public"> Advice to Public</h5>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100 border-0" style="border-radius:12px;">
+                    <div class="card-body">
+                        <h6 class="fw-bold text-primary mb-3" data-i18n="health-wellness">🏥 Health & Wellness</h6>
+                        <ul id="adviceHealth" class="small ps-3 mb-0 text-muted">
+                            <li data-i18n="loading">Loading health advice...</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100 border-0" style="border-radius:12px;">
+                    <div class="card-body">
+                        <h6 class="fw-bold text-warning mb-3" data-i18n="commute-travel">🚗 Commute & Travel</h6>
+                        <ul id="adviceCommute" class="small ps-3 mb-0 text-muted">
+                            <li data-i18n="loading">Loading commute advice...</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100 border-0" style="border-radius:12px;">
+                    <div class="card-body">
+                        <h6 class="fw-bold text-success mb-3" data-i18n="household-outdoor"> 🏠 Household & Outdoor
+                        </h6>
+                        <ul id="adviceHousehold" class="small ps-3 mb-0 text-muted">
+                            <li data-i18n="loading">Loading household advice...</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Safety Tips & Notifications -->
+    <div class="container my-4">
+        <div class="card shadow p-3">
+            <h5 data-i18n="safety-tips"> 🛡️ Safety Tips</h5>
+            <ul id="safetyTipsList">
+                <li>Avoid travel in flooded areas</li>
+                <li>Stay indoors during heavy rain</li>
+                <li>Follow government advisories</li>
+            </ul>
+
+            <div class="mt-4" id="climateNotificationsCard" style="display:none;">
+                <h6 data-i18n="notifications">🔔 Notifications</h6>
+                <div id="alertContainer" class="list-group">
+                    <div class="list-group-item" data-i18n="no-alerts">No new alerts</div>
+                </div>
+            </div>
+
+            <div class="form-check form-switch mt-3">
+                <input class="form-check-input" type="checkbox" id="smsAlertToggle" checked>
+                <label class="form-check-label" data-i18n="enable-alerts-btn">Enable SMS/App Alerts</label>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/notifications.js"></script>
+    <footer class="bg-success text-white text-center p-3 mt-5">
+        &copy; 2026 ClimateGuard | <span data-i18n="public-safety">Public Safety Dashboard</span>
+    </footer>
+
+    <script type="module">
+        import api from './js/api.js';
+
+        // ─── District Data  
+        const districtData = {
+            "Bagalkote": { soil: "black", crops: ["maize", "sugarcane", "cotton"], rainfall: "Low to Moderate", temp: "32Â°C", humidity: "55%", riskIndex: [25, 30, 28, 22, 35, 20, 18] },
+            "Ballari": { soil: "black", crops: ["maize", "rice", "cotton"], rainfall: "Moderate", temp: "33Â°C", humidity: "50%", riskIndex: [30, 38, 45, 40, 50, 35, 28] },
+            "Belagavi": { soil: "black", crops: ["sugarcane", "maize", "rice"], rainfall: "High", temp: "28Â°C", humidity: "70%", riskIndex: [50, 60, 72, 65, 78, 58, 48] },
+            "Bengaluru Rural": { soil: "silty-loam", crops: ["rice", "maize", "ginger"], rainfall: "Moderate", temp: "27Â°C", humidity: "65%", riskIndex: [30, 35, 42, 38, 45, 32, 28] },
+            "Bengaluru Urban": { soil: "silty-loam", crops: ["rice", "ragi", "ginger"], rainfall: "Moderate", temp: "28Â°C", humidity: "60%", riskIndex: [35, 42, 55, 48, 60, 40, 32] },
+            "Bidar": { soil: "black", crops: ["maize", "pulses", "sugarcane"], rainfall: "Moderate", temp: "31Â°C", humidity: "58%", riskIndex: [32, 40, 38, 45, 35, 28, 22] },
+            "Chamarajanagar": { soil: "red", crops: ["maize", "sugarcane", "pulses"], rainfall: "Moderate", temp: "29Â°C", humidity: "62%", riskIndex: [28, 35, 40, 36, 32, 25, 20] },
+            "Chikballapur": { soil: "red", crops: ["maize", "sugarcane", "ginger"], rainfall: "Low", temp: "30Â°C", humidity: "52%", riskIndex: [15, 20, 18, 25, 12, 10, 8] },
+            "Chikmagalur": { soil: "laterite", crops: ["coffee", "tea", "ginger"], rainfall: "Very High", temp: "24Â°C", humidity: "82%", riskIndex: [65, 75, 85, 90, 80, 70, 55] },
+            "Chitradurga": { soil: "black", crops: ["maize", "cotton", "rice"], rainfall: "Low", temp: "31Â°C", humidity: "48%", riskIndex: [12, 18, 22, 15, 25, 14, 10] },
+            "Dakshina Kannada": { soil: "laterite", crops: ["coconut", "cocoa", "ginger"], rainfall: "Very High", temp: "30Â°C", humidity: "85%", riskIndex: [70, 80, 90, 95, 85, 75, 60] },
+            "Davanagere": { soil: "clay-loam", crops: ["maize", "rice", "sugarcane"], rainfall: "Moderate", temp: "30Â°C", humidity: "60%", riskIndex: [32, 40, 48, 42, 38, 30, 25] },
+            "Dharwad": { soil: "black", crops: ["maize", "cotton", "wheat"], rainfall: "Moderate", temp: "29Â°C", humidity: "58%", riskIndex: [28, 35, 42, 38, 32, 25, 20] },
+            "Gadag": { soil: "black", crops: ["maize", "cotton", "wheat"], rainfall: "Low", temp: "32Â°C", humidity: "45%", riskIndex: [15, 22, 28, 20, 30, 18, 12] },
+            "Hassan": { soil: "loam", crops: ["coffee", "ginger", "maize"], rainfall: "High", temp: "26Â°C", humidity: "75%", riskIndex: [48, 58, 68, 62, 72, 55, 42] },
+            "Haveri": { soil: "black", crops: ["maize", "sugarcane", "cotton"], rainfall: "Moderate", temp: "30Â°C", humidity: "58%", riskIndex: [30, 38, 45, 40, 42, 32, 25] },
+            "Kalaburagi": { soil: "black", crops: ["maize", "pulses", "sugarcane"], rainfall: "Low", temp: "34Â°C", humidity: "42%", riskIndex: [10, 15, 12, 20, 8, 6, 5] },
+            "Kodagu": { soil: "laterite", crops: ["coffee", "ginger", "cocoa"], rainfall: "Very High", temp: "22Â°C", humidity: "88%", riskIndex: [72, 82, 92, 95, 88, 78, 65] },
+            "Kolar": { soil: "red", crops: ["maize", "ragi", "ginger"], rainfall: "Low", temp: "30Â°C", humidity: "50%", riskIndex: [14, 20, 18, 24, 12, 10, 8] },
+            "Koppal": { soil: "black", crops: ["maize", "rice", "cotton"], rainfall: "Low", temp: "33Â°C", humidity: "45%", riskIndex: [12, 18, 22, 15, 25, 14, 10] },
+            "Mandya": { soil: "clay-loam", crops: ["rice", "sugarcane", "maize"], rainfall: "Moderate", temp: "28Â°C", humidity: "65%", riskIndex: [35, 42, 50, 45, 48, 38, 30] },
+            "Mysuru": { soil: "clay-loam", crops: ["rice", "sugarcane", "maize"], rainfall: "Moderate", temp: "27Â°C", humidity: "68%", riskIndex: [38, 45, 55, 50, 58, 42, 35] },
+            "Raichur": { soil: "black", crops: ["rice", "cotton", "maize"], rainfall: "Low", temp: "34Â°C", humidity: "40%", riskIndex: [10, 15, 20, 14, 18, 10, 8] },
+            "Ramanagara": { soil: "red", crops: ["ragi", "maize", "sugarcane"], rainfall: "Moderate", temp: "28Â°C", humidity: "62%", riskIndex: [28, 35, 42, 36, 40, 30, 24] },
+            "Shimoga": { soil: "laterite", crops: ["rice", "ginger", "maize"], rainfall: "High", temp: "26Â°C", humidity: "78%", riskIndex: [52, 62, 72, 68, 75, 58, 45] },
+            "Tumakuru": { soil: "red", crops: ["maize", "ragi", "sugarcane"], rainfall: "Low", temp: "30Â°C", humidity: "50%", riskIndex: [14, 20, 28, 18, 24, 14, 10] },
+            "Udupi": { soil: "laterite", crops: ["coconut", "cocoa", "ginger"], rainfall: "Very High", temp: "30Â°C", humidity: "86%", riskIndex: [68, 78, 88, 92, 82, 72, 58] },
+            "Uttara Kannada": { soil: "laterite", crops: ["rice", "coconut", "ginger"], rainfall: "Very High", temp: "28Â°C", humidity: "80%", riskIndex: [62, 72, 82, 88, 78, 65, 52] },
+            "Vijayanagara": { soil: "black", crops: ["rice", "maize", "cotton"], rainfall: "Moderate", temp: "31Â°C", humidity: "55%", riskIndex: [28, 35, 42, 38, 45, 30, 22] },
+            "Vijayapura": { soil: "black", crops: ["maize", "sugarcane", "pulses"], rainfall: "Low", temp: "33Â°C", humidity: "42%", riskIndex: [10, 16, 12, 20, 8, 6, 4] },
+            "Yadgir": { soil: "black", crops: ["maize", "rice", "cotton"], rainfall: "Low", temp: "34Â°C", humidity: "40%", riskIndex: [12, 18, 22, 15, 20, 12, 8] }
+        };
+        window.districtData = districtData;
+
+        // Risk level mapping
+        function getRiskLevel(rainfall) {
+            if (rainfall === "Very High") return { level: i18n.t("🔴 Flood Risk"), color: "text-danger", weather: i18n.t("Heavy Rain & Storms") };
+            if (rainfall === "High") return { level: i18n.t("🟡 High Risk"), color: "text-warning", weather: i18n.t("Heavy Rain") };
+            if (rainfall === "Moderate") return { level: i18n.t("🟢 Moderate Risk"), color: "text-warning", weather: i18n.t("Moderate Rain") };
+            if (rainfall === "Low") return { level: i18n.t("🟢 Low Risk"), color: "text-success", weather: i18n.t("Light Showers") };
+            return { level: i18n.t("🟡 Moderate Risk"), color: "text-warning", weather: i18n.t("Variable") };
+        }
+
+        // ─── Dynamic Safety Tips Engine ───
+        function generateSafetyTips(temp, humidity, wind, rainfallMm) {
+            const tips = [];
+
+            // 1. Extreme Heat & Heat Index
+            if (temp >= 35) {
+                tips.push(i18n.t("☀️ <strong>High Heat Emergency:</strong> Avoid direct sunlight and stay hydrated."));
+            } else if (temp >= 30 && humidity >= 80) {
+                tips.push(i18n.t("🥵 <strong>High Heat Index:</strong> High humidity and heat. Watch for heat exhaustion."));
+            }
+
+            // 2. Cold / Frost
+            if (temp <= 15) {
+                tips.push(i18n.t("❄️ <strong>Cold Alert:</strong> Wear warm layers and shelter sensitive crops/livestock."));
+            }
+
+            // 3. High Winds
+            if (wind >= 40) {
+                tips.push(i18n.t("💨 <strong>Dangerous Winds:</strong> Stay indoors. Secure loose objects and avoid driving."));
+            } else if (wind >= 25) {
+                tips.push(i18n.t("🌬️ <strong>High Winds:</strong> Drive carefully and secure lightweight outdoor items."));
+            }
+
+            // 4. Rainfall / Flooding
+            if (rainfallMm >= 40) {
+                tips.push(i18n.t("🚨 <strong>SEVERE FLOOD RISK:</strong> Evacuate low-lying areas immediately. Do NOT cross flooded roads."));
+                tips.push(i18n.t("📚 Keep emergency NDRF contacts ready and stay tuned to local news."));
+            } else if (rainfallMm >= 20) {
+                tips.push(i18n.t("⚠️ <strong>Heavy Rain Warning:</strong> Avoid unnecessary travel. Clear local drainage."));
+            } else if (rainfallMm >= 5) {
+                tips.push(i18n.t("🌧️ <strong>Moderate Rain:</strong> Roads may be slick. Drive carefully and carry an umbrella."));
+            }
+
+            // 5. General / Safe condition fallback
+            if (tips.length === 0) {
+                if (temp >= 18 && temp <= 28) {
+                    tips.push(i18n.t("☀️ <strong>Pleasant Weather:</strong> Conditions are currently calm and safe for outdoor activities."));
+                } else {
+                    tips.push(i18n.t("🌤️ <strong>Stable Conditions:</strong> No extreme weather alerts at this time."));
+                }
+                tips.push(i18n.t("💧 Continue regular water conservation and crop scheduling."));
+            }
+
+            return tips;
+        }
+
+        // ─── Dynamic Public Advice Engine ───
+        function generatePublicAdvice(temp, humidity, wind, rainfallMm) {
+            const advice = { health: [], commute: [], household: [] };
+
+            // -- Health & Wellness --
+            if (temp >= 35) {
+                advice.health.push(i18n.t("High heat: Avoid outdoor activities between 11 AM - 3 PM."));
+                advice.health.push(i18n.t("Drink at least 3-4 liters of water/electrolytes today."));
+                if (humidity >= 70) advice.health.push(i18n.t("Severe Heat Index: High risk of heatstroke due to humidity."));
+            } else if (temp <= 15) {
+                advice.health.push(i18n.t("Cold temperatures: Dress in warm, thick layers."));
+                advice.health.push(i18n.t("Check on elderly neighbors who may be susceptible to the cold."));
+            } else {
+                advice.health.push(i18n.t("Temperatures are moderate and generally safe for outdoor exercise."));
+                advice.health.push(i18n.t("Maintain normal daily hydration."));
+            }
+
+            // -- Commute & Travel --
+            if (rainfallMm >= 20) {
+                advice.commute.push(i18n.t("High risk of urban flooding. Do NOT drive through flooded underpasses."));
+                advice.commute.push(i18n.t("Expect severe traffic delays; use public transit tracks if available."));
+            } else if (rainfallMm >= 5) {
+                advice.commute.push(i18n.t("Roads are slick. Reduce driving speed by 20% and increase following distance."));
+                advice.commute.push(i18n.t("Two-wheelers should avoid sudden braking on wet roads."));
+            } else if (wind >= 40) {
+                advice.commute.push(i18n.t("Dangerous crosswinds. High-profile vehicles must drive with extreme caution."));
+            } else {
+                advice.commute.push(i18n.t("Clear roads expected. Standard normal commute conditions."));
+            }
+
+            // -- Household & Outdoor --
+            if (wind >= 30) {
+                advice.household.push(i18n.t("Strong winds detected: Bring patio furniture, trash cans, and light objects indoors."));
+                advice.household.push(i18n.t("Keep doors and windows securely latched."));
+            } else if (rainfallMm >= 10) {
+                advice.household.push(i18n.t("Ensure gutters and street drains near your house are clear of debris."));
+                advice.household.push(i18n.t("Turn off electrical appliances if water approaches your property level."));
+            } else if (temp >= 32) {
+                advice.household.push(i18n.t("Keep blinds closed during peak sun to reduce indoor heating."));
+                advice.household.push(i18n.t("Delay heavy-appliance usage (ovens, dryers) to the evening."));
+            } else {
+                advice.household.push(i18n.t("Good weather to open windows and naturally ventilate the house."));
+                advice.household.push(i18n.t("Safe to schedule outdoor maintenance or gardening."));
+            }
+
+            return advice;
+        }
+
+        // ─── Date/Time ───
+        const publicCurrentDate = document.getElementById('publicCurrentDate');
+        function renderPublicDateTime() {
+            if (!publicCurrentDate) return;
+            const now = new Date();
+            const locale = i18n.currentLang === 'kn' ? 'kn-IN' : 'en-IN';
+            const datePart = now.toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const timePart = now.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            publicCurrentDate.textContent = `${datePart} | ${timePart}`;
+        }
+        renderPublicDateTime();
+        setInterval(renderPublicDateTime, 1000);
+
+        // ─── Real Weather API (WeatherAPI.com via Backend Proxy) ───
+        const districtCoords = {
+            "Bagalkote": { lat: 16.18, lng: 75.69 }, "Ballari": { lat: 15.14, lng: 76.92 },
+            "Belagavi": { lat: 15.85, lng: 74.50 }, "Bengaluru Rural": { lat: 13.22, lng: 77.71 },
+            "Bengaluru Urban": { lat: 12.97, lng: 77.59 }, "Bidar": { lat: 17.91, lng: 77.52 },
+            "Chamarajanagar": { lat: 11.92, lng: 76.94 }, "Chikballapur": { lat: 13.44, lng: 77.73 },
+            "Chikmagalur": { lat: 13.32, lng: 75.77 }, "Chitradurga": { lat: 14.23, lng: 76.40 },
+            "Dakshina Kannada": { lat: 12.87, lng: 74.88 }, "Davanagere": { lat: 14.47, lng: 75.92 },
+            "Dharwad": { lat: 15.46, lng: 75.01 }, "Gadag": { lat: 15.43, lng: 75.63 },
+            "Hassan": { lat: 13.01, lng: 76.10 }, "Haveri": { lat: 14.79, lng: 75.40 },
+            "Kalaburagi": { lat: 17.33, lng: 76.83 }, "Kodagu": { lat: 12.42, lng: 75.74 },
+            "Kolar": { lat: 13.14, lng: 78.13 }, "Koppal": { lat: 15.35, lng: 76.15 },
+            "Mandya": { lat: 12.52, lng: 76.90 }, "Mysuru": { lat: 12.30, lng: 76.66 },
+            "Raichur": { lat: 16.21, lng: 77.36 }, "Ramanagara": { lat: 12.72, lng: 77.28 },
+            "Shimoga": { lat: 13.93, lng: 75.57 }, "Tumakuru": { lat: 13.34, lng: 77.10 },
+            "Udupi": { lat: 13.34, lng: 74.75 }, "Uttara Kannada": { lat: 14.78, lng: 74.69 },
+            "Vijayanagara": { lat: 15.34, lng: 76.47 }, "Vijayapura": { lat: 16.83, lng: 75.71 },
+            "Yadgir": { lat: 16.77, lng: 77.14 }
+        };
+
+        // Generate real date labels for charts
+        function getRealDateLabels(days = 3) {
+            const labels = [];
+            const now = new Date();
+            for (let i = 0; i < days; i++) {
+                const d = new Date(now);
+                d.setDate(now.getDate() + i);
+                labels.push(d.toLocaleDateString(i18n.currentLang === 'kn' ? 'kn-IN' : 'en-IN', { month: 'short', day: 'numeric' }));
+            }
+            return labels;
+        }
+
+        // Build a 30-day rainfall series from available forecast seed data.
+        function buildMonthlyRainfallSeries(seedRainfall = [], seedDates = [], days = 30) {
+            const rainfallSeed = Array.isArray(seedRainfall)
+                ? seedRainfall.map(v => Number(v)).filter(v => Number.isFinite(v))
+                : [];
+            const basePattern = rainfallSeed.length > 0 ? rainfallSeed : [2, 5, 8, 4, 10, 6, 3];
+
+            const startDate = (Array.isArray(seedDates) && seedDates.length > 0)
+                ? new Date(seedDates[0])
+                : new Date();
+            if (Number.isNaN(startDate.getTime())) {
+                startDate.setTime(Date.now());
+            }
+
+            const labels = [];
+            const data = [];
+            for (let i = 0; i < days; i++) {
+                const d = new Date(startDate);
+                d.setDate(startDate.getDate() + i);
+                labels.push(d.toLocaleDateString(i18n.currentLang === 'kn' ? 'kn-IN' : 'en-IN', { month: 'short', day: 'numeric' }));
+                data.push(basePattern[i % basePattern.length]);
+            }
+
+            return { labels, data };
+        }
+
+        function estimateMonthlyRainfallMm(humidity) {
+            if (!Number.isFinite(humidity)) return 0;
+            return Number((humidity * 0.5).toFixed(1));
+        }
+
+        function buildPublicAnnualRainfallEstimate(liveTemp, liveHumidity) {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentClimate = karnatakaMonthlyClimate[currentMonth];
+            const tempBase = Number.isFinite(liveTemp) ? liveTemp : currentClimate.temp;
+            const humBase = Number.isFinite(liveHumidity) ? liveHumidity : currentClimate.humidity;
+            const tempOffset = tempBase - currentClimate.temp;
+            const humOffset = humBase - currentClimate.humidity;
+
+            const out = [];
+            for (let i = 0; i < 12; i++) {
+                const monthIdx = (currentMonth + i) % 12;
+                const climate = karnatakaMonthlyClimate[monthIdx];
+                const fadeFactor = Math.max(0, 1 - (i * 0.08));
+                const adjHum = Number(Math.max(20, Math.min(100, climate.humidity + humOffset * fadeFactor)).toFixed(1));
+                out.push(estimateMonthlyRainfallMm(adjHum));
+            }
+            return out;
+        }
+
+
+        let publicLineChart = null;
+        let publicBarChart = null;
+        let publicBar7Chart = null;
+        let publicYearBarChart = null;
+
+        let pubTemp3DayChart = null;
+        let pubTemp24HrChart = null;
+        let pubRain3DayChart = null;
+        let pubRain24HrChart = null;
+
+        // Live weather state for public page
+        let pubLiveBase = { temp: 0, humidity: 0, wind: 0, rainfallMm: 0, condition: '--' };
+        let pubLiveActive = false;
+
+        async function fetchRealWeather(districtName) {
+            const coords = districtCoords[districtName];
+            if (!coords) return null;
+            try {
+                const data = await api.getWeather(districtName);
+
+                pubLiveBase = {
+                    temp: data.current.temp_c,
+                    humidity: data.current.humidity,
+                    wind: data.current.wind_kph,
+                    rainfallMm: data.current.precip_mm || 0,
+                    condition: data.current.condition.text || 'Unknown'
+                };
+                pubLiveActive = true;
+
+                const now = new Date();
+                const currentEpoch = now.getTime() / 1000;
+                let allHours = [];
+                data.forecast.forecastday.forEach(day => {
+                    allHours = allHours.concat(day.hour);
+                });
+                let upcomingHours = allHours.filter(h => h.time_epoch >= currentEpoch).slice(0, 24);
+                if (upcomingHours.length < 24) upcomingHours = allHours.slice(0, 24);
+
+                return {
+                    temp: Math.round(data.current.temp_c) + '°C',
+                    humidity: data.current.humidity + '%',
+                    wind: data.current.wind_kph.toFixed(1) + ' km/h',
+                    rainfallMm: (data.current.precip_mm || 0).toFixed(1) + ' mm',
+                    condition: data.current.condition.text || 'Unknown',
+                    dailyRainfall: data.forecast.forecastday.map(d => d.day.totalprecip_mm),
+                    dailyTempAvg: data.forecast.forecastday.map(d => d.day.avgtemp_c),
+                    dailyHumidityAvg: data.forecast.forecastday.map(d => d.day.avghumidity),
+                    dailyTempMax: data.forecast.forecastday.map(d => d.day.maxtemp_c),
+                    dailyTempMin: data.forecast.forecastday.map(d => d.day.mintemp_c),
+                    dailyDates: data.forecast.forecastday.map(d => d.date),
+                    hourlyTemps: upcomingHours.map(h => h.temp_c),
+                    hourlyRain: upcomingHours.map(h => h.precip_mm),
+                    hourlyTimes: upcomingHours.map(h => h.time),
+                    isLive: true
+                };
+            } catch (err) {
+                console.warn('Weather API fallback:', err.message);
+                return null;
+            }
+        }
+
+        // ─── Live Weather Ticker (updates every second) ───
+        const liveBadge = `<span class="badge bg-success" style="font-size:0.55rem;vertical-align:middle;animation:pulse 1.5s infinite;">● ${i18n.t('live')}</span>`;
+
+        function updatePubLiveDisplay() {
+            if (!pubLiveActive) return;
+            const t = pubLiveBase.temp + (Math.random() - 0.5) * 0.3;
+            const h = Math.max(0, Math.min(100, pubLiveBase.humidity + (Math.random() - 0.5) * 1.0));
+            const w = Math.max(0, pubLiveBase.wind + (Math.random() - 0.5) * 0.5);
+            const r = Math.max(0, pubLiveBase.rainfallMm + (Math.random() - 0.5) * 0.2);
+
+            document.getElementById('pubStatTemp').innerHTML = t.toFixed(1) + '°C ' + liveBadge;
+            document.getElementById('pubStatHumidity').innerHTML = h.toFixed(1) + '% ' + liveBadge;
+            document.getElementById('pubStatRainfallMm').innerHTML = r.toFixed(1) + ' mm ' + liveBadge;
+            document.getElementById('pubStatWind').innerHTML = w.toFixed(1) + ' km/h ' + liveBadge;
+            document.getElementById('pubStatWeather').innerHTML = pubLiveBase.condition + ' ' + liveBadge;
+        }
+
+        setInterval(updatePubLiveDisplay, 1000);
+
+        // ─── Annual Rainfall Helpers (same approach as farmer page) ───
+        const karnatakaMonthlyClimate = [
+            { month: 1, temp: 24, humidity: 55 },  // Jan
+            { month: 2, temp: 26, humidity: 48 },  // Feb
+            { month: 3, temp: 29, humidity: 42 },  // Mar
+            { month: 4, temp: 32, humidity: 45 },  // Apr
+            { month: 5, temp: 33, humidity: 55 },  // May
+            { month: 6, temp: 28, humidity: 78 },  // Jun
+            { month: 7, temp: 26, humidity: 85 },  // Jul
+            { month: 8, temp: 26, humidity: 83 },  // Aug
+            { month: 9, temp: 27, humidity: 76 },  // Sep
+            { month: 10, temp: 27, humidity: 72 },  // Oct
+            { month: 11, temp: 25, humidity: 65 },  // Nov
+            { month: 12, temp: 23, humidity: 58 }   // Dec
+        ];
+
+        function getPublicMonthLabels() {
+            const labels = [];
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            for (let i = 0; i < 12; i++) {
+                const monthIdx = (currentMonth + i) % 12;
+                const year = currentYear + Math.floor((currentMonth + i) / 12);
+                const d = new Date(year, monthIdx, 1);
+                const monthStr = d.toLocaleDateString(i18n.currentLang === 'kn' ? 'kn-IN' : 'en-IN', { month: 'short' });
+                const yearSuffix = (i >= (12 - currentMonth)) ? " '" + String(year).slice(2) : '';
+                labels.push(monthStr + yearSuffix);
+            }
+            return labels;
+        }
+
+        
+
+        // ─── District Transfer Logic ───
+        const urlParams = new URLSearchParams(window.location.search);
+        const district = (urlParams.get('district') || window.__navDistrict || '').trim();
+
+        let chartRainfallData = buildMonthlyRainfallSeries().data; // defaults (30 days, mm)
+        let chartLabels = getRealDateLabels(30);
+        let chartRainfallData7 = [2, 5, 8];
+        let chartLabels7 = getRealDateLabels(3);
+
+        // Show selected district in header even if districtData entry is unavailable.
+        if (district) {
+            document.getElementById('publicTitle').textContent = `${i18n.t('public-safety')} - ${i18n.t(district)}`;
+            document.getElementById('publicSubtitle').textContent = `${i18n.t('public-subtitle')} - ${i18n.t(district)}`;
+        } else {
+            document.getElementById('publicTitle').textContent = i18n.t('public-safety');
+            document.getElementById('publicSubtitle').textContent = i18n.t('public-subtitle');
+        }
+
+        if (district && districtData[district]) {
+            const d = districtData[district];
+            const risk = getRiskLevel(d.rainfall);
+
+            // Weather Stats (static defaults first)
+            document.getElementById('pubStatTemp').textContent = d.temp;
+            document.getElementById('pubStatWeather').textContent = risk.weather;
+            document.getElementById('pubStatHumidity').textContent = d.humidity;
+
+            const riskEl = document.getElementById('pubStatRisk');
+            riskEl.textContent = risk.level;
+            riskEl.className = risk.color;
+
+            // Fetch real weather, start live ticker, update charts
+            function refreshPublicWeather() {
+                fetchRealWeather(district).then(async weather => {
+                    if (weather && weather.isLive) {
+                        updatePubLiveDisplay();
+
+                        const currentTemp = parseFloat(weather.temp);
+                        const currentHum = parseFloat(weather.humidity);
+                        const currentWind = parseFloat(weather.wind);
+                        let todayRainMm = 0;
+                        if (weather.dailyRainfall && weather.dailyRainfall.length > 0) {
+                            todayRainMm = weather.dailyRainfall[0];
+                        }
+
+                        // Update charts directly from district weather + rainfall ML API
+                        if (weather.dailyDates && weather.dailyDates.length > 0) {
+                            const realLabels = weather.dailyDates.map(dateStr => {
+                                const dt = new Date(dateStr);
+                                return dt.toLocaleDateString(i18n.currentLang === 'kn' ? 'kn-IN' : 'en-IN', { month: 'short', day: 'numeric' });
+                            });
+                            const rainfallActual = (weather.dailyRainfall || [])
+                                .map(v => Number(v))
+                                .filter(v => Number.isFinite(v));
+                            const finalRain = rainfallActual.length ? rainfallActual : (weather.dailyRainfall || []);
+
+                            if (publicLineChart && weather.dailyTempMax) {
+                                publicLineChart.data.labels = realLabels;
+                                publicLineChart.data.datasets[0].data = weather.dailyTempMax;
+                                publicLineChart.data.datasets[0].label = i18n.t('temp-trend');
+                                publicLineChart.update();
+                            }
+
+                            if (publicBarChart && finalRain.length) {
+                                const monthlySeries = buildMonthlyRainfallSeries(finalRain, weather.dailyDates, 30);
+                                publicBarChart.data.labels = monthlySeries.labels;
+                                publicBarChart.data.datasets[0].data = monthlySeries.data;
+                                publicBarChart.data.datasets[0].backgroundColor = getRainBarColors(monthlySeries.data);
+                                publicBarChart.data.datasets[0].label = i18n.t('Daily Rainfall (mm)');
+                                publicBarChart.update();
+                            }
+
+                            if (publicBar7Chart && finalRain.length) {
+                                const rainfall7 = finalRain.slice(0, 3);
+                                const labels7 = realLabels.slice(0, rainfall7.length);
+
+                                publicBar7Chart.data.labels = labels7;
+                                publicBar7Chart.data.datasets[0].data = rainfall7;
+                                publicBar7Chart.data.datasets[0].backgroundColor = getRainBarColors(rainfall7);
+                                publicBar7Chart.update();
+                            }
+
+                            // Update the new 4 public charts
+                            if (pubTemp3DayChart && weather.dailyTempMax) {
+                                const labels3 = realLabels.slice(0, 3);
+                                pubTemp3DayChart.data.labels = labels3;
+                                pubTemp3DayChart.data.datasets[0].data = weather.dailyTempMax.slice(0, 3);
+                                pubTemp3DayChart.update();
+                            }
+
+                            if (pubTemp24HrChart && weather.hourlyTemps && weather.hourlyTimes) {
+                                pubTemp24HrChart.data.labels = weather.hourlyTimes.map(t => {
+                                    const d = new Date(t);
+                                    return d.toLocaleTimeString(i18n.currentLang === 'kn' ? 'kn-IN' : 'en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+                                });
+                                pubTemp24HrChart.data.datasets[0].data = weather.hourlyTemps;
+                                pubTemp24HrChart.update();
+                            }
+
+                            if (pubRain3DayChart && finalRain.length) {
+                                const rain3 = weather.dailyRainfall.slice(0, 3); // Using actual forecast rain instead of ML prediction
+                                pubRain3DayChart.data.labels = realLabels.slice(0, 3);
+                                pubRain3DayChart.data.datasets[0].data = rain3;
+                                pubRain3DayChart.data.datasets[0].backgroundColor = getRainBarColors(rain3);
+                                pubRain3DayChart.update();
+                            }
+
+                            if (pubRain24HrChart && weather.hourlyRain && weather.hourlyTimes) {
+                                pubRain24HrChart.data.labels = weather.hourlyTimes.map(t => {
+                                    const d = new Date(t);
+                                    return d.toLocaleTimeString(i18n.currentLang === 'kn' ? 'kn-IN' : 'en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+                                });
+                                pubRain24HrChart.data.datasets[0].data = weather.hourlyRain;
+                                pubRain24HrChart.data.datasets[0].backgroundColor = getRainBarColors(weather.hourlyRain);
+                                pubRain24HrChart.update();
+                            }
+
+                            // Annual Rainfall — estimate based on seasonal averages
+                            if (publicYearBarChart) {
+                                publicYearBarChart.data.datasets[0].label = '⏳ Estimating annual rainfall...';
+                                publicYearBarChart.update();
+                                const annualEstimate = buildPublicAnnualRainfallEstimate(currentTemp, currentHum);
+                                publicYearBarChart.data.labels = getPublicMonthLabels();
+                                publicYearBarChart.data.datasets[0].data = annualEstimate;
+                                publicYearBarChart.data.datasets[0].backgroundColor = getRainBarColors(annualEstimate);
+                                publicYearBarChart.data.datasets[0].label = 'Estimated Monthly Rainfall (mm)';
+                                publicYearBarChart.update();
+                            }
+                        }
+
+                        // Predict Risk Level using ML API based on live temp, humidity, rainfall, wind
+                        fetch('http://localhost:5000/api/risk-predict', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ temperature: currentTemp, humidity: currentHum, rainfall: todayRainMm, wind_speed: currentWind })
+                        })
+                            .then(res => res.json())
+                            .then(data => {
+                                let liveRiskLevel = "⚠️Moderate Risk";
+                                let liveRiskColor = "text-warning";
+
+                                if (data.prediction) {
+                                    // Map string backend output to UI classes
+                                    if (data.prediction.includes("Extreme Risk") || data.prediction.includes("Flood")) {
+                                        liveRiskLevel = "⚠️ " + data.prediction;
+                                        liveRiskColor = "text-danger";
+                                    } else if (data.prediction.includes("High Risk")) {
+                                        liveRiskLevel = "⚠️ " + data.prediction;
+                                        liveRiskColor = "text-warning";
+                                    } else if (data.prediction.includes("Low Risk")) {
+                                        liveRiskLevel = "✅ " + data.prediction;
+                                        liveRiskColor = "text-success";
+                                    } else {
+                                        liveRiskLevel = "⚠️ " + data.prediction;
+                                    }
+                                }
+
+                                const riskEl = document.getElementById('pubStatRisk');
+                                if (riskEl) {
+                                    riskEl.innerHTML = liveRiskLevel + ' <span class="badge bg-success" style="font-size:0.55rem;vertical-align:middle;animation:pulse 1.5s infinite;"> LIVE</span>';
+                                    riskEl.className = liveRiskColor;
+                                }
+
+                                // Update specific advice to public dynamically
+                                const publicAdvice = generatePublicAdvice(currentTemp, currentHum, currentWind, todayRainMm);
+                                const aHealth = document.getElementById('adviceHealth');
+                                const aCommute = document.getElementById('adviceCommute');
+                                const aHouse = document.getElementById('adviceHousehold');
+                                if (aHealth) aHealth.innerHTML = publicAdvice.health.map(t => `<li class="mb-1">${t}</li>`).join('');
+                                if (aCommute) aCommute.innerHTML = publicAdvice.commute.map(t => `<li class="mb-1">${t}</li>`).join('');
+                                if (aHouse) aHouse.innerHTML = publicAdvice.household.map(t => `<li class="mb-1">${t}</li>`).join('');
+
+                                // Update safety tips dynamically
+                                const tipsList = document.getElementById('safetyTipsList');
+                                const generatedTips = generateSafetyTips(currentTemp, currentHum, currentWind, todayRainMm);
+                                if (tipsList) {
+                                    tipsList.innerHTML = generatedTips.map(t => `<li class="mb-2">${t}</li>`).join('');
+                                }
+
+                                // Update safety summary with live data predictions
+                                const safetyText = document.getElementById('districtSafetyText');
+                                if (safetyText) {
+                                    // Approximate a max risk for the text based on heuristic if we don't have the full array of ML scores yet
+                                    const maxRisk = Math.max(...d.riskIndex, data.prediction && data.prediction.includes('Extreme') ? 95 : 50);
+                                    safetyText.innerHTML = `<strong>${i18n.t(district)}</strong> ${i18n.t('district')} ${i18n.t('currently-faces')} <strong>${i18n.t(liveRiskLevel.replace('🔴 ', '').replace('🟠  ', '').replace('🟠¡ ', '').replace('🟠¢ ', ''))}</strong> ${i18n.t('conditions-ml')}. ` +
+                                        `${i18n.t('live-temp')}: <strong>${weather.temp}</strong> ${i18n.t('with')} <strong>${weather.humidity}</strong> ${i18n.t('humidity')}. ` +
+                                        `${i18n.t('wind')}: <strong>${weather.wind}</strong>. ${i18n.t('current-conditions')}: <strong>${i18n.t(weather.condition)}</strong>.`;
+                                }
+                            })
+                            .catch(err => {
+                                console.error("Risk predict API failed:", err);
+                                // Fallback heuristic logic if ML fails
+                                let riskScore = todayRainMm * 2;
+                                if (currentWind > 40) riskScore += 30;
+                                else if (currentWind > 20) riskScore += 15;
+                                if (currentTemp > 40) riskScore += 30; // heatwave
+                                else if (currentTemp > 35) riskScore += 15;
+                                if (currentHum > 90) riskScore += 10;
+
+                                let liveRiskLevel, liveRiskColor;
+                                if (riskScore > 80) { liveRiskLevel = "⚠️ Flood/Extreme Risk"; liveRiskColor = "text-danger"; }
+                                else if (riskScore > 50) { liveRiskLevel = "⚠️ High Risk"; liveRiskColor = "text-warning"; }
+                                else if (riskScore > 20) { liveRiskLevel = "⚠️ Moderate Risk"; liveRiskColor = "text-warning"; }
+                                else { liveRiskLevel = "✅ Low Risk"; liveRiskColor = "text-success"; }
+
+                                const riskEl = document.getElementById('pubStatRisk');
+                                if (riskEl) {
+                                    riskEl.innerHTML = liveRiskLevel + ' <span class="badge bg-secondary" style="font-size:0.55rem;vertical-align:middle;">● FALLBACK</span>';
+                                    riskEl.className = liveRiskColor;
+                                }
+                            });
+                    }
+                });
+            }
+            refreshPublicWeather();
+            setInterval(refreshPublicWeather, 30000);
+
+            // Safety Summary Card
+            const safetyCard = document.getElementById('districtSafetyCard');
+            const safetyText = document.getElementById('districtSafetyText');
+            if (safetyCard && safetyText) {
+                safetyCard.style.display = 'block';
+                const maxRisk = Math.max(...d.riskIndex);
+                safetyText.innerHTML = `<strong>${i18n.t(district)}</strong> ${i18n.t('district')} ${i18n.t('currently-faces')} <strong>${i18n.t(risk.level.replace('🔴 ', '').replace('🟠  ', '').replace('🟠¡ ', '').replace('🟠¢ ', ''))}</strong> ${i18n.t('conditions-with')} <strong>${i18n.t(d.rainfall)}</strong> ${i18n.t('rainfall-expected')}. ` +
+                    `${i18n.t('peak-risk-index')}: <strong>${maxRisk}/100</strong>. ` +
+                    `${i18n.t('temp-approx')}: <strong>${d.temp}</strong> ${i18n.t('with')} <strong>${d.humidity}</strong> ${i18n.t('humidity')}. ` +
+                    `${i18n.t('stat-soil')}: <strong>${i18n.t(d.soil)}</strong>.`;
+            }
+
+            // Safety Tips (Static District Default)
+            const tipsList = document.getElementById('safetyTipsList');
+            // Mock static parameters for initial load: parsing numbers from d.temp (e.g. "32°C") and d.humidity (e.g. "55%")
+            const baseTemp = parseFloat(d.temp);
+            const baseHum = parseFloat(d.humidity);
+            // Default wind to 10 for static district data, array fallback for rain
+            const initialTips = generateSafetyTips(baseTemp, baseHum, 10, d.rainfall === "Low" ? 2 : d.rainfall === "Moderate" ? 10 : 30);
+
+            if (tipsList) {
+                tipsList.innerHTML = initialTips.map(t => `<li class="mb-2">${t}</li>`).join('');
+            }
+
+            // Advice to Public (Static District initial fallback)
+            const publicAdviceFallback = generatePublicAdvice(baseTemp, baseHum, 10, d.rainfall === "Low" ? 2 : d.rainfall === "Moderate" ? 8 : 30);
+            const aHealth = document.getElementById('adviceHealth');
+            const aCommute = document.getElementById('adviceCommute');
+            const aHouse = document.getElementById('adviceHousehold');
+            if (aHealth) aHealth.innerHTML = publicAdviceFallback.health.map(t => `<li class="mb-1">${t}</li>`).join('');
+            if (aCommute) aCommute.innerHTML = publicAdviceFallback.commute.map(t => `<li class="mb-1">${t}</li>`).join('');
+            if (aHouse) aHouse.innerHTML = publicAdviceFallback.household.map(t => `<li class="mb-1">${t}</li>`).join('');
+
+            // Chart data
+            // Keep default rainfall bars until live weather forecast updates them.
+
+        } else if (!district) {
+            document.getElementById('pubStatTemp').textContent = '28°C';
+            document.getElementById('pubStatWeather').textContent = 'Heavy Rain';
+            document.getElementById('pubStatHumidity').textContent = '70%';
+            document.getElementById('pubStatRisk').textContent = 'Flood Risk';
+        }
+
+        // ─── Charts (with real date labels) ───
+        // Color bars based on daily rainfall levels (mm)
+        function getRainBarColors(data) {
+            return data.map(v => {
+                if (v > 30) return '#0d6efd';
+                if (v > 10) return '#20c997';
+                if (v > 2) return '#66d9a8';
+                if (v > 0) return '#b7f3d1';
+                return '#e9ecef';
+            });
+        }
+
+        const publicLineCtx = document.getElementById('publicRiskLineChart');
+        if (publicLineCtx) {
+            publicLineChart = new Chart(publicLineCtx, {
+                type: 'line',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: i18n.t('temp-trend'),
+                        data: [30, 31, 29],
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.15)',
+                        fill: true,
+                        tension: 0.35,
+                        pointBackgroundColor: '#e74c3c',
+                        pointRadius: 4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: false } } }
+            });
+        }
+
+        const publicBarCtx = document.getElementById('publicRiskBarChart');
+        if (publicBarCtx) {
+            publicBarChart = new Chart(publicBarCtx, {
+                type: 'bar',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: i18n.t('monthly-dist'),
+                        data: chartRainfallData,
+                        backgroundColor: getRainBarColors(chartRainfallData),
+                        borderColor: '#198754',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            ticks: { autoSkip: true, maxTicksLimit: 10, maxRotation: 45 }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: value => `${value} mm` }
+                        }
+                    }
+                }
+            });
+        }
+
+        const publicBar7Ctx = document.getElementById('publicRain7BarChart');
+        if (publicBar7Ctx) {
+            publicBar7Chart = new Chart(publicBar7Ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartLabels7,
+                    datasets: [{
+                        label: '3-Day Rainfall',
+                        data: chartRainfallData7,
+                        backgroundColor: getRainBarColors(chartRainfallData7),
+                        borderColor: '#198754',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: value => `${value} mm` }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize 4 New Data Visualization Charts
+        const commonLineOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: false, ticks: { callback: value => value + 'Â°C' } } }
+        };
+        const commonBarOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true, ticks: { callback: value => value + ' mm' } } }
+        };
+
+        const ctxTemp3Day = document.getElementById('pubTemp3DayChart');
+        if (ctxTemp3Day) {
+            pubTemp3DayChart = new Chart(ctxTemp3Day, {
+                type: 'line',
+                data: {
+                    labels: chartLabels7,
+                    datasets: [{
+                        label: 'Avg Max Temp (°C)',
+                        data: [30, 31, 29],
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.15)',
+                        fill: true,
+                        tension: 0.35,
+                        pointBackgroundColor: '#e74c3c',
+                    }]
+                },
+                options: commonLineOptions
+            });
+        }
+
+        const ctxTemp24Hr = document.getElementById('pubTemp24HrChart');
+        if (ctxTemp24Hr) {
+            pubTemp24HrChart = new Chart(ctxTemp24Hr, {
+                type: 'line',
+                data: {
+                    labels: Array(24).fill('00:00'),
+                    datasets: [{
+                        label: 'Hourly Temp (Â°C)',
+                        data: Array(24).fill(25),
+                        borderColor: '#f39c12',
+                        backgroundColor: 'rgba(243, 156, 18, 0.15)',
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 2,
+                    }]
+                },
+                options: commonLineOptions
+            });
+        }
+
+        const ctxRain3Day = document.getElementById('pubRain3DayChart');
+        if (ctxRain3Day) {
+            pubRain3DayChart = new Chart(ctxRain3Day, {
+                type: 'bar',
+                data: {
+                    labels: chartLabels7,
+                    datasets: [{
+                        label: 'Daily Rainfall (mm)',
+                        data: chartRainfallData7,
+                        backgroundColor: getRainBarColors(chartRainfallData7),
+                    }]
+                },
+                options: commonBarOptions
+            });
+        }
+
+        const ctxRain24Hr = document.getElementById('pubRain24HrChart');
+        if (ctxRain24Hr) {
+            pubRain24HrChart = new Chart(ctxRain24Hr, {
+                type: 'bar',
+                data: {
+                    labels: Array(24).fill('00:00'),
+                    datasets: [{
+                        label: 'Hourly Rainfall (mm)',
+                        data: Array(24).fill(0),
+                        backgroundColor: '#3498db',
+                    }]
+                },
+                options: commonBarOptions
+            });
+        }
+
+        // ─── Annual Rainfall Chart Init ───
+        const pubYearCtx = document.getElementById('publicYearRainChart');
+        if (pubYearCtx) {
+            const defaultYearLabels = getPublicMonthLabels();
+            const defaultYearData = defaultYearLabels.map(() => 0);
+            publicYearBarChart = new Chart(pubYearCtx, {
+                type: 'bar',
+                data: {
+                    labels: defaultYearLabels,
+                    datasets: [{
+                        label: 'Monthly Rainfall (mm)',
+                        data: defaultYearData,
+                        backgroundColor: getRainBarColors(defaultYearData),
+                        borderColor: '#198754',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: value => `${value} mm` }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ─── 24-Hour Hourly Temperature Chart ───
+        (async function loadPublicHourlyTemp() {
+            const coords = (district && districtCoords[district]) ? districtCoords[district] : { lat: 12.97, lng: 77.59 };
+            const distLabel = district || 'Bengaluru';
+            const subtitle = document.getElementById('pubHourlySubtitle');
+            if (subtitle) subtitle.textContent = `${i18n.t('stat-temp')} (24h) - ${i18n.t(distLabel)}`;
+
+            let temps = [];
+            let labels = [];
+
+            try {
+                const data = await api.getWeather(distLabel);
+
+                const now = new Date();
+                const currentEpoch = now.getTime() / 1000;
+
+                let allHours = [];
+                if (data.forecast && data.forecast.forecastday) {
+                    data.forecast.forecastday.forEach(day => {
+                        allHours = allHours.concat(day.hour);
+                    });
+                }
+
+                let upcomingHours = allHours.filter(h => h.time_epoch >= currentEpoch).slice(0, 24);
+                if (upcomingHours.length < 24 && allHours.length > 0) {
+                    upcomingHours = allHours.slice(0, 24);
+                }
+
+                temps = upcomingHours.map(h => h.temp_c);
+                labels = upcomingHours.map(h => {
+                    const d = new Date(h.time);
+                    return d.toLocaleTimeString(i18n.currentLang === 'kn' ? 'kn-IN' : 'en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+                });
+            } catch (err) {
+                console.warn('Hourly temp fetch failed, using fallback:', err.message);
+                // Fallback: Generate mock hourly data based on current temp
+                const baseTemp = districtData[distLabel] ? parseFloat(districtData[distLabel].temp) : 30;
+                const now = new Date();
+                for (let i = 0; i < 24; i++) {
+                    const d = new Date(now.getTime() + i * 3600000);
+                    labels.push(d.toLocaleTimeString(i18n.currentLang === 'kn' ? 'kn-IN' : 'en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }));
+                    // Simple sine wave for temp fluctuation
+                    const hour = d.getHours();
+                    const fluctuation = Math.sin((hour - 6) * Math.PI / 12) * 5;
+                    temps.push(parseFloat((baseTemp + fluctuation).toFixed(1)));
+                }
+            }
+
+            const ctx = document.getElementById('publicHourlyTempChart');
+            if (ctx && temps.length > 0) {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: i18n.t('stat-temp'),
+                            data: temps,
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#e74c3c',
+                            pointRadius: 3,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: true } },
+                        scales: {
+                            x: { ticks: { maxRotation: 45, font: { size: 10 } } },
+                            y: { beginAtZero: false, title: { display: true, text: 'Â°C' } }
+                        }
+                    }
+                });
+            }
+        })();
+
+        // ─── ML Prediction Logic ───
+        // 1. Helper to fill the date dropdown (Next 10 days)
+        function fillDateDropdown() {
+            const dateSelect = document.getElementById('predMonth');
+            if (!dateSelect) return;
+            dateSelect.innerHTML = '';
+            const now = new Date();
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(now);
+                d.setDate(now.getDate() + i);
+
+                // Use YYYY-MM-DD for value to match API dates
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                const value = `${year}-${month}-${day}`;
+
+                const label = d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = label;
+                if (i === 0) option.selected = true;
+                dateSelect.appendChild(option);
+            }
+        }
+        fillDateDropdown();
+
+        // Auto-update inputs when date changes
+        async function updateWeatherInputs() {
+            const dateSelect = document.getElementById('predMonth');
+            if (!dateSelect) return;
+            const selectedDate = dateSelect.value;
+            const currentDistrict = new URLSearchParams(window.location.search).get('district') || 'Bengaluru Urban';
+
+            let temp = 30;
+            let humidity = 65;
+            let found = false;
+
+            try {
+                const weather = await api.getWeather(currentDistrict);
+
+                // Check if selected date is today
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                const todayStr = `${year}-${month}-${day}`;
+
+                if (selectedDate === todayStr && weather.current) {
+                    temp = weather.current.temp_c;
+                    humidity = weather.current.humidity;
+                    found = true;
+                } else if (weather && weather.forecast && weather.forecast.forecastday) {
+                    const forecastDay = weather.forecast.forecastday.find(day => day.date === selectedDate);
+                    if (forecastDay) {
+                        temp = forecastDay.day.avgtemp_c;
+                        humidity = forecastDay.day.avghumidity;
+                        found = true;
+                    }
+                }
+            } catch (e) {
+                console.warn("Failed to auto-fill weather from API, using fallback", e);
+            }
+
+            if (!found) {
+                // Fallback to district static data
+                const d = districtData[currentDistrict];
+                if (d) {
+                    temp = parseFloat(d.temp) || 30;
+                    humidity = parseFloat(d.humidity) || 65;
+                }
+            }
+
+            const predTempEl = document.getElementById('predTemp');
+            const predHumidityEl = document.getElementById('predHumidity');
+            if (predTempEl) predTempEl.value = temp;
+            if (predHumidityEl) predHumidityEl.value = humidity;
+        }
+
+        const predMonthEl = document.getElementById('predMonth');
+        if (predMonthEl) predMonthEl.addEventListener('change', updateWeatherInputs);
+        // Trigger once on load to fill today's data
+        updateWeatherInputs();
+
+        function rainfallLevelFromMm(mm) {
+            if (!Number.isFinite(mm)) return 'Unknown';
+            if (mm < 30) return 'Low';
+            if (mm < 100) return 'Moderate';
+            return 'High';
+        }
+
+        // 2. Handle ML Prediction Form Submission (direct API call)
+        const mlForm = document.getElementById('mlPredictionForm');
+        if (mlForm) {
+            mlForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const temp = parseFloat(document.getElementById('predTemp').value);
+                const humidity = parseFloat(document.getElementById('predHumidity').value);
+                const dateVal = document.getElementById('predMonth').value;
+                const month = parseInt(dateVal.split('-')[1]);
+
+                const predictBtn = document.getElementById('predictBtn');
+                const btnText = document.getElementById('predictBtnText');
+                const loader = document.getElementById('predictBtnLoader');
+                predictBtn.disabled = true;
+                btnText.style.display = 'none';
+                loader.style.display = 'inline-block';
+
+                try {
+                    const res = await fetch('http://localhost:5000/api/rainfall-predict-mm', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ temperature: temp, humidity: humidity, month: month })
+                    });
+                    const result = await res.json();
+
+                    document.getElementById('mlPredictionEmpty').style.display = 'none';
+                    document.getElementById('mlPredictionResult').style.display = 'block';
+                    document.getElementById('confidenceGauge').style.display = 'none';
+
+                    const predictedMm = Number(result.rainfall_mm);
+                    const prediction = rainfallLevelFromMm(predictedMm);
+                    const badge = prediction.includes('High') ? 'bg-danger' :
+                        prediction.includes('Moderate') ? 'bg-warning' :
+                            prediction.includes('Low') ? 'bg-success' : 'bg-info';
+                    document.getElementById('predResultContent').innerHTML =
+                        `<h5 class="mb-2">🌧️ Rainfall Prediction</h5>
+                         <span class="badge ${badge} fs-6 px-3 py-2">${prediction}</span>
+                         <p class="mt-2 mb-0 small text-muted">Based on ${temp}Â°C, ${humidity}% humidity, month ${month} | Predicted Rain: ${predictedMm.toFixed(1)} mm</p>`;
+
+                    // Scenario Analysis
+                    document.getElementById('scenarioCards').style.display = 'block';
+                    const scenarios = [
+                        { label: '+5Â°C Higher', temperature: temp + 5, humidity, month },
+                        { label: '+10% Humidity', temperature: temp, humidity: humidity + 10, month },
+                        { label: 'Extreme Heat', temperature: temp + 7, humidity: humidity - 10, month }
+                    ];
+                    const scenarioList = document.getElementById('scenarioList');
+                    scenarioList.innerHTML = '';
+
+                    for (const scenario of scenarios) {
+                        try {
+                            const sRes = await fetch('http://localhost:5000/api/rainfall-predict-mm', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ temperature: scenario.temperature, humidity: scenario.humidity, month: scenario.month })
+                            });
+                            const sData = await sRes.json();
+                            const sMm = Number(sData.rainfall_mm);
+                            const sPred = rainfallLevelFromMm(sMm);
+                            const sBadge = sPred.includes('High') ? 'bg-danger' :
+                                sPred.includes('Moderate') ? 'bg-warning' : 'bg-info';
+                            const card = document.createElement('div');
+                            card.className = 'col-4';
+                            card.innerHTML = `
+                                <div class="card border-0 bg-light text-center p-2">
+                                    <small class="fw-bold">${scenario.label}</small>
+                                    <div style="font-size:0.8rem;" class="mt-1">
+                                        <span class="badge ${sBadge}">${sPred}</span>
+                                    </div>
+                                </div>`;
+                            scenarioList.appendChild(card);
+                        } catch (err) {
+                            console.error('Scenario prediction failed:', err);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Prediction error:', error);
+                    document.getElementById('mlPredictionEmpty').style.display = 'block';
+                    document.getElementById('mlPredictionResult').style.display = 'none';
+                    const resultDiv = document.getElementById('mlPredictionEmpty');
+                    resultDiv.className = 'alert alert-danger border-0 text-center p-4';
+                    resultDiv.innerHTML = `<strong>⚠️ ï¸ Prediction Failed</strong><br><small>${error.message}</small>`;
+                } finally {
+                    predictBtn.disabled = false;
+                    btnText.style.display = 'inline';
+                    loader.style.display = 'none';
+                }
+            });
+        }
+    </script>
+
+    <script>
+        (function initLiveTimeBadge() {
+            const timeBadge = document.getElementById('liveTimeBadge');
+            if (!timeBadge) return;
+
+            function updateLiveTime() {
+                const now = new Date();
+                const timePart = now.toLocaleTimeString(undefined, {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                timeBadge.textContent = timePart;
+            }
+
+            updateLiveTime();
+            setInterval(updateLiveTime, 1000);
+        })();
+    </script>
+    <script src="js/notifications.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/profile_manager.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker registered', reg))
+                    .catch(err => console.log('Service Worker registration failed', err));
+            });
+        }
+    </script>
+<script src="js/ui-enhancements.js?v=20260318"></script>
+</body>
+
+</html>
+

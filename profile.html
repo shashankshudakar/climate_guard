@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClimateGuard | Profile</title>
+  <link rel="icon" href="assets/logo.png" type="image/png" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css?v=3" />
+  <script src="js/theme.js"></script>
+  <script src="js/api.js" type="module"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="css/ui-enhancements.css?v=20260318">
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+    <div class="container">
+      <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="index.html">
+        <img src="assets/logo.png?v=3" alt="ClimateGuard Logo" width="40" height="40"
+          class="rounded-circle shadow-sm" />
+        <span>ClimateGuard</span>
+      </a>
+      <div class="navbar-nav me-auto">
+        <a href="profile.html" class="nav-link active"><span data-i18n="nav-profile">My Profile</span></a>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+
+        <button id="langToggleBtn" class="btn btn-sm btn-outline-light border-1 fw-bold"
+          style="border-radius: 20px; transition: all 0.3s ease;">Language</button>
+
+        <button id="themeToggleBtn" class="theme-toggle-btn" title="Switch to Dark Mode">
+          <i class="bi bi-moon-stars"></i>
+        </button>
+
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle hide-caret"
+            id="userProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="assets/user_avatar.png" alt="User" class="user-profile-img">
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-premium" aria-labelledby="userProfileDropdown">
+            <li>
+              <h6 class="dropdown-header-premium">User Account</h6>
+            </li>
+            <li id="loginMenuItem"><a class="dropdown-item dropdown-item-premium" href="login.html"><i
+                  class="bi bi-key me-2"></i>Login</a></li>
+            <li id="registerMenuItem"><a class="dropdown-item dropdown-item-premium" href="register.html"><i
+                  class="bi bi-person-plus me-2"></i>Register</a></li>
+            <li id="profileMenuItem" style="display:none;"><a class="dropdown-item dropdown-item-premium"
+                href="profile.html"><i class="bi bi-person-circle me-2"></i>My Profile</a></li>
+            <li id="settingsMenuItem" style="display:none;"><a class="dropdown-item dropdown-item-premium"
+                href="settings.html"><i class="bi bi-gear me-2"></i>Settings</a></li>
+            <li id="authDivider" style="display:none;">
+              <hr class="dropdown-divider opacity-10">
+            </li>
+            <li id="logoutMenuItem" style="display:none;"><a class="dropdown-item dropdown-item-premium text-danger"
+                href="#" onclick="handleLogout()"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container my-4">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card p-3 shadow-sm">
+          <div class="text-center">
+            <img id="profileAvatar" src="assets/user_avatar.png" alt="User Avatar"
+              class="rounded-circle mb-3 user-profile-img" width="120" height="120" style="object-fit: cover;" />
+            <h5 id="avatarUserName" class="mb-1">User</h5>
+            <p id="avatarUserEmail" class="text-muted mb-3">user@email.com</p>
+            <div id="avatarGridProfile" class="d-flex flex-wrap justify-content-center gap-2 mb-2"></div>
+            <label for="profilePhotoInput" class="btn btn-success btn-sm">Upload Photo</label>
+            <input type="file" id="profilePhotoInput" accept="image/*" style="display:none;" />
+            <button type="button" class="btn btn-outline-success btn-sm ms-2" id="openCameraProfileBtn">Take
+              Photo</button>
+            <button id="profileSaveBtn" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2 ms-2">
+              <i class="bi bi-check-circle"></i>
+              <span data-i18n="save-profile">Save Profile</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="card p-4 shadow-sm">
+          <h5 class="fw-bold mb-3"><i class="bi bi-person-circle me-2"></i><span data-i18n="profile-details">Profile
+              Details</span></h5>
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <div class="text-muted small" data-i18n="full-name">Full Name</div>
+              <div id="profName" class="fw-semibold">--</div>
+            </div>
+            <div class="col-sm-6">
+              <div class="text-muted small" data-i18n="email">Email</div>
+              <div id="profEmail" class="fw-semibold">--</div>
+            </div>
+            <div class="col-sm-6">
+              <div class="text-muted small">Phone</div>
+              <div id="profPhone" class="fw-semibold">--</div>
+            </div>
+            <div class="col-sm-6">
+              <div class="text-muted small">District</div>
+              <div id="profDistrict" class="fw-semibold">--</div>
+            </div>
+            <div class="col-sm-6">
+              <div class="text-muted small">Role</div>
+              <select id="profileRoleSelect" class="form-select form-select-sm mt-1">
+                <option value="farmer">Farmer</option>
+                <option value="public">Public</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-top">
+            <button id="profileEditBtn" class="btn btn-primary d-flex align-items-center gap-2">
+              <i class="bi bi-pencil-square"></i>
+              <span data-i18n="edit-profile">Edit Profile</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cameraModalProfile"
+    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:20px; padding:20px; max-width:420px; width:95%; text-align:center;">
+      <video id="cameraPreviewProfile" autoplay playsinline
+        style="width:100%; border-radius:12px; background:#000; max-height:280px; object-fit:cover;"></video>
+      <canvas id="cameraCanvasProfile" style="display:none;"></canvas>
+      <div class="d-flex gap-2 justify-content-center mt-3 flex-wrap">
+        <button type="button" id="snapBtnProfile" class="btn btn-success btn-sm">Snap</button>
+        <button type="button" id="retakeBtnProfile" class="btn btn-warning btn-sm" style="display:none;">Retake</button>
+        <button type="button" id="useBtnProfile" class="btn btn-primary btn-sm" style="display:none;">Use Photo</button>
+        <button type="button" id="closeCameraProfileBtn" class="btn btn-danger btn-sm">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+      const profileAvatar = document.getElementById('profileAvatar');
+      const avatarUserName = document.getElementById('avatarUserName');
+      const avatarUserEmail = document.getElementById('avatarUserEmail');
+      const avatarGridProfile = document.getElementById('avatarGridProfile');
+      const profileRoleSelect = document.getElementById('profileRoleSelect');
+      const headerAuthorRoleSelect = document.getElementById('headerAuthorRoleSelect');
+      const profAuthorRole = document.getElementById('profAuthorRole');
+
+      function updateAuthorDisplay(role) {
+        if (!profAuthorRole) return;
+        const map = {
+          'farmer': 'Farmer',
+          'expert': 'Expert',
+          'citizen': 'Citizen Author'
+        };
+        profAuthorRole.textContent = map[role] || 'None';
+      }
+
+      function updateAllAvatars(src) {
+        document.querySelectorAll('.user-profile-img').forEach(img => {
+          img.src = src;
+        });
+      }
+
+      async function persistAvatar(avatar) {
+        currentUser.avatar = avatar;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        if (window.api && typeof window.api.updateProfile === 'function') {
+          try {
+            await window.api.updateProfile({ avatar });
+          } catch (error) {
+            console.warn('Failed to update avatar in backend:', error);
+          }
+        }
+      }
+
+      let pendingAvatar = currentUser.avatar || 'assets/user_avatar.png';
+      let isAvatarDirty = false;
+
+      function markAvatarDirty() {
+        isAvatarDirty = true;
+        const profileSaveBtn = document.getElementById('profileSaveBtn');
+        if (profileSaveBtn) {
+          profileSaveBtn.disabled = false;
+          profileSaveBtn.textContent = 'Save Profile';
+        }
+      }
+
+      function makeAvatar(emoji, bg) {
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" rx="60" fill="${bg}"/><text x="60" y="75" font-size="60" text-anchor="middle">${emoji}</text></svg>`;
+        return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
+      }
+
+      if (avatarGridProfile) {
+        const avatarSources = [
+          makeAvatar('👨', '#e3f2fd'),
+          makeAvatar('👩', '#fce4ec'),
+          makeAvatar('🧑', '#e8f5e9'),
+          makeAvatar('👴', '#fff3e0'),
+          makeAvatar('👵', '#fbe9e7'),
+          makeAvatar('🧑‍💼', '#e0f7fa')
+        ];
+
+        avatarSources.forEach((src) => {
+          const img = document.createElement('img');
+          img.src = src;
+          img.width = 52;
+          img.height = 52;
+          img.style.borderRadius = '50%';
+          img.style.cursor = 'pointer';
+          img.addEventListener('click', () => {
+            pendingAvatar = src;
+            updateAllAvatars(pendingAvatar);
+            markAvatarDirty();
+          });
+          avatarGridProfile.appendChild(img);
+        });
+      }
+
+      document.getElementById('profName').textContent = currentUser.name || 'N/A';
+      document.getElementById('profEmail').textContent = currentUser.email || 'N/A';
+      document.getElementById('profPhone').textContent = currentUser.phone || 'N/A';
+      document.getElementById('profDistrict').textContent = currentUser.district || 'N/A';
+      if (profileRoleSelect) {
+        profileRoleSelect.value = currentUser.user_role || currentUser.role || 'public';
+        profileRoleSelect.addEventListener('change', async () => {
+          const nextRole = profileRoleSelect.value;
+          currentUser.user_role = nextRole;
+          localStorage.setItem('currentUser', JSON.stringify(currentUser));
+          if (window.api && typeof window.api.updateProfile === 'function') {
+            try {
+              await window.api.updateProfile({ user_role: nextRole });
+            } catch (error) {
+              console.warn('Failed to update role in backend:', error);
+            }
+          }
+        });
+      }
+
+      avatarUserName.textContent = currentUser.name || 'User';
+      avatarUserEmail.textContent = currentUser.email || '';
+
+      // Author Role Persistence
+      if (currentUser.author_role) {
+        if (headerAuthorRoleSelect) headerAuthorRoleSelect.value = currentUser.author_role;
+        updateAuthorDisplay(currentUser.author_role);
+      }
+
+      if (headerAuthorRoleSelect) {
+        headerAuthorRoleSelect.addEventListener('change', () => {
+          currentUser.author_role = headerAuthorRoleSelect.value;
+          localStorage.setItem('currentUser', JSON.stringify(currentUser));
+          updateAuthorDisplay(currentUser.author_role);
+        });
+      }
+
+      // Redirect to settings
+      document.getElementById('profileEditBtn').addEventListener('click', () => {
+        window.location.href = 'settings.html';
+      });
+
+      if (currentUser.avatar) {
+        updateAllAvatars(currentUser.avatar);
+      }
+
+      document.getElementById('profilePhotoInput').addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          pendingAvatar = ev.target.result;
+          updateAllAvatars(pendingAvatar);
+          markAvatarDirty();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      const profileSaveBtn = document.getElementById('profileSaveBtn');
+      if (profileSaveBtn) {
+        profileSaveBtn.disabled = true;
+        profileSaveBtn.addEventListener('click', async () => {
+          if (!isAvatarDirty) return;
+          profileSaveBtn.textContent = 'Saving...';
+          profileSaveBtn.disabled = true;
+          await persistAvatar(pendingAvatar);
+          isAvatarDirty = false;
+          profileSaveBtn.textContent = 'Saved';
+        });
+      }
+
+      const cameraModal = document.getElementById('cameraModalProfile');
+      const cameraPreview = document.getElementById('cameraPreviewProfile');
+      const cameraCanvas = document.getElementById('cameraCanvasProfile');
+      const snapBtn = document.getElementById('snapBtnProfile');
+      const retakeBtn = document.getElementById('retakeBtnProfile');
+      const useBtn = document.getElementById('useBtnProfile');
+      const openCameraBtn = document.getElementById('openCameraProfileBtn');
+      const closeCameraBtn = document.getElementById('closeCameraProfileBtn');
+
+      let cameraStream = null;
+      let capturedDataUrl = null;
+
+      function closeCamera() {
+        if (cameraStream) {
+          cameraStream.getTracks().forEach((t) => t.stop());
+          cameraStream = null;
+        }
+        cameraModal.style.display = 'none';
+      }
+
+      async function openCamera() {
+        try {
+          cameraModal.style.display = 'flex';
+          snapBtn.style.display = '';
+          retakeBtn.style.display = 'none';
+          useBtn.style.display = 'none';
+          capturedDataUrl = null;
+          cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+          cameraPreview.srcObject = cameraStream;
+        } catch (error) {
+          alert('Unable to access camera');
+          closeCamera();
+        }
+      }
+
+      if (openCameraBtn) openCameraBtn.addEventListener('click', openCamera);
+      if (closeCameraBtn) closeCameraBtn.addEventListener('click', closeCamera);
+
+      if (snapBtn) {
+        snapBtn.addEventListener('click', () => {
+          const context = cameraCanvas.getContext('2d');
+          cameraCanvas.width = cameraPreview.videoWidth;
+          cameraCanvas.height = cameraPreview.videoHeight;
+          context.drawImage(cameraPreview, 0, 0, cameraCanvas.width, cameraCanvas.height);
+          capturedDataUrl = cameraCanvas.toDataURL('image/png');
+          snapBtn.style.display = 'none';
+          retakeBtn.style.display = '';
+          useBtn.style.display = '';
+        });
+      }
+
+      if (retakeBtn) {
+        retakeBtn.addEventListener('click', () => {
+          capturedDataUrl = null;
+          snapBtn.style.display = '';
+          retakeBtn.style.display = 'none';
+          useBtn.style.display = 'none';
+        });
+      }
+
+      if (useBtn) {
+        useBtn.addEventListener('click', () => {
+          if (!capturedDataUrl) return;
+          pendingAvatar = capturedDataUrl;
+          updateAllAvatars(pendingAvatar);
+          markAvatarDirty();
+          closeCamera();
+        });
+      }
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/profile_manager.js"></script>
+  <script src="js/i18n.js?v=8" type="module"></script>
+  <script src="js/ui-enhancements.js?v=20260318"></script>
+</body>
+
+</html>

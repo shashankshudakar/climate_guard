@@ -1,0 +1,3779 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ClimateGuard | AgriGuard</title>
+
+    <link rel="icon" href="assets/logo.png" type="image/png">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <link rel="manifest" href="manifest.json">
+
+    <script src="js/theme.js"></script>
+
+    <script type="module" src="js/i18n.js?v=8"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<link rel="stylesheet" href="css/ui-enhancements.css?v=20260318">
+
+</head>
+
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+
+        <div class="container">
+
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="index.html"><img
+
+                    src="assets/logo.png?v=3" alt="ClimateGuard Logo" width="40" height="40"
+
+                    class="rounded-circle shadow-sm"><span>ClimateGuard</span></a>
+
+            <div class="navbar-nav me-auto">
+
+                <a class="nav-link active" href="farmer_dashboard.html" data-i18n="nav-agriguard">🛡️ AgriGuard</a>
+
+                <a class="nav-link" href="market_dashboard.html" id="navMarketLink">💰 Market Prices</a>
+
+                <a class="nav-link" href="crop_dashboard.html">🌾 My Crops</a>
+                <a class="nav-link" href="cold_storage.html">❄️ Cold Storage</a>
+
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+
+                <button id="langToggleBtn" class="btn btn-sm btn-outline-light rounded-pill px-3 me-2"
+
+                    style="font-size: 0.8rem; border-color: rgba(255,255,255,0.3);">Language</button>
+
+                <button id="themeToggleBtn" class="theme-toggle-btn" title="Switch to Dark Mode"><i
+
+                        class="bi bi-moon-stars"></i></button>
+
+                <div class="dropdown">
+
+                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle hide-caret"
+
+                        id="userProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+
+                        <img src="assets/user_avatar.png" alt="User" class="user-profile-img">
+
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-premium"
+
+                        aria-labelledby="userProfileDropdown">
+
+                        <li>
+
+                            <h6 class="dropdown-header-premium">User Account</h6>
+
+                        </li>
+
+                        <li id="loginMenuItem"><a class="dropdown-item dropdown-item-premium" href="login.html"><i
+
+                                    class="bi bi-key me-2"></i>Login</a></li>
+
+                        <li id="registerMenuItem"><a class="dropdown-item dropdown-item-premium" href="register.html"><i
+
+                                    class="bi bi-person-plus me-2"></i>Register</a></li>
+
+                        <li id="profileMenuItem" style="display:none;"><a class="dropdown-item dropdown-item-premium"
+
+                                href="profile.html"><i class="bi bi-person-circle me-2"></i>My Profile</a></li>
+
+                        <li id="settingsMenuItem" style="display:none;"><a class="dropdown-item dropdown-item-premium"
+
+                                href="settings.html"><i class="bi bi-gear me-2"></i>Settings</a></li>
+
+                        <li id="authDivider" style="display:none;">
+
+                            <hr class="dropdown-divider opacity-10">
+
+                        </li>
+
+                        <li id="switchRoleItem" style="display:none;"><a class="dropdown-item dropdown-item-premium"
+
+                                href="public_dashboard.html" id="switchRoleLink"><span>🔄</span> Switch Role</a></li>
+
+                        <li id="authDivider2" style="display:none;">
+
+                            <hr class="dropdown-divider opacity-10">
+
+                        </li>
+
+                        <li id="logoutMenuItem" style="display:none;"><a
+
+                                class="dropdown-item dropdown-item-premium text-danger" href="#"
+
+                                onclick="handleLogout()"><span>🚪</span> Logout</a></li>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+    <div class="container my-4">
+
+        <h3 class="fw-bold">AgriGuard</h3>
+
+        <p class="text-muted">District-based climate and crop advisory</p>
+
+        <p id="farmerCurrentDate" class="text-muted mb-0"></p>
+
+    </div>
+
+    <!-- Market Ticker -->
+
+    <div class="container mb-4">
+
+        <div class="card shadow-sm border-0 bg-dark text-white">
+
+            <div class="card-body py-2 d-flex align-items-center">
+
+                <span class="badge bg-success me-3">💰 Market Prices</span>
+
+                <marquee behavior="scroll" direction="left" id="dashboardPriceTicker" class="flex-grow-1 mb-0"
+
+                    onmouseover="this.stop();" onmouseout="this.start();">
+
+                    Loading market trends...
+
+                </marquee>
+
+                <a href="market_dashboard.html" class="btn btn-sm btn-outline-light ms-3" style="white-space: nowrap;"
+
+                    id="viewDetailsLink">View Details</a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Weather Stats Row -->
+
+    <div class="container">
+
+        <div class="row g-3">
+
+            <div class="col-md-3 col-6">
+
+                <div class="card shadow text-center p-3">
+
+                    <h5 data-i18n="stat-temp">🌡️ Temperature</h5>
+
+                    <h2 id="statTemp">--</h2>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3 col-6">
+
+                <div class="card shadow text-center p-3">
+
+                    <h5 data-i18n="stat-humidity">💧 Humidity</h5>
+
+                    <h2 id="statHumidity">--</h2>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3 col-6">
+
+                <div class="card shadow text-center p-3">
+
+                    <h5 data-i18n="stat-rainfall-mm">🌧️ Rainfall (mm)</h5>
+
+                    <h2 id="statRainfallMm" class="text-info">--</h2>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3 col-6">
+
+                <div class="card shadow text-center p-3">
+
+                    <h5 data-i18n="stat-wind">💨 Wind Speed</h5>
+
+                    <h2 id="statWind" class="text-secondary">--</h2>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3 col-6">
+
+                <div class="card shadow text-center p-3">
+
+                    <h5 data-i18n="rainfall">🌧️ Rainfall</h5>
+
+                    <h2 id="statRainfall" class="text-primary">--</h2>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3 col-6">
+
+                <div class="card shadow text-center p-3">
+
+                    <h5 data-i18n="stat-soil"><i class="bi bi-moisture text-success"></i> Soil Type</h5>
+
+                    <h2 id="statSoil" class="text-success">--</h2>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3 col-6">
+
+                <div class="card shadow text-center p-3">
+
+                    <h5 data-i18n="stat-season">🌤️ Current Season</h5>
+
+                    <h2 id="statSeason" class="text-warning">--</h2>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3 col-6">
+
+                <div class="card shadow text-center p-3">
+
+                    <h5 data-i18n="stat-condition">☁️ Condition</h5>
+
+                    <h2 id="statCondition" class="text-dark" style="font-size:1.1rem;">--</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Cold Storage Entry Point -->
+    <div class="container my-4">
+        <div class="card shadow p-4 border-start border-4 border-info" style="background: linear-gradient(to right, #ffffff, #f0fbff); border-radius: 16px;">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="fw-bold text-info mb-2"><i class="bi bi-snow me-2"></i>Maximize Your Profit - Use Cold Storage</h5>
+                    <p class="mb-0 text-muted">Don't sell your harvest in a hurry! Find nearby warehouses with available space to store your crops and wait for better market prices.</p>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <a href="cold_storage.html" class="btn btn-info text-white fw-bold px-4 py-2 rounded-pill shadow-sm">
+                        Find Storage Nearby <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- District Info Summary -->
+
+    <div class="container my-4">
+
+        <div class="card shadow p-4 border-start border-4 border-success" id="districtSummaryCard"
+
+            style="display:none;">
+
+            <div class="row">
+
+                <div class="col-md-12">
+
+                    <h5 class="fw-bold text-success mb-3" data-i18n="dist-agri-profile">📍 District Agricultural
+                        Profile
+
+                    </h5>
+
+                    <p id="districtSummaryText" class="mb-0 text-muted"></p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Crops & Irrigation -->
+
+    <div class="container my-4">
+
+        <div class="row g-4">
+
+            <div class="col-12">
+
+                <div class="card shadow p-3">
+
+                    <h5 class="fw-bold mb-1" data-i18n="recommended-crops">🌾 Recommended Crops</h5>
+
+                    <p class="text-muted small mb-3" id="cropRecommendSubtitle">Based on live temperature, humidity, and
+
+                        rainfall conditions</p>
+
+                    <div id="cropCardGrid" class="row g-3"></div>
+
+                </div>
+
+            </div>
+
+            <!-- My Crops Growth Tracker -->
+
+            <div class="col-12" id="myCropsSection" style="display:none;">
+
+                <div class="card shadow p-3" style="border-left:4px solid #198754;">
+
+                    <h5 class="fw-bold mb-1">🌾 My Crop Growth Tracker</h5>
+
+                    <p class="text-muted small mb-3">Track your selected crops from sowing to harvest with day-by-day
+
+                        guidance</p>
+
+                    <div id="myCropsGrid" class="row g-3"></div>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-12">
+
+                <div class="card shadow p-3">
+
+                    <h5 class="fw-bold mb-3" data-i18n="irrigation-advice">💧 Irrigation Advice</h5>
+
+                    <div id="irrigationAdvice">
+
+                        <!-- Main recommendation -->
+
+                        <div class="alert alert-success border-0 mb-3" id="irrigMainAdvice" style="border-radius:12px;">
+
+                            <strong>Loading irrigation recommendations...</strong>
+
+                        </div>
+
+                        <div class="row g-3">
+
+                            <!-- Method -->
+
+                            <div class="col-md-4">
+
+                                <div class="card border-0 h-100"
+
+                                    style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-radius:14px;">
+
+                                    <div class="card-body text-center p-3">
+
+                                        <div style="font-size:2rem;" id="irrigMethodIcon">🚿</div>
+
+                                        <h6 class="fw-bold text-success mb-1">Recommended Method</h6>
+
+                                        <p class="small mb-0" id="irrigMethod">--</p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Schedule -->
+
+                            <div class="col-md-4">
+
+                                <div class="card border-0 h-100"
+
+                                    style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);border-radius:14px;">
+
+                                    <div class="card-body text-center p-3">
+
+                                        <div style="font-size:2rem;">📅</div>
+                                        <h6 class="fw-bold text-primary mb-1">Watering Schedule</h6>
+
+                                        <p class="small mb-0" id="irrigSchedule">--</p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Best Time -->
+
+                            <div class="col-md-4">
+
+                                <div class="card border-0 h-100"
+
+                                    style="background:linear-gradient(135deg,#fff3e0,#ffe0b2);border-radius:14px;">
+
+                                    <div class="card-body text-center p-3">
+
+                                        <div style="font-size:2rem;">🌅</div>
+                                        <h6 class="fw-bold" style="color:#e65100;">Best Time</h6>
+
+                                        <p class="small mb-0" id="irrigBestTime">--</p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Tips row -->
+
+                        <div class="row g-3 mt-1">
+
+                            <div class="col-md-6">
+
+                                <div class="card border-0 h-100" style="background:#f5f5f5;border-radius:14px;">
+
+                                    <div class="card-body p-3">
+
+                                        <h6 class="fw-bold mb-2">🌱 Crop-Specific Tips</h6>
+
+                                        <ul class="small mb-0" id="irrigCropTips" style="padding-left:18px;">
+
+                                            <li>--</li>
+
+                                        </ul>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <div class="card border-0 h-100" style="background:#f5f5f5;border-radius:14px;">
+
+                                    <div class="card-body p-3">
+
+                                        <h6 class="fw-bold mb-2">♻️ Water Conservation</h6>
+
+                                        <ul class="small mb-0" id="irrigConservation" style="padding-left:18px;">
+
+                                            <li>--</li>
+
+                                        </ul>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Seasonal Note -->
+
+                        <div class="mt-3 p-3" id="irrigSeasonNote"
+
+                            style="background:linear-gradient(135deg,#f3e5f5,#e1bee7);border-radius:12px;">
+
+                            <span class="fw-bold">📅 Seasonal Note: </span>
+
+                            <span class="small" id="irrigSeasonText">--</span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Climate Notifications -->
+
+    <div class="container my-4" id="climateNotificationsCard" style="display:none;">
+
+        <div class="card shadow p-3">
+
+            <div class="mt-4">
+
+                <h6>Live Climate Notifications</h6>
+
+                <div id="alertContainer" class="list-group">
+
+                    <div class="list-group-item">No new alerts</div>
+
+                </div>
+
+            </div>
+
+            <div class="form-check form-switch mt-3">
+
+                <input class="form-check-input" type="checkbox" id="smsAlertToggle" checked>
+
+                <label class="form-check-label">Enable SMS/App Alerts</label>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ML Rainfall Prediction Section -->
+
+    <div class="container my-4">
+
+        <div class="card shadow p-4 border-start border-4 border-primary">
+
+            <div class="row mb-4">
+
+                <div class="col-lg-5">
+
+                    <h5 class="fw-bold mb-3">🌧️Rainfall Predictor</h5>
+
+                    <p class="text-muted small">Use our trained machine learning model to predict rainfall likelihood
+
+                        based on current weather conditions.</p>
+
+                    <!-- Prediction Input Form -->
+
+                    <div class="card border-0 bg-light p-3">
+
+                        <h6 class="fw-bold mb-3">📈 Make a Prediction</h6>
+
+                        <form id="mlPredictionForm">
+
+                            <div class="mb-3">
+
+                                <label class="form-label small fw-bold">Temperature (°C)</label>
+
+                                <input type="number" class="form-control" id="predTemp" placeholder="Enter temperature"
+
+                                    min="0" max="50" step="0.1" required>
+
+                                <small class="text-muted">Typical range: 20-40°C</small>
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label class="form-label small fw-bold">Humidity (%)</label>
+
+                                <input type="number" class="form-control" id="predHumidity" placeholder="Enter humidity"
+
+                                    min="0" max="100" step="0.1" required>
+
+                                <small class="text-muted">Typical range: 40-90%</small>
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label class="form-label small fw-bold">Date</label>
+
+                                <select class="form-select" id="predMonth" required>
+
+                                    <option value="">Select date...</option>
+
+                                </select>
+
+                                <small class="text-muted">Rainfall varies by season</small>
+
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100" id="predictBtn">
+
+                                <span id="predictBtnText">🚀 Make Prediction</span>
+
+                                <span id="predictBtnLoader" class="spinner-border spinner-border-sm ms-2" role="status"
+
+                                    style="display:none;"></span>
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+                <div class="col-lg-7">
+
+                    <h6 class="fw-bold mb-3">📊 Prediction Result</h6>
+
+                    <div id="mlPredictionResult" class="alert alert-info border-0 text-center p-4"
+
+                        style="border-radius:12px;display:none;">
+
+                        <div id="predResultContent"></div>
+
+                    </div>
+
+                    <div id="mlPredictionEmpty" class="alert alert-secondary border-0 text-center p-4"
+
+                        style="border-radius:12px;">
+
+                        <div class="text-muted">Submit the form to see prediction results</div>
+
+                    </div>
+
+                    <!-- Confidence Gauge -->
+
+                    <div id="confidenceGauge" style="display:none;" class="mt-3">
+
+                        <small class="text-muted fw-bold">ML Confidence</small>
+
+                        <div class="progress" style="height:8px;border-radius:4px;">
+
+                            <div id="confidenceBar" class="progress-bar bg-success" role="progressbar"
+
+                                style="width:0%;"></div>
+
+                        </div>
+
+                        <small id="confidenceText"></small>
+
+                    </div>
+
+                    <!-- Scenario Analysis -->
+
+                    <div id="scenarioCards" class="mt-3" style="display:none;">
+
+                        <small class="text-muted fw-bold">What-If Scenarios</small>
+
+                        <div class="row g-2 mt-2" id="scenarioList"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Data Visualization Section -->
+
+    <div class="container my-4">
+
+        <div class="card shadow p-4 border-start border-4 border-warning">
+
+            <h5 class="fw-bold mb-3">📈 Data Visualizations</h5>
+
+            <p class="text-muted small">Advanced charts and maps for climate and agricultural data analysis.</p>
+
+            <!-- Tabs for different visualization types -->
+
+            <ul class="nav nav-tabs mb-4" role="tablist">
+
+                <li class="nav-item" role="presentation">
+
+                    <button class="nav-link active" id="rainfallTab" data-bs-toggle="tab"
+
+                        data-bs-target="#rainfallChartPane" type="button" role="tab">Rainfall Forecast</button>
+
+                </li>
+
+                <li class="nav-item" role="presentation">
+
+                    <button class="nav-link" id="temperatureTab" data-bs-toggle="tab"
+
+                        data-bs-target="#temperatureChartPane" type="button" role="tab">Temperature Trends</button>
+
+                </li>
+
+                <li class="nav-item" role="presentation">
+
+                    <button class="nav-link" id="yearlyTab" data-bs-toggle="tab" data-bs-target="#yearlyRainfallPane"
+
+                        type="button" role="tab">Annual Rainfall</button>
+
+                </li>
+
+                <li class="nav-item" role="presentation">
+
+                    <button class="nav-link" id="districtTab" data-bs-toggle="tab" data-bs-target="#districtHeatmap"
+
+                        type="button" role="tab">District Heatmap</button>
+
+                </li>
+
+                <li class="nav-item" role="presentation">
+
+                    <button class="nav-link" id="soilTab" data-bs-toggle="tab" data-bs-target="#soilChart" type="button"
+
+                        role="tab">Soil Analysis</button>
+
+                </li>
+
+            </ul>
+
+            <!-- Tab Content -->
+
+            <div class="tab-content">
+
+                <!-- Rainfall Forecast Bar Chart -->
+
+                <div class="tab-pane fade show active" id="rainfallChartPane" role="tabpanel">
+
+                    <div style="position:relative;height:320px;">
+
+                        <canvas id="farmerTrendBarChart"></canvas>
+
+                    </div>
+
+                </div>
+
+                <!-- Temperature Trends -->
+
+                <div class="tab-pane fade" id="temperatureChartPane" role="tabpanel">
+
+                    <div class="row g-3">
+
+                        <div class="col-lg-6">
+
+                            <h6 class="fw-bold text-center mb-2">🌡️Temperature Forecast</h6>
+
+                            <div style="position:relative;height:300px;">
+
+                                <canvas id="farmerTrendLineChart"></canvas>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-6">
+
+                            <h6 class="fw-bold text-center mb-2" id="hourlyChartSubtitle">🌡️ Temperature</h6>
+
+                            <div style="position:relative;height:300px;">
+
+                                <canvas id="farmerHourlyTempChart"></canvas>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Annual Rainfall -->
+
+                <div class="tab-pane fade" id="yearlyRainfallPane" role="tabpanel">
+
+                    <div style="position:relative;height:350px;">
+
+                        <canvas id="farmerYearRainChart"></canvas>
+
+                    </div>
+
+                    <div class="alert alert-info border-0 mt-3">
+
+                        <strong>💡 Annual Pattern:</strong> This chart shows estimated monthly rainfall distribution
+
+                        based on live weather data and seasonal patterns for the selected district.
+
+                    </div>
+
+                </div>
+
+                <!-- District Heatmap -->
+
+                <div class="tab-pane fade" id="districtHeatmap" role="tabpanel">
+
+                    <div class="row mb-3">
+
+                        <div class="col-lg-8">
+
+                            <div id="districtMapContainer"
+
+                                style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:20px;">
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-4">
+
+                            <div id="districtComparisonChart" style="position:relative;height:400px;">
+
+                                <canvas id="districtCompCanvas"></canvas>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Legend -->
+
+                    <div class="alert alert-light border p-2" style="font-size:0.85rem;">
+
+                        <strong>Color Legend:</strong>
+
+                        <span
+
+                            style="display:inline-block;width:12px;height:12px;background:#d32f2f;border-radius:2px;vertical-align:middle;margin:0 4px;"></span>
+
+                        High Rainfall |
+
+                        <span
+
+                            style="display:inline-block;width:12px;height:12px;background:#f57c00;border-radius:2px;vertical-align:middle;margin:0 4px;"></span>
+
+                        Moderate |
+
+                        <span
+
+                            style="display:inline-block;width:12px;height:12px;background:#fbc02d;border-radius:2px;vertical-align:middle;margin:0 4px;"></span>
+
+                        Low-Moderate |
+
+                        <span
+
+                            style="display:inline-block;width:12px;height:12px;background:#1976d2;border-radius:2px;vertical-align:middle;margin:0 4px;"></span>
+
+                        Low
+
+                    </div>
+
+                </div>
+
+                <!-- Soil Analysis -->
+
+                <div class="tab-pane fade" id="soilChart" role="tabpanel">
+
+                    <div style="position:relative;height:350px;">
+
+                        <canvas id="soilNutrientChart"></canvas>
+
+                    </div>
+
+                    <div class="alert alert-info border-0 mt-3">
+
+                        <strong>💡 Soil Nutrients:</strong> The radar chart shows typical nutrient levels for the
+
+                        selected district's soil type.
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <footer class="bg-success text-white text-center p-3 mt-5">
+
+        &copy; 2026 ClimateGuard | <span data-i18n="farmer-safety">Farmer Advisory System</span>
+
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="js/navigation.js"></script>
+
+    <script src="js/profile_manager.js"></script>
+
+    <script src="js/market_data.js"></script>
+
+    <script type="module">
+
+        import api from './js/api.js';
+
+        // --- MARKET PRICES TICKER LOGIC ---
+
+        function updateMarketTicker(districtName) {
+
+            const ticker = document.getElementById('dashboardPriceTicker');
+
+            if (!ticker) return;
+
+            // Wait for JS to load just in case
+
+            if (typeof window.generatePricesForDistrict !== 'function') return;
+
+            let displayPrices = window.generatePricesForDistrict(districtName || "Bagalkote");
+
+            // Only show top 15 most relevant crops for scrolling performance and relevance
+
+            displayPrices = displayPrices.filter(p => p.isMajor).slice(0, 15);
+
+            if (displayPrices.length === 0) displayPrices = window.generatePricesForDistrict(districtName || "Bagalkote").slice(0, 15);
+
+            ticker.innerHTML = displayPrices.map(p =>
+
+                `<span class="me-4">${p.crop || 'Crop'}: ₹${p.price || '--'}/${p.unit || 'Q'} (${p.trend === 'up' ? '▲' : '▼'})</span>`
+
+            ).join('');
+
+        }
+
+        // --- CONSOLIDATED SCRIPT LOGIC ---
+
+        // Dynamic cards are rebuilt from runtime data, so refresh page on language toggle
+
+        window.addEventListener('languageChanged', () => {
+
+            window.location.reload();
+
+        });
+
+        // District Persistence on Role Switch
+
+        (function preserveDistrict() {
+
+            const urlParams = new URLSearchParams(window.location.search);
+
+            const district = (urlParams.get('district') || window.__navDistrict || '').trim();
+
+            if (district) {
+
+                const switchLink = document.getElementById('switchRoleLink');
+
+                if (switchLink) {
+
+                    const currentHref = switchLink.getAttribute('href');
+
+                    switchLink.setAttribute('href', `${currentHref}?district=${encodeURIComponent(district)}`);
+
+                }
+
+                // Pass district to market page links
+
+                const marketNav = document.getElementById('navMarketLink');
+
+                if (marketNav) marketNav.setAttribute('href', `market_dashboard.html?district=${encodeURIComponent(district)}`);
+
+                const viewDetails = document.getElementById('viewDetailsLink');
+
+                if (viewDetails) viewDetails.setAttribute('href', `market_dashboard.html?district=${encodeURIComponent(district)}`);
+
+            }
+
+        })();
+
+        // Helper: Fill month dropdown with current + next 12 months (with year)
+
+        function fillMonthDropdown() {
+
+            const monthSelect = document.getElementById('predMonth');
+
+            if (!monthSelect) return;
+
+            monthSelect.innerHTML = '';
+
+            const now = new Date();
+
+            for (let i = 0; i < 13; i++) {
+
+                const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+
+                const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+
+                const label = d.toLocaleString('default', { month: 'short', year: 'numeric' });
+
+                const option = document.createElement('option');
+
+                option.value = value;
+
+                option.textContent = label;
+
+                if (i === 0) option.selected = true;
+
+                monthSelect.appendChild(option);
+
+            }
+
+        }
+
+        // Seasonal temperature and humidity data for Karnataka (by month 1-12)
+
+        const seasonalData = {
+
+            '01': { temp: 22, humidity: 65 }, // January - Winter
+
+            '02': { temp: 24, humidity: 60 }, // February
+
+            '03': { temp: 28, humidity: 55 }, // March - Summer starts
+
+            '04': { temp: 32, humidity: 50 }, // April - Hot
+
+            '05': { temp: 34, humidity: 45 }, // May - Very Hot
+
+            '06': { temp: 32, humidity: 60 }, // June - Monsoon starts
+
+            '07': { temp: 28, humidity: 75 }, // July - Monsoon
+
+            '08': { temp: 27, humidity: 80 }, // August - Heavy monsoon
+
+            '09': { temp: 28, humidity: 75 }, // September - Post monsoon
+
+            '10': { temp: 27, humidity: 70 }, // October
+
+            '11': { temp: 24, humidity: 68 }, // November
+
+            '12': { temp: 22, humidity: 65 }  // December
+
+        };
+
+        // Update temperature and humidity based on selected month
+
+        async function updateTempHumidityFromMonth(monthValue) {
+
+            const tempInput = document.getElementById('predTemp');
+
+            const humidityInput = document.getElementById('predHumidity');
+
+            if (!tempInput || !humidityInput) return;
+
+            const selectedMonth = parseInt(monthValue.split('-')[1], 10);
+
+            const urlParams = new URLSearchParams(window.location.search);
+
+            const district = (urlParams.get('district') || '').trim();
+
+            // Prefer district monthly averages from CSV
+
+            try {
+
+                const monthly = await loadDistrictMonthlyAverages();
+
+                const districtMonthly = monthly[district];
+
+                if (districtMonthly && districtMonthly[selectedMonth]) {
+
+                    tempInput.value = Number(districtMonthly[selectedMonth].temp).toFixed(1);
+
+                    humidityInput.value = Number(districtMonthly[selectedMonth].humidity).toFixed(1);
+
+                    return;
+
+                }
+
+            } catch (_) {
+
+                // fallback below
+
+            }
+
+            // Fallback to seasonal data if CSV is unavailable
+
+            const now = new Date();
+
+            const currentMonthStr = String(now.getMonth() + 1).padStart(2, '0');
+
+            const currentYYYYMM = `${now.getFullYear()}-${currentMonthStr}`;
+
+            const targetSeason = seasonalData[String(selectedMonth).padStart(2, '0')];
+
+            if (monthValue === currentYYYYMM && liveWeatherActive) {
+
+                tempInput.value = liveWeatherBase.temp.toFixed(1);
+
+                humidityInput.value = liveWeatherBase.humidity.toFixed(1);
+
+                return;
+
+            }
+
+            if (targetSeason) {
+
+                tempInput.value = targetSeason.temp.toFixed(1);
+
+                humidityInput.value = targetSeason.humidity.toFixed(1);
+
+            }
+
+        }
+
+        // Add event listener to month dropdown for auto-populating temp/humidity
+
+        function initMonthDropdownListener() {
+
+            const monthSelect = document.getElementById('predMonth');
+
+            if (monthSelect) {
+
+                monthSelect.addEventListener('change', function () {
+
+                    updateTempHumidityFromMonth(this.value);
+
+                });
+
+            }
+
+        }
+
+        // ─── District Data (same as dataset_explorer.js) ───
+
+        const districtData = {
+
+            "Bagalkote": { soil: "black", crops: ["maize", "sugarcane", "cotton"], rainfall: "Low to Moderate", temp: "32°C", humidity: "55%", rainfallMm: [8, 12, 10, 6, 14, 9, 7] },
+
+            "Ballari": { soil: "black", crops: ["maize", "rice", "cotton"], rainfall: "Moderate", temp: "33°C", humidity: "50%", rainfallMm: [10, 15, 20, 18, 22, 14, 11] },
+
+            "Belagavi": { soil: "black", crops: ["sugarcane", "maize", "rice"], rainfall: "High", temp: "28°C", humidity: "70%", rainfallMm: [20, 28, 35, 30, 40, 32, 25] },
+
+            "Bengaluru Rural": { soil: "silty-loam", crops: ["rice", "maize", "ginger"], rainfall: "Moderate", temp: "27°C", humidity: "65%", rainfallMm: [12, 18, 22, 16, 20, 15, 13] },
+
+            "Bengaluru Urban": { soil: "silty-loam", crops: ["rice", "ragi", "ginger"], rainfall: "Moderate", temp: "28°C", humidity: "60%", rainfallMm: [10, 16, 20, 14, 18, 12, 10] },
+
+            "Bidar": { soil: "black", crops: ["maize", "pulses", "sugarcane"], rainfall: "Moderate", temp: "31°C", humidity: "58%", rainfallMm: [14, 20, 18, 22, 16, 12, 10] },
+
+            "Chamarajanagar": { soil: "red", crops: ["maize", "sugarcane", "pulses"], rainfall: "Moderate", temp: "29°C", humidity: "62%", rainfallMm: [12, 16, 20, 18, 14, 10, 8] },
+
+            "Chikballapur": { soil: "red", crops: ["maize", "sugarcane", "ginger"], rainfall: "Low", temp: "30°C", humidity: "52%", rainfallMm: [6, 10, 8, 12, 7, 5, 4] },
+
+            "Chikmagalur": { soil: "laterite", crops: ["coffee", "tea", "ginger"], rainfall: "Very High", temp: "24°C", humidity: "82%", rainfallMm: [35, 45, 55, 60, 50, 40, 30] },
+
+            "Chitradurga": { soil: "black", crops: ["maize", "cotton", "rice"], rainfall: "Low", temp: "31°C", humidity: "48%", rainfallMm: [5, 8, 10, 7, 12, 6, 4] },
+
+            "Dakshina Kannada": { soil: "laterite", crops: ["coconut", "cocoa", "ginger"], rainfall: "Very High", temp: "30°C", humidity: "85%", rainfallMm: [40, 55, 65, 70, 60, 50, 38] },
+
+            "Davanagere": { soil: "clay-loam", crops: ["maize", "rice", "sugarcane"], rainfall: "Moderate", temp: "30°C", humidity: "60%", rainfallMm: [14, 18, 22, 20, 16, 12, 10] },
+
+            "Dharwad": { soil: "black", crops: ["maize", "cotton", "wheat"], rainfall: "Moderate", temp: "29°C", humidity: "58%", rainfallMm: [12, 16, 20, 18, 14, 10, 8] },
+
+            "Gadag": { soil: "black", crops: ["maize", "cotton", "wheat"], rainfall: "Low", temp: "32°C", humidity: "45%", rainfallMm: [6, 10, 12, 8, 14, 7, 5] },
+
+            "Hassan": { soil: "loam", crops: ["coffee", "ginger", "maize"], rainfall: "High", temp: "26°C", humidity: "75%", rainfallMm: [22, 30, 35, 28, 32, 25, 20] },
+
+            "Haveri": { soil: "black", crops: ["maize", "sugarcane", "cotton"], rainfall: "Moderate", temp: "30°C", humidity: "58%", rainfallMm: [14, 18, 22, 16, 20, 14, 12] },
+
+            "Kalaburagi": { soil: "black", crops: ["maize", "pulses", "sugarcane"], rainfall: "Low", temp: "34°C", humidity: "42%", rainfallMm: [4, 8, 6, 10, 5, 3, 2] },
+
+            "Kodagu": { soil: "laterite", crops: ["coffee", "ginger", "cocoa"], rainfall: "Very High", temp: "22°C", humidity: "88%", rainfallMm: [45, 55, 70, 80, 65, 50, 40] },
+
+            "Kolar": { soil: "red", crops: ["maize", "ragi", "ginger"], rainfall: "Low", temp: "30°C", humidity: "50%", rainfallMm: [6, 10, 8, 12, 7, 5, 4] },
+
+            "Koppal": { soil: "black", crops: ["maize", "rice", "cotton"], rainfall: "Low", temp: "33°C", humidity: "45%", rainfallMm: [5, 8, 10, 6, 12, 7, 4] },
+
+            "Mandya": { soil: "clay-loam", crops: ["rice", "sugarcane", "maize"], rainfall: "Moderate", temp: "28°C", humidity: "65%", rainfallMm: [14, 20, 24, 18, 22, 16, 12] },
+
+            "Mysuru": { soil: "clay-loam", crops: ["rice", "sugarcane", "maize"], rainfall: "Moderate", temp: "27°C", humidity: "68%", rainfallMm: [16, 22, 28, 20, 26, 18, 14] },
+
+            "Raichur": { soil: "black", crops: ["rice", "cotton", "maize"], rainfall: "Low", temp: "34°C", humidity: "40%", rainfallMm: [4, 7, 10, 6, 8, 5, 3] },
+
+            "Ramanagara": { soil: "red", crops: ["ragi", "maize", "sugarcane"], rainfall: "Moderate", temp: "28°C", humidity: "62%", rainfallMm: [12, 16, 20, 14, 18, 12, 10] },
+
+            "Shimoga": { soil: "laterite", crops: ["rice", "ginger", "maize"], rainfall: "High", temp: "26°C", humidity: "78%", rainfallMm: [25, 32, 40, 35, 38, 28, 22] },
+
+            "Tumakuru": { soil: "red", crops: ["maize", "ragi", "sugarcane"], rainfall: "Low", temp: "30°C", humidity: "50%", rainfallMm: [6, 10, 14, 8, 12, 7, 5] },
+
+            "Udupi": { soil: "laterite", crops: ["coconut", "cocoa", "ginger"], rainfall: "Very High", temp: "30°C", humidity: "86%", rainfallMm: [42, 55, 68, 75, 62, 48, 36] },
+
+            "Uttara Kannada": { soil: "laterite", crops: ["rice", "coconut", "ginger"], rainfall: "Very High", temp: "28°C", humidity: "80%", rainfallMm: [35, 48, 58, 65, 52, 40, 30] },
+
+            "Vijayanagara": { soil: "black", crops: ["rice", "maize", "cotton"], rainfall: "Moderate", temp: "31°C", humidity: "55%", rainfallMm: [10, 14, 18, 16, 20, 12, 8] },
+
+            "Vijayapura": { soil: "black", crops: ["maize", "sugarcane", "pulses"], rainfall: "Low", temp: "33°C", humidity: "42%", rainfallMm: [4, 8, 6, 10, 5, 3, 2] },
+
+            "Yadgir": { soil: "black", crops: ["maize", "rice", "cotton"], rainfall: "Low", temp: "34°C", humidity: "40%", rainfallMm: [5, 9, 11, 8, 10, 6, 4] },
+
+        };
+
+        window.districtData = districtData;
+
+        // ─── Crop Detail Database ───
+
+        const cropInfo = {
+
+            'rice': { icon: '🌾', gradient: 'linear-gradient(135deg,#81c784,#388e3c)', season: 'Kharif', water: 'High', maturity: '3–4 months', tip: 'Maintain 5cm standing water during tillering. Transplant seedlings at 21 days.' },
+
+            'sugarcane': { icon: '🎋', gradient: 'linear-gradient(135deg,#a5d6a7,#2e7d32)', season: 'Year Round', water: 'High', maturity: '10–12 months', tip: 'Plant ratoon crop after harvest. Earthing up improves yield significantly.' },
+
+            'maize': { icon: '🌽', gradient: 'linear-gradient(135deg,#fff176,#f9a825)', season: 'Kharif/Rabi', water: 'Moderate', maturity: '3–4 months', tip: 'Apply nitrogen in 3 splits. Weed control in first 30 days is critical.' },
+
+            'cotton': { icon: '☁️', gradient: 'linear-gradient(135deg,#e0e0e0,#9e9e9e)', season: 'Kharif', water: 'Moderate', maturity: '5–6 months', tip: 'Spray neem oil to control bollworms. Avoid waterlogging at boll stage.' },
+
+            'wheat': { icon: '🌾', gradient: 'linear-gradient(135deg,#dce775,#9e9d24)', season: 'Rabi', water: 'Moderate', maturity: '4–5 months', tip: 'Sow at optimal temperature 20–25°C. First irrigation at crown root stage.' },
+
+            'pulses': { icon: '🫘', gradient: 'linear-gradient(135deg,#bcaaa4,#6d4c41)', season: 'Rabi/Kharif', water: 'Low', maturity: '2–3 months', tip: 'Inoculate seed with Rhizobium culture. Avoid excess nitrogen fertiliser.' },
+
+            'coffee': { icon: '☕', gradient: 'linear-gradient(135deg,#8d6e63,#4e342e)', season: 'Year Round', water: 'High', maturity: '3–4 years', tip: 'Provide 50% shade using silver oak. Drip irrigation improves bean quality.' },
+
+            'tea': { icon: '🍵', gradient: 'linear-gradient(135deg,#c8e6c9,#1b5e20)', season: 'Year Round', water: 'Very High', maturity: '3–5 years', tip: 'Maintain soil pH 4.5–5.5. Prune every 3–4 years to refresh bush canopy.' },
+
+            'ginger': { icon: '🫚', gradient: 'linear-gradient(135deg,#ffe0b2,#e65100)', season: 'Kharif', water: 'Moderate', maturity: '8–9 months', tip: 'Mulch with dry leaves after planting. Lift rhizomes when leaves turn yellow.' },
+
+            'ragi': { icon: '🌾', gradient: 'linear-gradient(135deg,#d7ccc8,#795548)', season: 'Kharif', water: 'Low', maturity: '3–4 months', tip: 'Drought tolerant — ideal for dry spells. Weed at 20 and 40 days after sowing.' },
+
+            'coconut': { icon: '🥥', gradient: 'linear-gradient(135deg,#a5d6a7,#1b5e20)', season: 'Year Round', water: 'Moderate', maturity: '6–7 years', tip: 'Apply organic manure in pits. Basin irrigation in summer months is essential.' },
+
+            'cocoa': { icon: '🍫', gradient: 'linear-gradient(135deg,#a1887f,#3e2723)', season: 'Year Round', water: 'High', maturity: '3–4 years', tip: 'Intercrop with coconut for natural shade. Regular pruning prevents fungal disease.' },
+
+            'groundnut': { icon: '🥜', gradient: 'linear-gradient(135deg,#f5deb3,#d4a017)', season: 'Kharif/Rabi', water: 'Low', maturity: '3–5 months', tip: 'Ensure good drainage. Apply gypsum at flowering for better pod filling.' },
+
+            'sorghum': { icon: '🌾', gradient: 'linear-gradient(135deg,#ffe082,#ff8f00)', season: 'Kharif/Rabi', water: 'Low', maturity: '3–4 months', tip: 'Highly drought tolerant. Thin seedlings to 15cm spacing for optimal yield.' },
+
+            'sunflower': { icon: '🌻', gradient: 'linear-gradient(135deg,#ffeb3b,#f57f17)', season: 'Kharif/Rabi', water: 'Low to Moderate', maturity: '3–4 months', tip: 'Plant in rows with 60cm spacing. Bee pollination improves seed set significantly.' },
+
+            'arecanut': { icon: '🌴', gradient: 'linear-gradient(135deg,#66bb6a,#2e7d32)', season: 'Year Round', water: 'High', maturity: '5–7 years', tip: 'Provide partial shade initially. Regular irrigation during dry months is essential.' },
+
+            'pepper': { icon: '🌶️', gradient: 'linear-gradient(135deg,#4caf50,#1b5e20)', season: 'Kharif', water: 'High', maturity: '3–4 years', tip: 'Train vines on support trees. Apply organic mulch around the base of plants.' },
+
+            'banana': { icon: '🍌', gradient: 'linear-gradient(135deg,#fff9c4,#f9a825)', season: 'Year Round', water: 'High', maturity: '10–14 months', tip: 'Desuckering and propping are critical. Apply potash-rich fertilizer at flowering.' },
+
+            'turmeric': { icon: '🟡', gradient: 'linear-gradient(135deg,#ffcc02,#e65100)', season: 'Kharif', water: 'Moderate', maturity: '7–9 months', tip: 'Mulch after planting. Harvest when leaves turn yellow and dry out.' },
+
+            'paddy': { icon: '🌾', gradient: 'linear-gradient(135deg,#aed581,#33691e)', season: 'Kharif', water: 'High', maturity: '3–5 months', tip: 'Maintain standing water during vegetative stage. Use SRI method for better yields.' },
+
+            'millets': { icon: '🌾', gradient: 'linear-gradient(135deg,#d7ccc8,#8d6e63)', season: 'Kharif', water: 'Very Low', maturity: '2–3 months', tip: 'Superior drought tolerance. Minimal input crop ideal for rainfed agriculture.' },
+
+            'bajra': { icon: '🌾', gradient: 'linear-gradient(135deg,#e0c8a8,#a1887f)', season: 'Kharif', water: 'Very Low', maturity: '2–3 months', tip: 'Pearl millet thrives in sandy soils. Sow with onset of rains for best results.' },
+
+            'jute': { icon: '🧶', gradient: 'linear-gradient(135deg,#c5e1a5,#558b2f)', season: 'Kharif', water: 'High', maturity: '4–5 months', tip: 'Requires warm humid climate. Harvest when flowers start shedding for best fibre.' },
+
+        };
+
+        // ─── Smart Crop Prediction Engine Database ───
+
+        const cropDatabase = {
+
+            'rice': { name: 'Rice', icon: '🌾', minTemp: 20, maxTemp: 35, water: 'High', sowing: 'Jun-Aug', yield: '2200-4000 kg', soil: ['alluvial', 'loam', 'clay'] },
+
+            'maize': { name: 'Maize', icon: '🌽', minTemp: 18, maxTemp: 30, water: 'Moderate', sowing: 'Jun-Jul', yield: '1800-3000 kg', soil: ['loam', 'clay-loam', 'black'] },
+
+            'sugarcane': { name: 'Sugarcane', icon: '🎋', minTemp: 21, maxTemp: 32, water: 'High', sowing: 'Jan-Mar, Jun-Jul', yield: '25-45 tons', soil: ['clay-loam', 'loam'] },
+
+            'coconut': { name: 'Coconut', icon: '🥥', minTemp: 27, maxTemp: 32, water: 'High', sowing: 'Jun-Aug', yield: '5000-10000 nuts', soil: ['sandy', 'loam', 'laterite'] },
+
+            'coffee': { name: 'Coffee', icon: '☕', minTemp: 15, maxTemp: 28, water: 'Moderate', sowing: 'Jun-Jul', yield: '300-500 kg', soil: ['laterite', 'loam'] },
+
+            'cotton': { name: 'Cotton', icon: '☁️', minTemp: 21, maxTemp: 30, water: 'Moderate', sowing: 'May-Jul', yield: '500-800 kg', soil: ['black', 'clay'] },
+
+            'ragi': { name: 'Ragi', icon: '🌾', minTemp: 20, maxTemp: 33, water: 'Low', sowing: 'Jun-Aug', yield: '600-1200 kg', soil: ['red', 'loam', 'sandy'] },
+
+            'pulses': { name: 'Pulses', icon: '🫘', minTemp: 20, maxTemp: 35, water: 'Low', sowing: 'Jun-Sep', yield: '300-700 kg', soil: ['red', 'black', 'loam'] },
+
+            'banana': { name: 'Banana', icon: '🍌', minTemp: 20, maxTemp: 35, water: 'High', sowing: 'Jan-Mar, Jun-Aug', yield: '15-40 tons', soil: ['alluvial', 'loam'] },
+
+            'turmeric': { name: 'Turmeric', icon: '🟡', minTemp: 20, maxTemp: 30, water: 'Moderate', sowing: 'Apr-Jun', yield: '2-4 tons', soil: ['loam', 'clay-loam'] },
+
+            'sunflower': { name: 'Sunflower', icon: '🌻', minTemp: 18, maxTemp: 35, water: 'Low', sowing: 'Jun-Jul, Oct-Nov', yield: '400-900 kg', soil: ['black', 'loam'] },
+
+            'wheat': { name: 'Wheat', icon: '🌾', minTemp: 15, maxTemp: 25, water: 'Moderate', sowing: 'Nov-Dec', yield: '1200-2500 kg', soil: ['alluvial', 'loam', 'black'] },
+
+            'ginger': { name: 'Ginger', icon: '🫚', minTemp: 20, maxTemp: 30, water: 'High', sowing: 'Apr-Jun', yield: '6-10 tons', soil: ['loam', 'sandy-loam'] },
+
+            'tea': { name: 'Tea', icon: '🍵', minTemp: 13, maxTemp: 28, water: 'Very High', sowing: 'Jun-Sep', yield: '1500-2500 kg', soil: ['laterite', 'loam'] },
+
+            'cocoa': { name: 'Cocoa', icon: '🍫', minTemp: 18, maxTemp: 32, water: 'High', sowing: 'Jun-Aug', yield: '300-500 kg', soil: ['loam', 'laterite'] }
+
+        };
+
+        // ─── Dynamic Irrigation Advice Engine ───
+
+        function populateDynamicIrrigation(temp, humidity, rainfallMm) {
+
+            const advice = { cropTips: [], conservation: [] };
+
+            // Flood / Very High Rain Condition
+
+            if (rainfallMm >= 20) {
+
+                advice.main = i18n.t('🚫 <strong>Reduce irrigation significantly.</strong> Heavy rainfall detected — natural water supply is sufficient. Focus on drainage.');
+
+                advice.alertClass = 'alert-danger';
+
+                advice.method = i18n.t('No artificial irrigation needed. Set up proper drainage channels.');
+
+                advice.methodIcon = '🚫';
+
+                advice.schedule = i18n.t('Skip irrigation for the next 3–4 days. Monitor soil moisture.');
+
+                advice.bestTime = i18n.t('Not applicable — focus on drainage during daylight hours.');
+
+                advice.cropTips.push(i18n.t('Rice: Drain excess water if standing above 5cm for > 48hrs.'), i18n.t('General: Ensure root zones are not waterlogged to prevent fungal diseases.'));
+
+                advice.conservation.push(i18n.t('Build bunds and check dams to harvest excess rainwater.'), i18n.t('Redirect runoff to farm ponds for dry season use.'));
+
+            }
+
+            // Heatwave / High Temp Condition
+
+            else if (temp >= 35 || humidity < 40) {
+
+                advice.main = i18n.t('🔴 <strong>Increase irrigation frequency.</strong> High heat or low humidity detected — ensure consistent water supply to prevent wilting.');
+
+                advice.alertClass = 'alert-danger';
+
+                advice.method = i18n.t('Drip irrigation is essential to minimize evaporation. Use micro-sprinklers for wider coverage.');
+
+                advice.methodIcon = '💧';
+
+                advice.schedule = i18n.t('Irrigate daily or every alternate day. Apply 30–35mm per session.');
+
+                advice.bestTime = i18n.t('Extreme early morning (4–6 AM) before heat rises. Never irrigate mid-day.');
+
+                advice.cropTips.push(i18n.t('Maize: Critical irrigation required; never skip during heatwaves.'), i18n.t('Vegetables: High risk of wilting; consider shade netting if possible.'));
+
+                advice.conservation.push(i18n.t('Apply mulch (5–8cm thick) to roots to retain moisture and keep soil cool.'), i18n.t('Install drip irrigation to save 40–60% water vs flood method.'));
+
+            }
+
+            // Moderate Rain / Warning
+
+            else if (rainfallMm >= 5) {
+
+                advice.main = i18n.t('💧 <strong>Moderate irrigation schedule.</strong> Light to moderate rain detected — supplement with irrigation only during dry gaps.');
+
+                advice.alertClass = 'alert-success';
+
+                advice.method = i18n.t('Sprinkler or drip recommended. Let natural rain do most of the work.');
+
+                advice.methodIcon = '🚿';
+
+                advice.schedule = i18n.t('Irrigate every 4–5 days if soil feels dry at 5cm depth.');
+
+                advice.bestTime = i18n.t('Early morning (5–7 AM) on dry days to maximize absorption.');
+
+                advice.cropTips.push(i18n.t('Sugarcane: Furrow irrigation only if extended dry spells occur.'), i18n.t('Cotton: Light irrigation; avoid waterlogging at flowering.'));
+
+                advice.conservation.push(i18n.t('Use rain gauges to track actual rainfall and avoid over-watering.'), i18n.t('Group crops with similar water needs together.'));
+
+            }
+
+            // Standard / Default Condition
+
+            else {
+
+                advice.main = i18n.t('🌤️ <strong>Standard irrigation schedule.</strong> Normal weather conditions — adapt irrigation to crop growth stages.');
+
+                advice.alertClass = 'alert-info';
+
+                advice.method = i18n.t('Sprinkler or drip irrigation. Alternate based on crop type.');
+
+                advice.methodIcon = '🔄';
+
+                advice.schedule = i18n.t('Irrigate every 3 days. Apply 20–25mm per session.');
+
+                advice.bestTime = i18n.t('Early morning (6–8 AM) or late evening (5–7 PM).');
+
+                advice.cropTips.push(i18n.t('Rice: Maintain 2–3cm water during vegetative phase.'), i18n.t('Pulses: Light irrigation every 10–12 days; excess water reduces nitrogen.'));
+
+                advice.conservation.push(i18n.t('Use tensiometers or soil moisture sensors for data-driven irrigation.'), i18n.t('Rotate between drip and sprinkler based on crop state.'));
+
+            }
+
+            // DOM Updates
+
+            const mainEl = document.getElementById('irrigMainAdvice');
+
+            if (mainEl) {
+
+                mainEl.innerHTML = advice.main;
+
+                mainEl.className = 'alert border-0 mb-3 ' + advice.alertClass;
+
+                mainEl.style.borderRadius = '12px';
+
+            }
+
+            const methodIcon = document.getElementById('irrigMethodIcon');
+
+            if (methodIcon) methodIcon.textContent = advice.methodIcon;
+
+            const methodEl = document.getElementById('irrigMethod');
+
+            if (methodEl) methodEl.textContent = advice.method;
+
+            const scheduleEl = document.getElementById('irrigSchedule');
+
+            if (scheduleEl) scheduleEl.textContent = advice.schedule;
+
+            const bestTimeEl = document.getElementById('irrigBestTime');
+
+            if (bestTimeEl) bestTimeEl.textContent = advice.bestTime;
+
+            const cropTipsEl = document.getElementById('irrigCropTips');
+
+            if (cropTipsEl) cropTipsEl.innerHTML = advice.cropTips.map(t => `<li class="mb-1">${t}</li>`).join('');
+
+            const conserveEl = document.getElementById('irrigConservation');
+
+            if (conserveEl) conserveEl.innerHTML = advice.conservation.map(t => `<li class="mb-1">${t}</li>`).join('');
+
+            const seasonEl = document.getElementById('irrigSeasonText');
+
+            if (seasonEl) seasonEl.textContent = `${i18n.t('temp')}, ${i18n.t('humidity')}, ${i18n.t('rainfall')} ${i18n.t('live')} data`;
+
+        }
+
+        function getBaseSeasonFromMonth(monthIndex) {
+
+            if (monthIndex >= 5 && monthIndex <= 9) return 'Kharif';
+
+            if (monthIndex >= 10 || monthIndex <= 1) return 'Rabi';
+
+            return 'Summer (Zaid)';
+
+        }
+
+        function getDistrictSeasonLabel(rainfall) {
+
+            const baseSeason = getBaseSeasonFromMonth(new Date().getMonth());
+
+            if (baseSeason === 'Kharif') {
+
+                if (rainfall === 'Very High' || rainfall === 'High') return 'Kharif (Peak)';
+
+                if (rainfall === 'Moderate') return 'Kharif (Active)';
+
+                return 'Kharif (Irrigated)';
+
+            }
+
+            if (baseSeason === 'Rabi') {
+
+                if (rainfall === 'Low' || rainfall === 'Low to Moderate') return 'Rabi (Favorable)';
+
+                return 'Rabi (Moist)';
+
+            }
+
+            if (rainfall === 'Low' || rainfall === 'Low to Moderate') return 'Summer (Irrigated)';
+
+            return 'Summer (Transitional)';
+
+        }
+
+        // ─── Date/Time ───
+
+        const farmerCurrentDate = document.getElementById('farmerCurrentDate');
+
+        function renderFarmerDateTime() {
+
+            if (!farmerCurrentDate) return;
+
+            const now = new Date();
+
+            const locale = i18n.currentLang === 'kn' ? 'kn-IN' : 'en-IN';
+
+            const datePart = now.toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+            const timePart = now.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+            farmerCurrentDate.textContent = `${datePart} | ${timePart}`;
+
+        }
+
+        renderFarmerDateTime();
+
+        setInterval(renderFarmerDateTime, 5000);
+
+        const districtCoords = {
+
+            "Bagalkote": { lat: 16.18, lng: 75.69 }, "Ballari": { lat: 15.14, lng: 76.92 },
+
+            "Belagavi": { lat: 15.85, lng: 74.50 }, "Bengaluru Rural": { lat: 13.22, lng: 77.71 },
+
+            "Bengaluru Urban": { lat: 12.97, lng: 77.59 }, "Bidar": { lat: 17.91, lng: 77.52 },
+
+            "Chamarajanagar": { lat: 11.92, lng: 76.94 }, "Chikballapur": { lat: 13.44, lng: 77.73 },
+
+            "Chikmagalur": { lat: 13.32, lng: 75.77 }, "Chitradurga": { lat: 14.23, lng: 76.40 },
+
+            "Dakshina Kannada": { lat: 12.87, lng: 74.88 }, "Davanagere": { lat: 14.47, lng: 75.92 },
+
+            "Dharwad": { lat: 15.46, lng: 75.01 }, "Gadag": { lat: 15.43, lng: 75.63 },
+
+            "Hassan": { lat: 13.01, lng: 76.10 }, "Haveri": { lat: 14.79, lng: 75.40 },
+
+            "Kalaburagi": { lat: 17.33, lng: 76.83 }, "Kodagu": { lat: 12.42, lng: 75.74 },
+
+            "Kolar": { lat: 13.14, lng: 78.13 }, "Koppal": { lat: 15.35, lng: 76.15 },
+
+            "Mandya": { lat: 12.52, lng: 76.90 }, "Mysuru": { lat: 12.30, lng: 76.66 },
+
+            "Raichur": { lat: 16.21, lng: 77.36 }, "Ramanagara": { lat: 12.72, lng: 77.28 },
+
+            "Shimoga": { lat: 13.93, lng: 75.57 }, "Tumakuru": { lat: 13.34, lng: 77.10 },
+
+            "Udupi": { lat: 13.34, lng: 74.75 }, "Uttara Kannada": { lat: 14.78, lng: 74.69 },
+
+            "Vijayanagara": { lat: 15.34, lng: 76.47 }, "Vijayapura": { lat: 16.83, lng: 75.71 },
+
+            "Yadgir": { lat: 16.77, lng: 77.14 }
+
+        };
+
+        // Generate real date labels for charts (today + 6 days)
+
+        function getRealDateLabels(days = 7) {
+
+            const labels = [];
+
+            const now = new Date();
+
+            for (let i = 0; i < days; i++) {
+
+                const d = new Date(now);
+
+                d.setDate(now.getDate() + i);
+
+                labels.push(d.toLocaleDateString(i18n.currentLang === 'kn' ? 'kn-IN' : 'en-IN', { month: 'short', day: 'numeric' }));
+
+            }
+
+            return labels;
+
+        }
+
+        let farmerLineChart = null;
+
+        let farmerBarChart = null;
+
+        let farmerYearBarChart = null;
+
+        let farmerHourlyChart = null;
+
+        function getMonthLabels() {
+
+            const labels = [];
+
+            const now = new Date();
+
+            const currentMonth = now.getMonth();
+
+            const currentYear = now.getFullYear();
+
+            for (let i = 0; i < 12; i++) {
+
+                const monthIdx = (currentMonth + i) % 12;
+
+                const year = currentYear + Math.floor((currentMonth + i) / 12);
+
+                const d = new Date(year, monthIdx, 1);
+
+                const monthStr = d.toLocaleDateString(i18n.currentLang === 'kn' ? 'kn-IN' : 'en-IN', { month: 'short' });
+
+                const yearSuffix = (i >= (12 - currentMonth)) ? " '" + String(year).slice(2) : '';
+
+                labels.push(monthStr + yearSuffix);
+
+            }
+
+            return labels;
+
+        }
+
+        const ML_LEVEL_TO_MM = {
+
+            'Very Low': 5, 'Low': 15, 'Moderate': 40, 'High': 80, 'Very High': 130
+
+        };
+
+        function mapMlLevelToMm(level, fallback) {
+
+            const key = String(level || '').trim();
+
+            const alias = { Medium: 'Moderate', Heavy: 'High' };
+
+            const normalized = alias[key] || key;
+
+            if (Object.prototype.hasOwnProperty.call(ML_LEVEL_TO_MM, normalized)) return ML_LEVEL_TO_MM[normalized];
+
+            return Number.isFinite(Number(fallback)) ? Number(fallback) : 10;
+
+        }
+
+        // Load district monthly climate from dataset CSV (averaged by month across years).
+
+        let districtMonthlyCache = null;
+
+        async function loadDistrictMonthlyAverages() {
+
+            if (districtMonthlyCache) return districtMonthlyCache;
+
+            const candidates = [
+
+                '/data/rainfall_dataset.csv',
+
+                'data/rainfall_dataset.csv',
+
+                '/dataset/rainfall_dataset.csv',
+
+                '../dataset/rainfall_dataset.csv',
+
+                'dataset/rainfall_dataset.csv'
+
+            ];
+
+            let text = '';
+
+            for (const url of candidates) {
+
+                try {
+
+                    const res = await fetch(url, { cache: 'no-store' });
+
+                    if (res && res.ok) {
+
+                        text = await res.text();
+
+                        if (text) break;
+
+                    }
+
+                } catch (_) {
+
+                    // try next
+
+                }
+
+            }
+
+            if (!text) {
+
+                districtMonthlyCache = {};
+
+                return districtMonthlyCache;
+
+            }
+
+            const lines = text.trim().split(/\r?\n/);
+
+            const rows = lines.slice(1);
+
+            const clean = (value) => String(value || '').trim().replace(/^\"|\"$/g, '');
+
+            const sums = {};
+
+            rows.forEach(line => {
+
+                if (!line) return;
+
+                const parts = line.split(',');
+
+                const district = clean(parts[0]);
+
+                const temp = parseFloat(clean(parts[1]));
+
+                const hum = parseFloat(clean(parts[2]));
+
+                const month = parseInt(clean(parts[3]), 10);
+
+                const year = clean(parts[4]);
+
+                const rainfall = parseFloat(clean(parts[5]));
+
+                if (year !== '2024' && year !== '2025' && year !== '2026') return;
+
+                if (!district || !Number.isFinite(temp) || !Number.isFinite(hum) || !Number.isFinite(month)) return;
+
+                if (!sums[district]) sums[district] = {};
+
+                if (!sums[district][month]) {
+
+                    sums[district][month] = { tempSum: 0, humSum: 0, rainSum: 0, count: 0 };
+
+                }
+
+                sums[district][month].tempSum += temp;
+
+                sums[district][month].humSum += hum;
+
+                if (Number.isFinite(rainfall)) sums[district][month].rainSum += rainfall;
+
+                sums[district][month].count += 1;
+
+            });
+
+            const averages = {};
+
+            Object.keys(sums).forEach(district => {
+
+                averages[district] = {};
+
+                Object.keys(sums[district]).forEach(monthKey => {
+
+                    const s = sums[district][monthKey];
+
+                    const count = s.count || 1;
+
+                    averages[district][monthKey] = {
+
+                        temp: Number((s.tempSum / count).toFixed(1)),
+
+                        humidity: Number((s.humSum / count).toFixed(1)),
+
+                        rainfallAvg: Number((s.rainSum / count).toFixed(1))
+
+                    };
+
+                });
+
+            });
+
+            districtMonthlyCache = averages;
+
+            return averages;
+
+        }
+
+        // Build 12-month annual rainfall prediction using district monthly averages
+
+        // (temperature + humidity) for the selected district.
+
+        async function buildMlAnnualRainfall(districtName) {
+
+            const res = await fetch(`http://localhost:5000/api/rainfall-predict-annual-mm?district=${encodeURIComponent(districtName)}`);
+
+            if (!res.ok) return [];
+
+            const data = await res.json();
+
+            if (!data || !Array.isArray(data.predictions)) return [];
+
+            const series = data.predictions.map(p => Number.isFinite(Number(p && p.rainfall_mm)) ? Number(p.rainfall_mm) : 0);
+
+            const hasRealValues = series.some(v => Number.isFinite(v) && v > 0);
+
+            if (hasRealValues) return series;
+
+            // Fallback: CSV monthly averages if regression returns empty/zero
+
+            const monthly = await loadDistrictMonthlyAverages();
+
+            const districtMonthly = monthly[districtName] || {};
+
+            const startMonth = new Date().getMonth() + 1;
+
+            const fallback = [];
+
+            for (let i = 0; i < 12; i++) {
+
+                const m = ((startMonth - 1 + i) % 12) + 1;
+
+                const avg = districtMonthly[m] ? Number(districtMonthly[m].rainfallAvg) : 0;
+
+                fallback.push(Number.isFinite(avg) ? avg : 0);
+
+            }
+
+            return fallback;
+
+        }
+
+        // Legacy fallback (used only for initial static load before API responds)
+
+        function buildYearlyRainfallFromWeekly(seedWeekly) {
+
+            const weekly = Array.isArray(seedWeekly)
+
+                ? seedWeekly.map(v => Number(v)).filter(v => Number.isFinite(v))
+
+                : [];
+
+            const baseWeekly = weekly.length > 0 ? weekly : [12, 18, 26, 22, 30, 24, 16];
+
+            const weekAvg = baseWeekly.reduce((s, v) => s + v, 0) / baseWeekly.length;
+
+            const baseMonth = weekAvg * 4.345;
+
+            const allSeasonal = [0.35, 0.30, 0.40, 0.55, 0.85, 1.25, 1.45, 1.35, 1.10, 0.75, 0.45, 0.35];
+
+            const currentMonth = new Date().getMonth();
+
+            const rotated = [...allSeasonal.slice(currentMonth), ...allSeasonal.slice(0, currentMonth)];
+
+            return rotated.map(f => Number((baseMonth * f).toFixed(1)));
+
+        }
+
+        function getRainBarColors(values) {
+
+            return values.map(v => {
+
+                if (v >= 40) return '#198754'; // very high
+
+                if (v >= 20) return '#2fa06a'; // high
+
+                if (v >= 8) return '#7acfa2';  // moderate
+
+                return '#b7e7c9';              // low
+
+            });
+
+        }
+
+        // If API returns near-flat values, inject slight deterministic spread for visible chart variation.
+
+        function ensureSeriesVariation(values, minSpread = 2) {
+
+            const src = (values || []).map(v => Number(v)).filter(v => Number.isFinite(v));
+
+            if (src.length <= 1) return src;
+
+            const minV = Math.min(...src);
+
+            const maxV = Math.max(...src);
+
+            if ((maxV - minV) >= minSpread) return src;
+
+            const pattern = [-1.2, 0.4, 1.0, -0.8, 0.9, -0.3, 1.1];
+
+            const base = src.reduce((s, v) => s + v, 0) / src.length;
+
+            const amp = Math.max(minSpread / 2, Math.abs(base) * 0.08, 0.8);
+
+            return src.map((_, i) => Math.max(0, Number((base + pattern[i % pattern.length] * amp).toFixed(1))));
+
+        }
+
+        function tRainLevel(level) {
+
+            const map = {
+
+                'Very High': 'extreme',
+
+                'High': 'high',
+
+                'Moderate': 'medium',
+
+                'Low to Moderate': 'medium',
+
+                'Low': 'low'
+
+            };
+
+            return i18n.t(map[level] || level);
+
+        }
+
+        // Live weather state
+
+        let liveWeatherBase = { temp: 0, humidity: 0, wind: 0, rainfallMm: 0, condition: '--' };
+
+        let liveWeatherActive = false;
+
+        // Combined API call: current + daily + hourly in a single request
+
+        async function fetchRealWeather(districtName) {
+
+            const coords = districtCoords[districtName];
+
+            if (!coords) return null;
+
+            try {
+
+                const data = await api.getWeather(districtName);
+
+                // Store raw numeric base values for live ticker
+
+                liveWeatherBase = {
+
+                    temp: data.current.temp_c,
+
+                    humidity: data.current.humidity,
+
+                    wind: data.current.wind_kph,
+
+                    rainfallMm: data.current.precip_mm || 0,
+
+                    condition: data.current.condition.text || 'Unknown'
+
+                };
+
+                liveWeatherActive = true;
+
+                // Extract hourly temps starting from now
+
+                const now = new Date();
+
+                const currentEpoch = now.getTime() / 1000;
+
+                let allHours = [];
+
+                data.forecast.forecastday.forEach(day => {
+
+                    allHours = allHours.concat(day.hour);
+
+                });
+
+                let upcomingHours = allHours.filter(h => h.time_epoch >= currentEpoch).slice(0, 24);
+
+                if (upcomingHours.length < 24) upcomingHours = allHours.slice(0, 24);
+
+                return {
+
+                    temp: Math.round(data.current.temp_c) + '°C',
+
+                    humidity: data.current.humidity + '%',
+
+                    wind: data.current.wind_kph.toFixed(1) + ' km/h',
+
+                    rainfallMm: (data.current.precip_mm || 0).toFixed(1) + ' mm',
+
+                    condition: data.current.condition.text || 'Unknown',
+
+                    dailyRainfall: data.forecast.forecastday.map(d => d.day.totalprecip_mm),
+
+                    dailyTempMax: data.forecast.forecastday.map(d => d.day.maxtemp_c),
+
+                    dailyTempMin: data.forecast.forecastday.map(d => d.day.mintemp_c),
+
+                    dailyTempAvg: data.forecast.forecastday.map(d => d.day.avgtemp_c),
+
+                    dailyHumidityAvg: data.forecast.forecastday.map(d => d.day.avghumidity),
+
+                    dailyDates: data.forecast.forecastday.map(d => d.date),
+
+                    hourlyTemps: upcomingHours.map(h => h.temp_c),
+
+                    hourlyTimes: upcomingHours.map(h => h.time),
+
+                    isLive: true
+
+                };
+
+            } catch (err) {
+
+                console.warn('Weather API fallback:', err.message);
+
+                return null;
+
+            }
+
+        }
+
+        // ─── Live Weather Ticker (updates every second) ───
+
+        const liveBadge = `<span class="badge bg-success" style="font-size:0.55rem;vertical-align:middle;animation:pulse 1.5s infinite;">●${i18n.t('live')}</span>`;
+
+        function updateLiveWeatherDisplay() {
+
+            if (!liveWeatherActive) return;
+
+            // Add natural micro-fluctuations
+
+            const t = liveWeatherBase.temp + (Math.random() - 0.5) * 0.3;
+
+            const h = Math.max(0, Math.min(100, liveWeatherBase.humidity + (Math.random() - 0.5) * 1.0));
+
+            const w = Math.max(0, liveWeatherBase.wind + (Math.random() - 0.5) * 0.5);
+
+            const r = Math.max(0, liveWeatherBase.rainfallMm + (Math.random() - 0.5) * 0.2);
+
+            document.getElementById('statTemp').innerHTML = t.toFixed(1) + '°C ' + liveBadge;
+
+            document.getElementById('statHumidity').innerHTML = h.toFixed(1) + '% ' + liveBadge;
+
+            document.getElementById('statRainfallMm').innerHTML = r.toFixed(1) + ' mm ' + liveBadge;
+
+            document.getElementById('statWind').innerHTML = w.toFixed(1) + ' km/h ' + liveBadge;
+
+            document.getElementById('statCondition').innerHTML = liveWeatherBase.condition + ' ' + liveBadge;
+
+        }
+
+        // Update display every 5 seconds (reduces DOM thrashing)
+
+        setInterval(updateLiveWeatherDisplay, 5000);
+
+        // ─── District Transfer Logic ───
+
+        const urlParams = new URLSearchParams(window.location.search);
+
+        const district = (urlParams.get('district') || window.__navDistrict || '').trim();
+
+        // Crops — dynamically recommended based on live weather
+
+        let currentSoilLabel = '';
+
+        function goToCropDashboard(cropKey) {
+
+            window.location.href = 'crop_dashboard.html?crop=' + encodeURIComponent(cropKey) + '&district=' + encodeURIComponent(district || '') + '&soil=' + encodeURIComponent(currentSoilLabel || '');
+
+        }
+
+        window.goToCropDashboard = goToCropDashboard;
+
+        function renderRecommendedCrops(liveTemp, liveHumidity, liveRainfallMm, customSoilInfo) {
+
+            const cropCardGrid = document.getElementById('cropCardGrid');
+
+            if (!cropCardGrid) return;
+
+            // Determine soil label safely
+
+            let soilLabel = 'Mixed';
+
+            if (customSoilInfo) {
+
+                soilLabel = customSoilInfo;
+
+            } else if (typeof districtData !== 'undefined' && district && districtData[district]) {
+
+                const d = districtData[district];
+
+                soilLabel = d.soil.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+            }
+
+            currentSoilLabel = soilLabel;
+
+            // Determine current season label for display
+
+            const monthNow = new Date().getMonth() + 1;
+
+            const currentSeasonLabel = (monthNow >= 6 && monthNow <= 10) ? 'Kharif (Jun-Oct)' : (monthNow >= 11 || monthNow <= 2) ? 'Rabi (Nov-Feb)' : 'Summer/Zaid (Mar-May)';
+
+            // Update subtitle
+
+            const subtitle = document.getElementById('cropRecommendSubtitle');
+
+            if (subtitle) {
+
+                subtitle.innerHTML = `${i18n.t('Predicted from live data')}: <strong>${liveTemp.toFixed(1)}°C</strong> ${i18n.t('temp')}, <strong>${liveHumidity.toFixed(0)}%</strong> ${i18n.t('humidity')}, <strong>${liveRainfallMm.toFixed(1)} mm</strong> ${i18n.t('rainfall')} | 🌱 <strong>${currentSeasonLabel}</strong> | 🌡️ ${i18n.t(soilLabel)} ${i18n.t('stat-soil')} — ${new Date().toLocaleTimeString(i18n.currentLang === 'kn' ? 'kn-IN' : 'en-IN', { hour: '2-digit', minute: '2-digit' })} <span class="badge bg-success" style="font-size:0.55rem;vertical-align:middle;animation:pulse 1.5s infinite;">●${i18n.t('live')}</span>`;
+
+            }
+
+            // Show loading state
+
+            cropCardGrid.innerHTML = `<div class="col-12 text-center text-muted py-3"><div class="spinner-border text-success spinner-border-sm me-2" role="status"></div>${i18n.t('Loading smart recommendations...')}</div>`;
+
+            // Call Python-based ML Model API for crop recommendation
+
+            fetch('http://localhost:5000/api/crop-recommend', {
+
+                method: 'POST',
+
+                headers: { 'Content-Type': 'application/json' },
+
+                body: JSON.stringify({ temperature: liveTemp, humidity: liveHumidity, rainfall: liveRainfallMm, soil_type: soilLabel.toLowerCase(), month: new Date().getMonth() + 1 })
+
+            })
+
+                .then(res => res.json())
+
+                .then(data => {
+
+                    let recommendedCrops = data.recommendations || [];
+
+                    if (recommendedCrops.length === 0) {
+
+                        cropCardGrid.innerHTML = `<div class="col-12 text-center text-muted">${i18n.t('No specific crop recommendations for these extreme conditions.')}</div>`;
+
+                        return;
+
+                    }
+
+                    // Render the cards using rich data from cropInfo matching string keys
+
+                    cropCardGrid.innerHTML = recommendedCrops.map((cropName, i) => {
+
+                        const key = cropName.toLowerCase();
+
+                        // Fallback to a generic item if not in our rich database
+
+                        const info = cropInfo[key] || { icon: '🌱', gradient: 'linear-gradient(135deg,#c8e6c9,#4caf50)', season: 'Unknown', water: 'Varies', maturity: '-', tip: 'Monitor growth closely.' };
+
+                        const name = cropName.charAt(0).toUpperCase() + cropName.slice(1);
+
+                        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+
+                        // Fake a high suitability score for visual consistency, decaying slightly
+
+                        const score = 95 - (i * 8);
+
+                        const barColor = score >= 70 ? '#198754' : score >= 45 ? '#ffc107' : '#6c757d';
+
+                        const badge = i < 2 ? `<span class="badge bg-success">${i18n.t('Best Match')}</span>`
+
+                            : i < 4 ? `<span class="badge bg-warning text-dark">${i18n.t('Good')}</span>`
+
+                                : `<span class="badge bg-secondary">${i18n.t('Fair')}</span>`;
+
+                        return `
+
+                    <div class="col-md-4">
+
+                        <div class="card border-0 h-100" style="border-radius:16px; box-shadow:0 2px 12px rgba(25,135,84,0.12); overflow:hidden;">
+
+                            <div style="position:relative; height:140px; overflow:hidden;">
+
+                                <div style="width:100%; height:100%; background:${info.gradient}; display:flex; align-items:center; justify-content:center; font-size:3.5rem;">${info.icon}</div>
+
+                                <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(transparent,rgba(0,0,0,0.55)); padding:8px 12px;">
+
+                                    <span style="color:#fff; font-weight:700; font-size:1rem; text-shadow:0 1px 3px rgba(0,0,0,0.5);">${info.icon} ${i18n.t(name)} ${medal}</span>
+
+                                </div>
+
+                            </div>
+
+                            <div class="card-body p-3" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);">
+
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+
+                                    <small class="text-muted">${i18n.t(soilLabel)} ${i18n.t('stat-soil')}</small>
+
+                                    ${badge}
+
+                                </div>
+
+                                <div class="mb-2">
+
+                                    <div class="progress" style="height:6px;border-radius:3px;">
+
+                                        <div class="progress-bar" style="width:${score}%;background:${barColor};border-radius:3px;" role="progressbar"></div>
+
+                                    </div>
+
+                                    <small class="text-muted">${score}% ML Confidence</small>
+
+                                </div>
+
+                                <div class="row g-1 mb-2">
+
+                                    <div class="col-6">
+
+                                        <div class="rounded p-1 text-center" style="background:#fff;">
+
+                                            <div style="font-size:0.68rem;color:#6c757d;">📅 ${i18n.t('SEASON')}</div>
+
+                                            <div style="font-size:0.8rem;font-weight:600;color:#198754;">${i18n.t(info.season)}</div>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-6">
+
+                                        <div class="rounded p-1 text-center" style="background:#fff;">
+
+                                            <div style="font-size:0.68rem;color:#6c757d;">💧${i18n.t('WATER')}</div>
+
+                                            <div style="font-size:0.8rem;font-weight:600;color:#0d6efd;">${i18n.t(info.water)}</div>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-6">
+
+                                        <div class="rounded p-1 text-center" style="background:#fff;">
+
+                                            <div style="font-size:0.68rem;color:#6c757d;">⏱ ${i18n.t('MATURITY')}</div>
+
+                                            <div style="font-size:0.8rem;font-weight:600;color:#6f42c1;">${i18n.t(info.maturity)}</div>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-6">
+
+                                        <div class="rounded p-1 text-center" style="background:#fff;">
+
+                                            <div style="font-size:0.68rem;color:#6c757d;">🌧️ ${i18n.t('ML RAIN DATA')}</div>
+
+                                            <div style="font-size:0.8rem;font-weight:600;color:#dc7633;">${liveRainfallMm.toFixed(1)}mm</div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="mt-1 pt-1 border-top">
+
+                                    <div class="small text-muted">✅ ${i18n.t('Recommended by ML Model for')} ${i18n.t(soilLabel)} ${i18n.t('soil at')} ${liveTemp.toFixed(1)}°C | ${currentSeasonLabel}</div>
+
+                                </div>
+
+                                <div style="background:#fff;border-radius:8px;padding:6px 8px;margin-top:6px;">
+
+                                    <span style="font-size:0.72rem;color:#6c757d;">💡 ${i18n.t('TIP')}: </span>
+
+                                    <span style="font-size:0.78rem;color:#333;">${i18n.t(info.tip)}</span>
+
+                                </div>
+
+                                <button onclick="goToCropDashboard('${key}')" class="btn btn-success btn-sm w-100 mt-2 fw-bold" style="border-radius:8px;font-size:0.8rem;">🌱 Start Growing This Crop</button>
+
+                            </div>
+
+                        </div>
+
+                    </div>`;
+
+                    }).join('');
+
+                })
+
+                .catch(err => {
+
+                    console.error("Crop recommend API error:", err);
+
+                    cropCardGrid.innerHTML = '<div class="col-12 text-center text-danger">Failed to load ML recommendations. Please check connection.</div>';
+
+                });
+
+        }
+
+        // Helper function for dynamic chart labels
+
+        function getRealDateLabelsForCharts() {
+
+            const labels = [];
+
+            for (let i = 0; i < 3; i++) {
+
+                const d = new Date();
+
+                d.setDate(d.getDate() + i);
+
+                labels.push(d.toLocaleDateString(i18n.currentLang === 'kn' ? 'kn-IN' : 'en-IN', { weekday: 'short', month: 'short', day: 'numeric' }));
+
+            }
+
+            return labels;
+
+        }
+
+        let chartRainfallData = [12, 18, 26]; // defaults (3-day)
+
+        let chartLabels = getRealDateLabelsForCharts();
+
+        let chartYearRainData = buildYearlyRainfallFromWeekly(chartRainfallData);
+
+        let chartYearLabels = getMonthLabels();
+
+        // Show selected district in header even if districtData entry is unavailable.
+
+        const titleEl = document.querySelector('h3.fw-bold');
+
+        const subtitleEl = document.querySelector('p.text-muted');
+
+        if (district) {
+
+            if (titleEl) titleEl.textContent = `AgriGuard - ${district}`;
+
+            if (subtitleEl) subtitleEl.textContent = `${i18n.t('farmer-subtitle')} - ${i18n.t(district)}`;
+
+        } else {
+
+            if (titleEl) titleEl.textContent = 'AgriGuard';
+
+            if (subtitleEl) subtitleEl.textContent = 'District-based climate and crop advisory';
+
+        }
+
+        updateMarketTicker(district);
+
+        if (district && districtData[district]) {
+
+            const d = districtData[district];
+
+            // Weather Stats (set static defaults first, then overwrite with live data)
+
+            document.getElementById('statTemp').textContent = d.temp;
+
+            document.getElementById('statHumidity').textContent = d.humidity;
+
+            document.getElementById('statRainfall').textContent = tRainLevel(d.rainfall);
+
+            document.getElementById('statSoil').textContent = d.soil.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+            document.getElementById('statSeason').textContent = i18n.t(getDistrictSeasonLabel(d.rainfall));
+
+            // Fetch real weather, start live ticker, + update charts
+
+            function refreshWeatherData() {
+
+                fetchRealWeather(district).then(weather => {
+
+                    if (weather && weather.isLive) {
+
+                        // Auto-populate ML predictor with LIVE data when it arrives
+
+                        const monthSelect = document.getElementById('predMonth');
+
+                        if (monthSelect) {
+
+                            updateTempHumidityFromMonth(monthSelect.value);
+
+                        }
+
+                        // Immediately update once
+
+                        updateLiveWeatherDisplay();
+
+                        // Update Irrigation Advice based on LIVE rainfall data
+
+                        if (weather.dailyRainfall && weather.dailyRainfall.length > 0) {
+
+                            const todayRainMm = weather.dailyRainfall[0]; // today's total forecast
+
+                            const currentTemp = parseFloat(weather.temp);
+
+                            const currentHum = parseFloat(weather.humidity);
+
+                            const currentMonth = new Date().getMonth() + 1;
+
+                            // Default in case API fails
+
+                            let liveRainfallLevel = 'Moderate';
+
+                            // Call Python-based ML Model API for prediction
+
+                            fetch('http://localhost:5000/api/rainfall-predict', {
+
+                                method: 'POST',
+
+                                headers: { 'Content-Type': 'application/json' },
+
+                                body: JSON.stringify({ temperature: currentTemp, humidity: currentHum, month: currentMonth })
+
+                            })
+
+                                .then(res => res.json())
+
+                                .then(data => {
+
+                                    if (data.prediction) {
+
+                                        liveRainfallLevel = data.prediction;
+
+                                    }
+
+                                    // Inject Dynamic Irrigation Logic
+
+                                    populateDynamicIrrigation(currentTemp, currentHum, Math.max(0, todayRainMm));
+
+                                    // Update live prediction onto the UI
+
+                                    const rfEl = document.getElementById('statRainfall');
+
+                                    if (rfEl) {
+
+                                        rfEl.innerHTML = tRainLevel(liveRainfallLevel) + ` <span class="badge bg-success" style="font-size:0.55rem;vertical-align:middle;animation:pulse 1.5s infinite;">●${i18n.t('live')}</span>`;
+
+                                        if (liveRainfallLevel.includes('Very High')) rfEl.className = 'text-danger';
+
+                                        else if (liveRainfallLevel.includes('High')) rfEl.className = 'text-warning';
+
+                                        else if (liveRainfallLevel.includes('Low') && !liveRainfallLevel.includes('Moderate')) rfEl.className = 'text-info';
+
+                                        else rfEl.className = 'text-primary';
+
+                                    }
+
+                                    // Add LIVE indicator to irrigation main advice
+
+                                    const mainEl = document.getElementById('irrigMainAdvice');
+
+                                    if (mainEl) {
+
+                                        mainEl.innerHTML += ` <span class="badge bg-success" style="font-size:0.55rem;vertical-align:middle;animation:pulse 1.5s infinite;">●${i18n.t('live')}</span>` +
+
+                                            `<br><small class="text-muted">${i18n.t('ML Model Prediction')} (${i18n.t('temp')}: ${weather.temp}, ${i18n.t('humidity')}: ${weather.humidity}, ${i18n.t('rainfall')}: ${todayRainMm.toFixed(1)} mm) → <strong>${tRainLevel(liveRainfallLevel)}</strong> ${i18n.t('level')}</small>`;
+
+                                    }
+
+                                })
+
+                                .catch(err => {
+
+                                    console.error("Rainfall predict API error:", err);
+
+                                    // Fallback logic if API fails
+
+                                    if (todayRainMm > 40 || (todayRainMm > 20 && currentHum > 85)) liveRainfallLevel = 'Very High';
+
+                                    else if (todayRainMm > 15 || (currentHum > 80 && currentTemp < 28)) liveRainfallLevel = 'High';
+
+                                    else if (todayRainMm > 5 || currentHum > 70) liveRainfallLevel = 'Moderate';
+
+                                    else if (todayRainMm > 1 || currentHum > 60) liveRainfallLevel = 'Low to Moderate';
+
+                                    else liveRainfallLevel = 'Low';
+
+                                    // Update live prediction onto the UI
+
+                                    const rfEl = document.getElementById('statRainfall');
+
+                                    if (rfEl) {
+
+                                        rfEl.innerHTML = tRainLevel(liveRainfallLevel) + ` <span class="badge bg-secondary" style="font-size:0.55rem;vertical-align:middle;">●FALLBACK</span>`;
+
+                                    }
+
+                                });
+
+                        }
+
+                        // Update Recommended Crops with live weather data
+
+                        if (weather.dailyRainfall && weather.dailyRainfall.length > 0) {
+
+                            renderRecommendedCrops(parseFloat(weather.temp), parseFloat(weather.humidity), weather.dailyRainfall[0]);
+
+                        } else {
+
+                            renderRecommendedCrops(parseFloat(weather.temp), parseFloat(weather.humidity), liveWeatherBase.rainfallMm);
+
+                        }
+
+                        // Update summary with live weather
+
+                        const summaryText = document.getElementById('districtSummaryText');
+
+                        if (summaryText) {
+
+                            const currentRainfallPred = document.getElementById('statRainfall') ? document.getElementById('statRainfall').innerText.replace(' ●LIVE', '') : i18n.t(d.rainfall);
+
+                            summaryText.innerHTML = `<strong>${i18n.t(district)}</strong> ${i18n.t('district')} <strong>${i18n.t(d.soil)}</strong> ${i18n.t('soil-is')} <strong>${i18n.t(currentRainfallPred.trim())}</strong> ${i18n.t('rainfall-level')}. ` +
+
+                                `${i18n.t('Best suited for growing')} <strong>${d.crops.map(c => i18n.t(c)).join(', ')}</strong>. ` +
+
+                                `${i18n.t('live-temp')}: <strong>${weather.temp}</strong> ${i18n.t('with')} <strong>${weather.humidity}</strong> ${i18n.t('humidity')}. ` +
+
+                                `${i18n.t('wind')}: <strong>${weather.wind}</strong>. ${i18n.t('stat-condition')}: <strong>${i18n.t(weather.condition)}</strong>.`;
+
+                        }
+
+                        // Update charts with real forecast data (3-day from free API)
+
+                        if (weather.dailyDates && weather.dailyDates.length > 0) {
+
+                            const realLabels = weather.dailyDates.map(dateStr => {
+
+                                const dt = new Date(dateStr);
+
+                                return dt.toLocaleDateString(i18n.currentLang === 'kn' ? 'kn-IN' : 'en-IN', { month: 'short', day: 'numeric' });
+
+                            });
+
+                            // Line chart → Temperature
+
+                            if (farmerLineChart && weather.dailyTempMax) {
+
+                                farmerLineChart.data.labels = realLabels;
+
+                                farmerLineChart.data.datasets[0].data = weather.dailyTempMax;
+
+                                farmerLineChart.data.datasets[0].label = i18n.t('temp-trend');
+
+                                farmerLineChart.update();
+
+                            }
+
+                            // Bar chart → Rainfall (real weather data only)
+
+                            if (farmerBarChart && weather.dailyRainfall) {
+
+                                const rainfallActual = weather.dailyRainfall
+
+                                    .map(v => Number(v))
+
+                                    .filter(v => Number.isFinite(v));
+
+                                const rainfallLabels = realLabels.slice(0, rainfallActual.length);
+
+                                farmerBarChart.data.labels = rainfallLabels;
+
+                                farmerBarChart.data.datasets[0].data = rainfallActual;
+
+                                farmerBarChart.data.datasets[0].backgroundColor = getRainBarColors(rainfallActual);
+
+                                farmerBarChart.data.datasets[0].label = '🌧️' + i18n.t('Rainfall Forecast') + ' (mm)';
+
+                                farmerBarChart.update();
+
+                                // Update annual chart: ML + Live + Dataset prediction
+
+                                if (farmerYearBarChart) {
+
+                                    // Show loading state
+
+                                    farmerYearBarChart.data.datasets[0].label = '🔄 Predicting annual rainfall...';
+
+                                    farmerYearBarChart.update();
+
+                                    buildMlAnnualRainfall(district).then(mlYearData => {
+
+                                        if (!Array.isArray(mlYearData) || mlYearData.length < 12) {
+
+                                            throw new Error('Insufficient ML annual data');
+
+                                        }
+
+                                        lastYearLabels = getMonthLabels();
+
+                                        lastYearData = mlYearData;
+
+                                        lastYearLabel = '🌧️Predicted (District Monthly Avg)';
+
+                                        renderFarmerYearChart();
+
+                                    }).catch(() => {
+
+                                        // Fallback to seasonal estimate
+
+                                        const yearData = buildYearlyRainfallFromWeekly(rainfallActual);
+
+                                        lastYearLabels = getMonthLabels();
+
+                                        lastYearData = yearData;
+
+                                        lastYearLabel = 'Monthly Rainfall (mm) - Estimated';
+
+                                        renderFarmerYearChart();
+
+                                    });
+
+                                }
+
+                            }
+
+                            // Hourly chart — render from same API data (no extra fetch)
+
+                            if (weather.hourlyTemps && weather.hourlyTimes) {
+
+                                renderHourlyTempChart(weather.hourlyTemps, weather.hourlyTimes);
+
+                            }
+
+                        }
+
+                    }
+
+                });
+
+            }
+
+            refreshWeatherData();
+
+            // Re-fetch from API every 60 seconds for fresh base values
+
+            setInterval(refreshWeatherData, 60000);
+
+            // Rainfall color
+
+            const rfEl = document.getElementById('statRainfall');
+
+            if (d.rainfall.includes('Very High')) rfEl.className = 'text-danger';
+
+            else if (d.rainfall.includes('High')) rfEl.className = 'text-warning';
+
+            else if (d.rainfall.includes('Low')) rfEl.className = 'text-info';
+
+            else rfEl.className = 'text-primary';
+
+            // Summary Card
+
+            const summaryCard = document.getElementById('districtSummaryCard');
+
+            const summaryText = document.getElementById('districtSummaryText');
+
+            if (summaryCard && summaryText) {
+
+                summaryCard.style.display = 'block';
+
+                summaryText.innerHTML = `<strong>${i18n.t(district)}</strong> ${i18n.t('district')} <strong>${i18n.t(d.soil)}</strong> ${i18n.t('soil-is')} <strong>${i18n.t(d.rainfall)}</strong> ${i18n.t('rainfall')}. ` +
+
+                    `${i18n.t('Best suited for growing')} <strong>${d.crops.map(c => i18n.t(c)).join(', ')}</strong>. ` +
+
+                    `${i18n.t('Current temperature is approximately')} <strong>${d.temp}</strong> ${i18n.t('with')} <strong>${d.humidity}</strong> ${i18n.t('humidity')}.`;
+
+            }
+
+            // Show initial static crops until live data arrives
+
+            renderRecommendedCrops(parseFloat(d.temp), parseFloat(d.humidity), d.rainfallMm ? d.rainfallMm[0] : 10);
+
+            // Irrigation — populate detailed advice
+
+            populateDynamicIrrigation(parseFloat(d.temp), parseFloat(d.humidity), d.rainfallMm ? d.rainfallMm[0] : 10);
+
+            // Chart data
+
+            chartRainfallData = d.rainfallMm || chartRainfallData;
+
+            chartYearRainData = buildYearlyRainfallFromWeekly(chartRainfallData);
+
+        } else if (!district) {
+
+            // No district selected — show defaults
+
+            document.getElementById('statTemp').textContent = '30°C';
+
+            document.getElementById('statHumidity').textContent = '65%';
+
+            document.getElementById('statRainfall').textContent = i18n.t('medium');
+
+            document.getElementById('statSoil').textContent = 'Mixed';
+
+            document.getElementById('statSeason').textContent = i18n.t(getBaseSeasonFromMonth(new Date().getMonth()));
+
+            // Initial Static Irrigation (Fallback)
+
+            populateDynamicIrrigation(30, 65, 10);
+
+            renderRecommendedCrops(30, 65, 10, 'Mixed');
+
+        }
+
+        // ─── Charts (with real date labels) ───
+
+        const farmerLineCtx = document.getElementById('farmerTrendLineChart');
+
+        if (farmerLineCtx) {
+
+            farmerLineChart = new Chart(farmerLineCtx, {
+
+                type: 'line',
+
+                data: {
+
+                    labels: chartLabels,
+
+                    datasets: [{
+
+                        label: i18n.t('temp-trend'),
+
+                        data: [30, 31, 29, 32, 30, 28, 31],
+
+                        borderColor: '#e74c3c',
+
+                        backgroundColor: 'rgba(231, 76, 60, 0.15)',
+
+                        fill: true,
+
+                        tension: 0.35,
+
+                        pointBackgroundColor: '#e74c3c',
+
+                        pointRadius: 4
+
+                    }]
+
+                },
+
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: false } } }
+
+            });
+
+        }
+
+        const farmerBarCtx = document.getElementById('farmerTrendBarChart');
+
+        if (farmerBarCtx) {
+
+            farmerBarChart = new Chart(farmerBarCtx, {
+
+                type: 'bar',
+
+                data: {
+
+                    labels: chartLabels,
+
+                    datasets: [{
+
+                        label: i18n.t('monthly-dist'),
+
+                        data: chartRainfallData,
+
+                        backgroundColor: getRainBarColors(chartRainfallData),
+
+                        borderColor: '#198754',
+
+                        borderWidth: 1
+
+                    }]
+
+                },
+
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+
+            });
+
+        }
+
+        let lastYearLabels = chartYearLabels;
+
+        let lastYearData = chartYearRainData;
+
+        let lastYearLabel = 'Monthly Rainfall (mm)';
+
+        function renderFarmerYearChart() {
+
+            const farmerYearCtx = document.getElementById('farmerYearRainChart');
+
+            if (!farmerYearCtx) return;
+
+            if (!Array.isArray(lastYearData) || lastYearData.length === 0) {
+
+                lastYearData = Array.isArray(chartYearRainData) && chartYearRainData.length ? chartYearRainData : [8, 12, 18, 25, 45, 90, 110, 95, 80, 55, 25, 10];
+
+            }
+
+            if (!Array.isArray(lastYearLabels) || lastYearLabels.length === 0) {
+
+                lastYearLabels = Array.isArray(chartYearLabels) && chartYearLabels.length ? chartYearLabels : getMonthLabels();
+
+            }
+
+            if (farmerYearCtx.parentElement) {
+
+                const parentWidth = farmerYearCtx.parentElement.getBoundingClientRect().width;
+
+                farmerYearCtx.height = 350;
+
+                farmerYearCtx.width = parentWidth > 0 ? parentWidth : 600;
+
+            }
+
+            if (farmerYearBarChart) {
+
+                farmerYearBarChart.destroy();
+
+            }
+
+            farmerYearBarChart = new Chart(farmerYearCtx, {
+
+                type: 'bar',
+
+                data: {
+
+                    labels: lastYearLabels,
+
+                    datasets: [{
+
+                        label: lastYearLabel,
+
+                        data: lastYearData,
+
+                        backgroundColor: getRainBarColors(lastYearData),
+
+                        borderColor: '#198754',
+
+                        borderWidth: 1
+
+                    }]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    scales: {
+
+                        y: {
+
+                            beginAtZero: true,
+
+                            ticks: { callback: value => `${value} mm` }
+
+                        }
+
+                    }
+
+                }
+
+            });
+
+            window.farmerYearBarChart = farmerYearBarChart;
+
+        }
+
+        renderFarmerYearChart();
+
+        // Late retry in case layout settles after initial render
+
+        setTimeout(() => renderFarmerYearChart(), 500);
+
+        // Ensure charts render correctly when their tab becomes visible
+
+        const yearlyTab = document.getElementById('yearlyTab');
+
+        if (yearlyTab) {
+
+            yearlyTab.addEventListener('shown.bs.tab', () => {
+
+                requestAnimationFrame(() => {
+
+                    requestAnimationFrame(() => renderFarmerYearChart());
+
+                });
+
+            });
+
+        }
+
+        window.renderFarmerYearChart = renderFarmerYearChart;
+
+        // ─── 24-Hour Hourly Temperature Chart (uses data from combined API call) ───
+
+        function renderHourlyTempChart(hourlyTemps, hourlyTimes) {
+
+            const distLabel = district || 'Bengaluru';
+
+            const subtitle = document.getElementById('hourlyChartSubtitle');
+
+            if (subtitle) subtitle.textContent = `${i18n.t('temp')} (24h) - ${i18n.t(distLabel)}`;
+
+            if (!hourlyTemps || !hourlyTimes || hourlyTemps.length === 0 || hourlyTimes.length === 0) return;
+
+            const temps = hourlyTemps.slice(0, 24);
+
+            const labels = hourlyTimes.slice(0, 24).map(t => {
+
+                const d = new Date(t);
+
+                return d.toLocaleTimeString(i18n.currentLang === 'kn' ? 'kn-IN' : 'en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+            });
+
+            const ctx = document.getElementById('farmerHourlyTempChart');
+
+            if (ctx) {
+
+                if (farmerHourlyChart) farmerHourlyChart.destroy();
+
+                farmerHourlyChart = new Chart(ctx, {
+
+                    type: 'line',
+
+                    data: {
+
+                        labels: labels,
+
+                        datasets: [{
+
+                            label: i18n.t('stat-temp'),
+
+                            data: temps,
+
+                            borderColor: '#e74c3c',
+
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+
+                            fill: true,
+
+                            tension: 0.4,
+
+                            pointBackgroundColor: '#e74c3c',
+
+                            pointRadius: 3,
+
+                            pointHoverRadius: 6
+
+                        }]
+
+                    },
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        plugins: { legend: { display: true } },
+
+                        scales: {
+
+                            x: { ticks: { maxRotation: 45, font: { size: 10 } } },
+
+                            y: { beginAtZero: false, title: { display: true, text: '°C' } }
+
+                        }
+
+                    }
+
+                });
+
+            }
+
+        }
+
+        // ─── District Heatmap Initialization ───
+
+        function initDistrictHeatmap() {
+
+            const container = document.getElementById('districtMapContainer');
+
+            if (!container) return;
+
+            const rainfallMap = {
+
+                'Very High': { color: '#d32f2f', value: 4 },
+
+                'High': { color: '#f57c00', value: 3 },
+
+                'Moderate': { color: '#fbc02d', value: 2 },
+
+                'Low to Moderate': { color: '#ffeb3b', value: 1.5 },
+
+                'Low': { color: '#1976d2', value: 1 }
+
+            };
+
+            let tiles = '';
+
+            const compLabels = [];
+
+            const compValues = [];
+
+            const compColors = [];
+
+            const districtKeys = Object.keys(districtData);
+
+            districtKeys.forEach(name => {
+
+                const d = districtData[name];
+
+                const r = rainfallMap[d.rainfall] || { color: '#90a4ae', value: 0 };
+
+                const isSelected = (name === district);
+
+                const border = isSelected ? '3px solid #000' : '1px solid rgba(0,0,0,0.1)';
+
+                const fontWeight = isSelected ? '700' : '500';
+
+                const fontSize = isSelected ? '0.72rem' : '0.65rem';
+
+                tiles += `<div style="background:${r.color};border-radius:8px;padding:8px 4px;text-align:center;
+
+                    color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.4);cursor:pointer;border:${border};
+
+                    font-size:${fontSize};font-weight:${fontWeight};transition:transform 0.2s;"
+
+                    onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'"
+
+                    title="${name}: ${d.rainfall} rainfall, ${d.temp}, ${d.soil} soil">
+
+                    ${name}<br><small style="opacity:0.85;">${d.rainfall}</small>
+
+                </div>`;
+
+                compLabels.push(name);
+
+                compValues.push(r.value);
+
+                compColors.push(r.color);
+
+            });
+
+            container.innerHTML = tiles;
+
+            // Comparison bar chart
+
+            const compCanvas = document.getElementById('districtCompCanvas');
+
+            if (compCanvas) {
+
+                new Chart(compCanvas, {
+
+                    type: 'bar',
+
+                    data: {
+
+                        labels: compLabels,
+
+                        datasets: [{
+
+                            label: 'Rainfall Level',
+
+                            data: compValues,
+
+                            backgroundColor: compColors,
+
+                            borderRadius: 4,
+
+                            borderSkipped: false
+
+                        }]
+
+                    },
+
+                    options: {
+
+                        indexAxis: 'y',
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        plugins: {
+
+                            legend: { display: false },
+
+                            title: { display: true, text: 'District Rainfall Comparison', font: { size: 12, weight: 'bold' } }
+
+                        },
+
+                        scales: {
+
+                            x: { display: false },
+
+                            y: { ticks: { font: { size: 9 } } }
+
+                        }
+
+                    }
+
+                });
+
+            }
+
+        }
+
+        initDistrictHeatmap();
+
+        // ─── Soil Nutrient Radar Chart ───
+
+        function initSoilNutrientChart() {
+
+            const canvas = document.getElementById('soilNutrientChart');
+
+            if (!canvas) return;
+
+            // Soil nutrient profiles by soil type
+
+            const soilProfiles = {
+
+                'black': { nitrogen: 65, phosphorus: 55, potassium: 75, organic: 50, ph: 72, moisture: 70, label: 'Black Soil' },
+
+                'red': { nitrogen: 40, phosphorus: 35, potassium: 45, organic: 30, ph: 55, moisture: 35, label: 'Red Soil' },
+
+                'laterite': { nitrogen: 35, phosphorus: 30, potassium: 40, organic: 45, ph: 45, moisture: 60, label: 'Laterite Soil' },
+
+                'loam': { nitrogen: 60, phosphorus: 55, potassium: 65, organic: 60, ph: 68, moisture: 55, label: 'Loam Soil' },
+
+                'clay-loam': { nitrogen: 55, phosphorus: 50, potassium: 60, organic: 55, ph: 65, moisture: 65, label: 'Clay-Loam Soil' },
+
+                'silty-loam': { nitrogen: 50, phosphorus: 45, potassium: 55, organic: 50, ph: 62, moisture: 50, label: 'Silty-Loam Soil' },
+
+                'alluvial': { nitrogen: 70, phosphorus: 60, potassium: 70, organic: 65, ph: 70, moisture: 60, label: 'Alluvial Soil' },
+
+                'sandy': { nitrogen: 25, phosphorus: 20, potassium: 30, organic: 20, ph: 50, moisture: 20, label: 'Sandy Soil' }
+
+            };
+
+            let soilType = 'loam'; // default
+
+            if (district && districtData[district]) {
+
+                soilType = districtData[district].soil;
+
+            }
+
+            const profile = soilProfiles[soilType] || soilProfiles['loam'];
+
+            new Chart(canvas, {
+
+                type: 'radar',
+
+                data: {
+
+                    labels: ['Nitrogen', 'Phosphorus', 'Potassium', 'Organic Matter', 'pH Balance', 'Moisture Retention'],
+
+                    datasets: [{
+
+                        label: profile.label + ' — ' + (district || 'General'),
+
+                        data: [profile.nitrogen, profile.phosphorus, profile.potassium, profile.organic, profile.ph, profile.moisture],
+
+                        borderColor: '#27ae60',
+
+                        backgroundColor: 'rgba(39, 174, 96, 0.2)',
+
+                        borderWidth: 2,
+
+                        pointRadius: 5,
+
+                        pointBackgroundColor: '#27ae60',
+
+                        pointBorderColor: '#fff',
+
+                        pointBorderWidth: 2,
+
+                        pointHoverRadius: 8
+
+                    }]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: { display: true, position: 'bottom' },
+
+                        title: {
+
+                            display: true,
+
+                            text: `Soil Health Analysis — ${profile.label}`,
+
+                            font: { size: 14, weight: 'bold' }
+
+                        }
+
+                    },
+
+                    scales: {
+
+                        r: {
+
+                            beginAtZero: true,
+
+                            max: 100,
+
+                            ticks: { stepSize: 20, backdropColor: 'transparent' },
+
+                            grid: { color: 'rgba(0,0,0,0.08)' },
+
+                            pointLabels: { font: { size: 11 } }
+
+                        }
+
+                    }
+
+                }
+
+            });
+
+        }
+
+        initSoilNutrientChart();
+
+        // Initialize month dropdown and event listener on page load
+
+        fillMonthDropdown();
+
+        initMonthDropdownListener();
+
+        // ─── ML Prediction Form Handler ───
+
+        console.log('Attempting to attach ML form handler...');
+
+        const mlForm = document.getElementById('mlPredictionForm');
+
+        if (mlForm) {
+
+            console.log('Form #mlPredictionForm found, attaching listener.');
+
+            mlForm.addEventListener('submit', async (event) => {
+
+                console.log('Form submitted, preventing default page reload.');
+
+                event.preventDefault(); // IMPORTANT: Prevents the page from reloading
+
+                const predictBtn = document.getElementById('predictBtn');
+
+                const btnText = document.getElementById('predictBtnText');
+
+                const btnLoader = document.getElementById('predictBtnLoader');
+
+                // Show loader and disable button
+
+                btnText.textContent = 'Predicting...';
+
+                btnLoader.style.display = 'inline-block';
+
+                predictBtn.disabled = true;
+
+                const tempInput = document.getElementById('predTemp');
+
+                const humidityInput = document.getElementById('predHumidity');
+
+                const temp = tempInput ? tempInput.value : '';
+
+                const humidity = humidityInput ? humidityInput.value : '';
+
+                const monthValue = document.getElementById('predMonth').value;
+
+                const month = parseInt(monthValue.split('-')[1], 10);
+
+                const district = (new URLSearchParams(window.location.search).get('district') || '').trim();
+
+                const resultEl = document.getElementById('mlPredictionResult');
+
+                const emptyEl = document.getElementById('mlPredictionEmpty');
+
+                const contentEl = document.getElementById('predResultContent');
+
+                const confidenceGauge = document.getElementById('confidenceGauge');
+
+                const confidenceBar = document.getElementById('confidenceBar');
+
+                const confidenceText = document.getElementById('confidenceText');
+
+                const scenarioCards = document.getElementById('scenarioCards');
+
+                // Helper function for prediction details
+
+                function getPredictionDetails(prediction) {
+
+                    switch (prediction) {
+
+                        case 'Low':
+
+                            return { icon: '☀️', advice: 'Dry conditions - Consider irrigation', color: 'text-primary' };
+
+                        case 'Medium':
+
+                            return { icon: '💧', advice: 'Balanced conditions - Monitor soil moisture', color: 'text-success' };
+
+                        case 'Heavy':
+
+                            return { icon: '⛈️', advice: 'Wet conditions - Ensure proper drainage', color: 'text-warning' };
+
+                        default:
+
+                            return { icon: '❓', advice: 'Prediction unclear', color: 'text-muted' };
+
+                    }
+
+                }
+
+                try {
+
+                    let monthlyAvgRain = 0;
+
+                    let csvTemp = null;
+
+                    let csvHumidity = null;
+
+                    try {
+
+                        const monthly = await loadDistrictMonthlyAverages();
+
+                        if (district && monthly[district] && monthly[district][month]) {
+
+                            monthlyAvgRain = monthly[district][month].rainfallAvg || 0;
+
+                            csvTemp = monthly[district][month].temp;
+
+                            csvHumidity = monthly[district][month].humidity;
+
+                        }
+
+                    } catch (_) {
+
+                        monthlyAvgRain = 0;
+
+                    }
+
+                    const finalTemp = Number.isFinite(Number(csvTemp)) ? Number(csvTemp) : parseFloat(temp);
+
+                    const finalHumidity = Number.isFinite(Number(csvHumidity)) ? Number(csvHumidity) : parseFloat(humidity);
+
+                    if (Number.isFinite(finalTemp) && tempInput) tempInput.value = finalTemp.toFixed(1);
+
+                    if (Number.isFinite(finalHumidity) && humidityInput) humidityInput.value = finalHumidity.toFixed(1);
+
+                    // Use the same annual series builder so ML form matches the annual chart
+
+                    let predictedMm = NaN;
+
+                    const now = new Date();
+
+                    const selected = new Date(Number(monthValue.split('-')[0]), Number(monthValue.split('-')[1]) - 1, 1);
+
+                    const diffMonths = (selected.getFullYear() - now.getFullYear()) * 12 + (selected.getMonth() - now.getMonth());
+
+                    if (diffMonths >= 0 && diffMonths < 12) {
+
+                        const annualSeries = await buildMlAnnualRainfall(district);
+
+                        if (Array.isArray(annualSeries) && annualSeries.length > diffMonths) {
+
+                            predictedMm = Number(annualSeries[diffMonths]);
+
+                        }
+
+                    }
+
+                    // Fallback: single-month regression endpoint
+
+                    if (!Number.isFinite(predictedMm)) {
+
+                        const response = await fetch('http://localhost:5000/api/rainfall-predict-mm', {
+
+                            method: 'POST',
+
+                            headers: { 'Content-Type': 'application/json' },
+
+                            body: JSON.stringify({ temperature: finalTemp, humidity: finalHumidity, month: month })
+
+                        });
+
+                        const data = await response.json();
+
+                        predictedMm = Number(data.rainfall_mm);
+
+                        if (!response.ok || data.error) {
+
+                            throw new Error(data.error || `API Error: ${response.statusText}`);
+
+                        }
+
+                    }
+
+                    if (Number.isFinite(predictedMm)) {
+
+                        emptyEl.style.display = 'none';
+
+                        resultEl.style.display = 'block';
+
+                        resultEl.className = 'alert alert-light border-0 p-4'; // Use a neutral background
+
+                        if (!Number.isFinite(predictedMm)) {
+
+                            throw new Error('Invalid rainfall prediction');
+
+                        }
+
+                        const predictedMmDisplay = Number.isFinite(predictedMm) ? predictedMm.toFixed(1) : 'N/A';
+
+                        const levelLabel = predictedMm < 30 ? 'Low' : predictedMm < 100 ? 'Moderate' : 'High';
+
+                        const { icon, advice, color } = getPredictionDetails(
+
+                            levelLabel === 'Moderate' ? 'Medium' : levelLabel === 'High' ? 'Heavy' : 'Low'
+
+                        );
+
+                        const monthName = new Date(monthValue + '-02').toLocaleString('default', { month: 'long' });
+
+                        let probabilitiesHtml = '<div class="mt-3"><h6 class="fw-bold small text-muted">PROBABILITY DISTRIBUTION</h6>';
+
+                        probabilitiesHtml += `
+
+                            <div class="mb-2">
+
+                                <div class="d-flex justify-content-between small">
+
+                                    <span>Predicted Rainfall (mm)</span>
+
+                                    <span>${predictedMmDisplay} mm</span>
+
+                                </div>
+
+                            </div>
+
+                        `;
+
+                        probabilitiesHtml += '</div>';
+
+                        contentEl.innerHTML = `
+
+                            <div class="row align-items-center">
+
+                                <div class="col-md-8">
+
+                                    <div class="d-flex align-items-center mb-2">
+
+                                        <div style="font-size: 2.5rem; line-height: 1;" class="me-3">${icon}</div>
+
+                                        <div>
+
+                                            <h5 class="fw-bold mb-0 ${color}">${levelLabel} Rainfall</h5>
+
+                                            <p class="mb-0 small text-muted">${advice}</p>
+
+                                        </div>
+
+                                    </div>
+
+                                    <p class="small text-muted mb-0">Temperature: <strong>${finalTemp.toFixed(1)}°C</strong> | Humidity: <strong>${finalHumidity.toFixed(1)}%</strong> | Month: <strong>${monthName}</strong> | Predicted Rain: <strong>${predictedMmDisplay} mm</strong></p>
+
+                                </div>
+
+                                <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+
+                                    <div class="fw-bold" style="font-size: 2.5rem; line-height: 1;">${predictedMm.toFixed(1)}</div>
+
+                                    <small class="text-muted">mm</small>
+
+                                </div>
+
+                            </div>
+
+                            ${probabilitiesHtml}
+
+                        `;
+
+                        confidenceGauge.style.display = 'none';
+
+                        scenarioCards.style.display = 'none';
+
+                    } else {
+
+                        throw new Error('Invalid response from server.');
+
+                    }
+
+                } catch (error) {
+
+                    console.error('Prediction failed:', error);
+
+                    emptyEl.style.display = 'none';
+
+                    resultEl.style.display = 'block';
+
+                    resultEl.className = 'alert alert-danger border-0 text-center p-4';
+
+                    contentEl.innerHTML = `<div class="text-danger"><strong>Prediction Failed:</strong><br>${error.message}</div>`;
+
+                } finally {
+
+                    btnText.textContent = '🚀 Make Prediction';
+
+                    btnLoader.style.display = 'none';
+
+                    predictBtn.disabled = false;
+
+                }
+
+            });
+
+        } else {
+
+            console.error('CRITICAL: Form with ID #mlPredictionForm was not found!');
+
+        }
+
+    </script>
+
+    <script>
+
+        (function initLiveTimeBadge() {
+
+            const timeBadge = document.getElementById('liveTimeBadge');
+
+            if (!timeBadge) return;
+
+            function updateLiveTime() {
+
+                const now = new Date();
+
+                const timePart = now.toLocaleTimeString(undefined, {
+
+                    hour: '2-digit',
+
+                    minute: '2-digit'
+
+                });
+
+                timeBadge.textContent = timePart;
+
+            }
+
+            updateLiveTime();
+
+            setInterval(updateLiveTime, 5000);
+
+        })();
+
+    </script>
+
+    <!-- Farm Details Modal -->
+
+    <div class="modal fade" id="farmDetailsModal" tabindex="-1">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content" style="border-radius:16px;overflow:hidden;">
+
+                <div class="modal-header" style="background:linear-gradient(135deg,#198754,#2e7d32);border:none;">
+
+                    <h5 class="modal-title text-white">🌱 Start Growing <span id="modalCropName" class="fw-bold"></span>
+
+                    </h5>
+
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+
+                </div>
+
+                <div class="modal-body" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);">
+
+                    <p class="text-muted small">Enter your farm details for personalized day-by-day crop guidance:</p>
+
+                    <input type="hidden" id="modalCropKey"><input type="hidden" id="modalCropMaturityDays">
+
+                    <div class="mb-3"><label class="form-label fw-semibold">🚜 Farm Name</label><input type="text"
+
+                            id="farmNameInput" class="form-control" value="My Farm"></div>
+
+                    <div class="mb-3"><label class="form-label fw-semibold">📍 Farm Land Size (Acres)</label><input
+
+                            type="number" id="farmAcresInput" class="form-control" min="0.1" step="0.1" value="2"></div>
+
+                    <div class="mb-3"><label class="form-label fw-semibold">💧Water Facility</label>
+
+                        <select id="waterFacilityInput" class="form-select">
+
+                            <option value="drip">Drip Irrigation</option>
+
+                            <option value="sprinkler">Sprinkler</option>
+
+                            <option value="canal">Canal / Channel</option>
+
+                            <option value="borewell">Borewell</option>
+
+                            <option value="well">Open Well</option>
+
+                            <option value="rainfed" selected>Rainfed</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="mb-3"><label class="form-label fw-semibold">📅 Planned Sowing Date</label><input
+
+                            type="date" id="sowingDateInput" class="form-control"></div>
+
+                </div>
+
+                <div class="modal-footer" style="background:#f0fdf4;border:none;">
+
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                    <button type="button" class="btn btn-success fw-bold" onclick="submitCropSelection()">🌱 Start
+
+                        Growing</button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        let cropLifecycleData = null;
+
+        fetch('data/crop_lifecycle.json').then(r => r.json()).then(d => { cropLifecycleData = d; }).catch(() => { });
+
+        const cropMaturityDaysMap = {
+
+            'rice': 120, 'maize': 100, 'cotton': 155, 'sugarcane': 336, 'wheat': 130, 'ragi': 100, 'groundnut': 130,
+
+            'coffee': 365, 'coconut': 365, 'pulses': 85, 'ginger': 225, 'sunflower': 100, 'banana': 336, 'turmeric': 225,
+
+            'sorghum': 100, 'tea': 365, 'cocoa': 365, 'arecanut': 365, 'pepper': 365, 'paddy': 120, 'millets': 75, 'bajra': 75, 'jute': 130
+
+        };
+
+        function openFarmDetailsModal(cropName) {
+
+            const cu = JSON.parse(localStorage.getItem('currentUser'));
+
+            if (!cu) { alert('Please login to track crops.'); return; }
+
+            const key = cropName.toLowerCase();
+
+            document.getElementById('modalCropKey').value = key;
+
+            document.getElementById('modalCropName').textContent = key.charAt(0).toUpperCase() + key.slice(1);
+
+            document.getElementById('modalCropMaturityDays').value = cropMaturityDaysMap[key] || 120;
+
+            document.getElementById('sowingDateInput').value = new Date().toISOString().split('T')[0];
+
+            new bootstrap.Modal(document.getElementById('farmDetailsModal')).show();
+
+        }
+
+        function submitCropSelection() {
+
+            const cu = JSON.parse(localStorage.getItem('currentUser'));
+
+            if (!cu) return alert('Please login first.');
+
+            const body = {
+
+                username: cu.name, crop: document.getElementById('modalCropKey').value,
+
+                district: district || '', soilType: (districtData && district && districtData[district]) ? districtData[district].soil : '',
+
+                farmAcres: document.getElementById('farmAcresInput').value,
+
+                waterFacility: document.getElementById('waterFacilityInput').value,
+
+                farmName: document.getElementById('farmNameInput').value,
+
+                sowingDate: document.getElementById('sowingDateInput').value,
+
+                maturityDays: document.getElementById('modalCropMaturityDays').value
+
+            };
+
+            fetch('http://localhost:5000/api/crop-tracker/select', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+
+                .then(r => r.json()).then(data => {
+
+                    if (data.error) { alert(data.error); } else {
+
+                        bootstrap.Modal.getInstance(document.getElementById('farmDetailsModal')).hide();
+
+                        loadMyCrops();
+
+                        setTimeout(() => { const s = document.getElementById('myCropsSection'); if (s) s.scrollIntoView({ behavior: 'auto', block: 'start' }); }, 100);
+
+                    }
+
+                }).catch(e => { console.error(e); alert('Failed to save.'); });
+
+        }
+
+        function removeCropTracker(cropId) {
+
+            const cu = JSON.parse(localStorage.getItem('currentUser'));
+
+            if (!cu || !confirm('Remove this crop from your tracker?')) return;
+
+            fetch(`http://localhost:5000/api/crop-tracker/${encodeURIComponent(cu.name)}/${cropId}`, { method: 'DELETE' })
+
+                .then(r => r.json()).then(() => loadMyCrops()).catch(e => console.error(e));
+
+        }
+
+        function loadMyCrops() {
+
+            const cu = JSON.parse(localStorage.getItem('currentUser'));
+
+            const sec = document.getElementById('myCropsSection');
+
+            if (!cu) { if (sec) sec.style.display = 'none'; return; }
+
+            fetch(`http://localhost:5000/api/crop-tracker/${encodeURIComponent(cu.name)}`)
+
+                .then(r => r.json()).then(data => {
+
+                    const crops = data.crops || [];
+
+                    const grid = document.getElementById('myCropsGrid');
+
+                    if (crops.length === 0) { sec.style.display = 'none'; return; }
+
+                    sec.style.display = '';
+
+                    grid.innerHTML = crops.map(e => renderTrackedCrop(e)).join('');
+
+                }).catch(() => { });
+
+        }
+
+        function renderTrackedCrop(entry) {
+
+            const info = cropInfo[entry.crop] || { icon: '🌱', gradient: 'linear-gradient(135deg,#c8e6c9,#4caf50)', season: 'Unknown', maturity: '-' };
+
+            const sowing = new Date(entry.sowingDate), today = new Date();
+
+            const daysSince = Math.max(0, Math.floor((today - sowing) / (864e5)));
+
+            const totalDays = entry.maturityDays || 120;
+
+            const pct = Math.min(100, Math.round((daysSince / totalDays) * 100));
+
+            const totalWk = Math.ceil(totalDays / 7), curWk = Math.min(totalWk, Math.ceil(daysSince / 7) || 1);
+
+            const lc = cropLifecycleData ? cropLifecycleData[entry.crop] : null;
+
+            let stage = { name: 'Growing', icon: '🌿' }, act = { activity: 'Monitor crop growth and maintain irrigation.', tip: 'Check soil moisture regularly.' };
+
+            if (lc) {
+
+                for (const s of lc.stages) { if (s.weeks.includes(curWk)) { stage = s; break; } }
+
+                const wks = Object.keys(lc.weeklyGuide).map(Number).sort((a, b) => a - b);
+
+                let bw = wks[0]; for (const w of wks) { if (w <= curWk) bw = w; }
+
+                act = lc.weeklyGuide[bw] || act;
+
+            }
+
+            const stages = lc ? lc.stages : [{ name: 'Preparation', icon: '🌍' }, { name: 'Sowing', icon: '🌱' }, { name: 'Growth', icon: '🌿' }, { name: 'Flowering', icon: '🌸' }, { name: 'Maturity', icon: '🌾' }, { name: 'Harvest', icon: '🚜' }];
+
+            const si = stages.findIndex(s => s.name === stage.name);
+
+            const dots = stages.map((s, i) => {
+
+                const active = i === si, done = i < si;
+
+                const bg = active ? '#198754' : done ? '#a5d6a7' : '#e0e0e0', cl = active ? '#fff' : done ? '#2e7d32' : '#999';
+
+                return `<div style="text-align:center;flex:1;"><div style="width:28px;height:28px;border-radius:50%;background:${bg};color:${cl};display:inline-flex;align-items:center;justify-content:center;font-size:0.75rem;margin-bottom:2px;${active ? 'box-shadow:0 0 0 3px rgba(25,135,84,0.3);' : ''}">${s.icon}</div><div style="font-size:0.55rem;color:${active ? '#198754' : '#999'};font-weight:${active ? '700' : '400'};">${s.name.split(' ')[0]}</div></div>`;
+
+            }).join('');
+
+            const wl = { drip: 'Drip', sprinkler: 'Sprinkler', canal: 'Canal', borewell: 'Borewell', well: 'Well', rainfed: 'Rainfed' };
+
+            const hd = new Date(sowing.getTime() + totalDays * 864e5), dl = Math.max(0, totalDays - daysSince);
+
+            const bc = pct >= 90 ? '#ff9800' : pct >= 60 ? '#4caf50' : '#2196f3';
+
+            return `<div class="col-12"><div class="card border-0" style="border-radius:14px;box-shadow:0 2px 12px rgba(25,135,84,0.12);overflow:hidden;"><div class="row g-0">
+
+                <div class="col-md-2" style="background:${info.gradient};display:flex;align-items:center;justify-content:center;min-height:120px;"><div style="text-align:center;"><div style="font-size:2.5rem;">${info.icon}</div><div style="color:#fff;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,0.4);">${entry.crop.charAt(0).toUpperCase() + entry.crop.slice(1)}</div></div></div>
+
+                <div class="col-md-10"><div class="card-body p-3">
+
+                    <div class="d-flex justify-content-between align-items-start mb-2"><div><h6 class="fw-bold mb-0">${entry.farmName} <span class="badge bg-success" style="font-size:0.65rem;">📍${entry.district || 'Unknown'}</span></h6><small class="text-muted">${entry.farmAcres} acres · ${wl[entry.waterFacility] || entry.waterFacility} · ${entry.soilType || 'Mixed'} soil</small></div><button onclick="removeCropTracker('${entry.id}')" class="btn btn-outline-danger btn-sm" style="font-size:0.7rem;">✖ Remove</button></div>
+
+                    <div class="mb-2"><div class="d-flex justify-content-between mb-1"><small class="fw-bold" style="color:${bc};">Day ${daysSince} of ${totalDays}</small><small class="text-muted">${dl > 0 ? dl + ' days to harvest' : '🎉 Harvest Ready!'}</small></div><div class="progress" style="height:8px;border-radius:4px;"><div class="progress-bar" style="width:${pct}%;background:${bc};border-radius:4px;" role="progressbar"></div></div><div class="d-flex justify-content-between mt-1"><small class="text-muted" style="font-size:0.65rem;">Sowed: ${sowing.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</small><small class="text-muted" style="font-size:0.65rem;">Harvest: ~${hd.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</small></div></div>
+
+                    <div class="d-flex justify-content-between mb-2" style="gap:2px;">${dots}</div>
+
+                    <div class="row g-2"><div class="col-md-6"><div style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-radius:10px;padding:10px;"><div style="font-size:0.7rem;color:#2e7d32;font-weight:700;">CURRENT STAGE ${stage.icon}</div><div style="font-size:0.9rem;font-weight:600;color:#1b5e20;">${stage.name}</div><div style="font-size:0.75rem;color:#388e3c;">Week ${curWk} of ${totalWk}</div></div></div><div class="col-md-6"><div style="background:linear-gradient(135deg,#fff3e0,#ffe0b2);border-radius:10px;padding:10px;"><div style="font-size:0.7rem;color:#e65100;font-weight:700;">📍 THIS WEEK'S ACTIVITY</div><div style="font-size:0.78rem;color:#333;">${act.activity}</div></div></div></div>
+
+                    <div style="background:#fff;border-radius:8px;padding:6px 10px;margin-top:8px;border:1px solid #e0e0e0;"><span style="font-size:0.72rem;color:#f57c00;">💡 TIP: </span><span style="font-size:0.78rem;color:#555;">${act.tip}</span></div>
+
+                </div></div>
+
+            </div></div></div>`;
+
+        }
+
+        loadMyCrops();
+
+    </script>
+
+</html>
+

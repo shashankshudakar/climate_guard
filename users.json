@@ -1,0 +1,28 @@
+[
+  {
+    "name": "Test User",
+    "email": "",
+    "phone": "9876543210",
+    "password": "$2a$10$2d022bgf2VD.rF8/FcWeLeJdU3WAK2dsPaxQ4n8igP4VY.dU74ezu",
+    "avatar": "assets/user_avatar.png",
+    "alerts_enabled": true
+  },
+  {
+    "name": "FarmerTest",
+    "email": "",
+    "phone": "1111111111",
+    "password": "$2a$10$krDfnfxL8jLUVUd7RwYRxeOJIJAeH.xsGjccyAfFtASVgyAkersKi",
+    "user_role": "farmer",
+    "avatar": "assets/user_avatar.png",
+    "alerts_enabled": true
+  },
+  {
+    "name": "abc",
+    "email": "",
+    "phone": "1234567890",
+    "password": "$2a$10$yY13di/ylLUzTGp/7C3lVe/tDRjNFjwOE6D99fPy.kZIQYJQqCEXS",
+    "user_role": "farmer",
+    "avatar": "assets/user_avatar.png",
+    "alerts_enabled": true
+  }
+]

@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClimateGuard | Market Prices</title>
+    <link rel="icon" href="assets/logo.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/theme.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/profile_manager.js"></script>
+    <script type="module" src="js/i18n.js?v=8"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/ui-enhancements.css?v=20260318">
+</head>
+
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="index.html">
+                <img src="assets/logo.png" alt="Logo" width="40" height="40" class="rounded-circle shadow-sm">
+                <span>ClimateGuard</span>
+            </a>
+            <div class="navbar-nav me-auto">
+                <a class="nav-link" href="farmer_dashboard.html" id="navAgriLink" data-i18n="nav-agriguard">🛡️
+                    AgriGuard</a>
+                <a class="nav-link active" href="market_dashboard.html" id="navMarketLink" data-i18n="market-prices">💰
+                    Market Prices</a>
+                <a class="nav-link" href="crop_dashboard.html">🌾 My Crops</a>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button id="langToggleBtn" class="btn btn-sm btn-outline-light rounded-pill px-3 me-2"
+                    style="font-size: 0.8rem; border-color: rgba(255,255,255,0.3);">Language</button>
+                <button id="themeToggleBtn" class="theme-toggle-btn" title="Switch to Dark Mode"><i
+                        class="bi bi-moon-stars"></i></button>
+                <div class="dropdown">
+
+                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle hide-caret"
+                        id="userProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="assets/user_avatar.png" alt="User" class="user-profile-img">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-premium"
+                        aria-labelledby="userProfileDropdown">
+                        <li>
+                            <h6 class="dropdown-header-premium">User Account</h6>
+                        </li>
+                        <li id="loginMenuItem"><a class="dropdown-item dropdown-item-premium" href="login.html"><i
+                                    class="bi bi-key me-2"></i>Login</a></li>
+                        <li id="registerMenuItem"><a class="dropdown-item dropdown-item-premium" href="register.html"><i
+                                    class="bi bi-person-plus me-2"></i>Register</a></li>
+                        <li id="profileMenuItem" style="display:none;"><a class="dropdown-item dropdown-item-premium"
+                                href="profile.html"><i class="bi bi-person-circle me-2"></i>My Profile</a></li>
+                        <li id="settingsMenuItem" style="display:none;"><a class="dropdown-item dropdown-item-premium"
+                                href="settings.html"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                        <li id="authDivider" style="display:none;">
+                            <hr class="dropdown-divider opacity-10">
+                        </li>
+
+                        <li id="logoutMenuItem" style="display:none;"><a
+                                class="dropdown-item dropdown-item-premium text-danger" href="#"
+                                onclick="handleLogout()"><span>🚪</span> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold"><span data-i18n="market-dashboard-title">💰 Market Price Dashboard</span></h3>
+                <p class="text-muted"><span data-i18n="market-dashboard-desc">Real-time crop prices from local APMC
+                        markets</span></p>
+            </div>
+            <div class="text-end">
+                <span class="badge bg-success p-2"><i class="bi bi-broadcast"></i> <span data-i18n="live-updates">Live
+                        Updates</span></span>
+            </div>
+        </div>
+
+        <!-- Market Ticker -->
+        <div class="card shadow-sm border-0 mb-4 bg-dark text-white">
+            <div class="card-body py-2">
+                <marquee behavior="scroll" direction="left" id="priceTicker">
+                    <span data-i18n="loading-market-trends">Loading market trends...</span>
+                </marquee>
+            </div>
+        </div>
+
+        <!-- Profit Calculator -->
+        <div class="card shadow border-0 mt-4 mb-5" id="profitCalculatorSection">
+            <div class="card-header bg-success text-white py-3">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-calculator"></i> <span data-i18n="profit-calculator">Profit
+                        Calculator</span></h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="p-4 bg-light rounded-3 border h-100">
+                            <h6 class="fw-bold mb-3 text-success"><span data-i18n="enter-details">Enter Details</span>
+                            </h6>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold"><span data-i18n="select-crop">Select
+                                        Crop</span></label>
+                                <select id="calcCrop" class="form-select">
+                                    <option value="" disabled selected data-i18n="select-a-crop">Select a crop...
+                                    </option>
+                                </select>
+                                <small class="text-muted" id="calcCropPriceNote"><span
+                                        data-i18n="current-price-prefix">Current Price: </span>--</small>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <label class="form-label fw-semibold"><span data-i18n="area-acres">Area
+                                            (Acres)</span></label>
+                                    <input type="number" id="calcArea" class="form-control" value="5" min="0"
+                                        step="0.1">
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label class="form-label fw-semibold"><span data-i18n="yield-per-acre">Yield per
+                                            Acre (Quintals)</span></label>
+                                    <input type="number" id="calcYield" class="form-control" value="10" min="0"
+                                        step="0.1">
+                                </div>
+                            </div>
+                            <div class="mb-0">
+                                <label class="form-label fw-semibold mb-2"><span data-i18n="estimated-costs">Estimated
+                                        Costs (₹ per Acre)</span></label>
+                                <div class="row g-2">
+                                    <div class="col-4">
+                                        <label class="form-label small text-muted mb-1"><span
+                                                data-i18n="cost-seeds">Seeds</span></label>
+                                        <input type="number" id="calcCostSeeds" class="form-control form-control-sm"
+                                            value="3000" min="0" step="100">
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label small text-muted mb-1"><span
+                                                data-i18n="cost-fertilizers">Fertilizers</span></label>
+                                        <input type="number" id="calcCostFertilizers"
+                                            class="form-control form-control-sm" value="5000" min="0" step="100">
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label small text-muted mb-1"><span
+                                                data-i18n="cost-labor">Labor/Machinery</span></label>
+                                        <input type="number" id="calcCostLabor" class="form-control form-control-sm"
+                                            value="2000" min="0" step="100">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row h-100 g-3">
+                            <div class="col-12">
+                                <div class="card bg-primary text-white h-100 border-0 shadow-sm"
+                                    style="background: linear-gradient(135deg, #0d6efd, #0dcaf0);">
+                                    <div class="card-body d-flex flex-column justify-content-center text-center py-4">
+                                        <h6 class="card-title opacity-75 fw-bold text-uppercase"
+                                            style="letter-spacing: 1px;"><span data-i18n="gross-revenue">Gross
+                                                Revenue</span></h6>
+                                        <h2 class="display-6 fw-bold mb-0" id="calcGrossRevenue">₹ 0</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card bg-danger text-white h-100 border-0 shadow-sm"
+                                    style="background: linear-gradient(135deg, #dc3545, #fd7e14);">
+                                    <div class="card-body d-flex flex-column justify-content-center text-center py-4">
+                                        <h6 class="card-title opacity-75 fw-bold text-uppercase"
+                                            style="letter-spacing: 1px;"><span data-i18n="total-expenses">Total
+                                                Expenses</span></h6>
+                                        <h3 class="fw-bold mb-0" id="calcExpensesOut">₹ 0</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card bg-success text-white h-100 border-0 shadow-sm"
+                                    style="background: linear-gradient(135deg, #198754, #20c997);">
+                                    <div class="card-body d-flex flex-column justify-content-center text-center py-4">
+                                        <h6 class="card-title opacity-75 fw-bold text-uppercase"
+                                            style="letter-spacing: 1px;"><span data-i18n="net-profit">Net Profit</span>
+                                        </h6>
+                                        <h3 class="fw-bold mb-0" id="calcNetProfit">₹ 0</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Price Table -->
+        <div class="card shadow border-0">
+            <div class="card-header bg-white py-3">
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-3">
+                        <h5 class="mb-0 fw-bold"><span data-i18n="crop-prices-table">Crop Prices</span> <span
+                                id="cropCount" class="badge bg-success ms-2" style="font-size:0.7rem;"></span></h5>
+                    </div>
+                    <div class="col-md-5">
+                        <select id="districtFilter" class="form-select form-select-sm" onchange="filterByDistrict()">
+                            <option value="all">🗺️ All Districts</option>
+                            <option value="Bagalkote">Bagalkote</option>
+                            <option value="Ballari">Ballari (Bellary)</option>
+                            <option value="Belagavi">Belagavi (Belgaum)</option>
+                            <option value="Bengaluru">Bengaluru</option>
+                            <option value="Bidar">Bidar</option>
+                            <option value="Byadgi">Byadgi</option>
+                            <option value="Chamarajanagar">Chamarajanagar</option>
+                            <option value="Chikkaballapura">Chikkaballapura</option>
+                            <option value="Chikkamagaluru">Chikkamagaluru</option>
+                            <option value="Chitradurga">Chitradurga</option>
+                            <option value="Dakshina Kannada">Dakshina Kannada</option>
+                            <option value="Davangere">Davangere</option>
+                            <option value="Dharwad">Dharwad</option>
+                            <option value="Gadag">Gadag</option>
+                            <option value="Hassan">Hassan</option>
+                            <option value="Haveri">Haveri</option>
+                            <option value="Kalaburagi">Kalaburagi</option>
+                            <option value="Kodagu">Kodagu</option>
+                            <option value="Kolar">Kolar</option>
+                            <option value="Koppal">Koppal</option>
+                            <option value="Mandya">Mandya</option>
+                            <option value="Mysuru">Mysuru</option>
+                            <option value="Raichur">Raichur</option>
+                            <option value="Ramanagara">Ramanagara</option>
+                            <option value="Shimoga">Shimoga</option>
+                            <option value="Tumakuru">Tumakuru</option>
+                            <option value="Udupi">Udupi</option>
+                            <option value="Uttara Kannada">Uttara Kannada</option>
+                            <option value="Vijayapura">Vijayapura</option>
+                            <option value="Yadgir">Yadgir</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <button class="btn btn-sm btn-success" onclick="loadMarketPrices()"><i
+                                class="bi bi-arrow-clockwise"></i> Refresh</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Crop</th>
+                                <th>Market / District</th>
+                                <th>Price (₹)</th>
+                                <th>Unit</th>
+                                <th>Trend</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody id="priceTableBody">
+                            <tr>
+                                <td colspan="6" class="text-center py-4">Loading prices...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/market_data.js"></script>
+    <script type="module">
+        import api from './js/api.js';
+
+        // Generate daily mock prices if API fails
+        function getDailyMockPrices() {
+            const crops = [
+                { name: "Rice (Sona Masuri)", market: "Mandya APMC", base: 2850, unit: "Quintal" },
+                { name: "Ragi", market: "Hassan APMC", base: 3200, unit: "Quintal" },
+                { name: "Maize", market: "Haveri APMC", base: 1950, unit: "Quintal" },
+                { name: "Cotton", market: "Raichur APMC", base: 6500, unit: "Quintal" },
+                { name: "Sugarcane", market: "Belagavi APMC", base: 2900, unit: "Ton" },
+                { name: "Coconut", market: "Tumakuru APMC", base: 18000, unit: "1000 Nuts" },
+                { name: "Arecanut", market: "Shivamogga APMC", base: 45000, unit: "Quintal" },
+                { name: "Turmeric", market: "Chamarajanagar", base: 7200, unit: "Quintal" },
+                { name: "Groundnut", market: "Chitradurga", base: 5800, unit: "Quintal" },
+                { name: "Sunflower", market: "Gadag", base: 4600, unit: "Quintal" },
+                { name: "Jowar", market: "Vijayapura", base: 2400, unit: "Quintal" },
+                { name: "Bajra", market: "Bagalkote", base: 2100, unit: "Quintal" },
+                { name: "Green Gram", market: "Bidar APMC", base: 7500, unit: "Quintal" },
+                { name: "Black Gram", market: "Kalaburagi APMC", base: 6800, unit: "Quintal" },
+                { name: "Bengal Gram", market: "Dharwad APMC", base: 5200, unit: "Quintal" },
+                { name: "Tur Dal", market: "Yadgir APMC", base: 8100, unit: "Quintal" },
+                { name: "Soybean", market: "Belagavi APMC", base: 4300, unit: "Quintal" },
+                { name: "Chilli (Dry)", market: "Byadgi APMC", base: 18000, unit: "Quintal" },
+                { name: "Pepper", market: "Kodagu APMC", base: 38000, unit: "Quintal" },
+                { name: "Cardamom", market: "Sakleshpur APMC", base: 1500, unit: "Kg" },
+                { name: "Ginger", market: "Hassan APMC", base: 3500, unit: "Quintal" },
+                { name: "Onion", market: "Chitradurga APMC", base: 1200, unit: "Quintal" },
+                { name: "Potato", market: "Hassan APMC", base: 1400, unit: "Quintal" },
+                { name: "Tomato", market: "Kolar APMC", base: 800, unit: "Quintal" },
+                { name: "Banana", market: "Mysuru APMC", base: 1800, unit: "Quintal" },
+                { name: "Pomegranate", market: "Koppal APMC", base: 6500, unit: "Quintal" },
+                { name: "Mango", market: "Srinivaspur APMC", base: 4500, unit: "Quintal" },
+                { name: "Wheat", market: "Bidar APMC", base: 2600, unit: "Quintal" },
+                { name: "Paddy (IR-64)", market: "Raichur APMC", base: 2200, unit: "Quintal" },
+                { name: "Horse Gram", market: "Tumakuru APMC", base: 4800, unit: "Quintal" },
+                { name: "Cowpea", market: "Dharwad APMC", base: 5600, unit: "Quintal" },
+                { name: "Sesame (Til)", market: "Koppal APMC", base: 11000, unit: "Quintal" },
+                { name: "Castor Seed", market: "Raichur APMC", base: 5400, unit: "Quintal" },
+                { name: "Linseed", market: "Vijayapura APMC", base: 5800, unit: "Quintal" },
+                { name: "Coriander", market: "Gadag APMC", base: 7200, unit: "Quintal" },
+                { name: "Cumin", market: "Dharwad APMC", base: 16000, unit: "Quintal" },
+                { name: "Fenugreek", market: "Belagavi APMC", base: 8500, unit: "Quintal" },
+                { name: "Tamarind", market: "Tumakuru APMC", base: 6000, unit: "Quintal" },
+                { name: "Cashew Nut", market: "Dakshina Kannada APMC", base: 75000, unit: "Quintal" },
+                { name: "Coffee (Robusta)", market: "Chikkamagaluru APMC", base: 22000, unit: "Quintal" },
+                { name: "Rubber", market: "Dakshina Kannada APMC", base: 15000, unit: "Quintal" },
+                { name: "Mulberry Silk", market: "Ramanagara APMC", base: 48000, unit: "Quintal" },
+                { name: "Drumstick", market: "Belagavi APMC", base: 2200, unit: "Quintal" },
+                { name: "Cabbage", market: "Chikkaballapura APMC", base: 600, unit: "Quintal" },
+                { name: "Carrot", market: "Ooty/Hassan APMC", base: 1600, unit: "Quintal" },
+                { name: "Beetroot", market: "Kolar APMC", base: 1100, unit: "Quintal" },
+                { name: "Watermelon", market: "Mandya APMC", base: 900, unit: "Quintal" },
+                { name: "Papaya", market: "Mysuru APMC", base: 1200, unit: "Quintal" },
+                { name: "Guava", market: "Bengaluru Rural APMC", base: 3200, unit: "Quintal" },
+                { name: "Sapota (Chikoo)", market: "Dharwad APMC", base: 2800, unit: "Quintal" },
+                { name: "Jackfruit", market: "Tumakuru APMC", base: 2000, unit: "Quintal" },
+                { name: "Grapes", market: "Vijayapura APMC", base: 4500, unit: "Quintal" },
+                { name: "Custard Apple", market: "Chitradurga APMC", base: 3800, unit: "Quintal" },
+                { name: "Fig (Anjeer)", market: "Bellary APMC", base: 8500, unit: "Quintal" },
+                { name: "Lemon", market: "Davangere APMC", base: 2500, unit: "Quintal" },
+                { name: "Sweet Orange", market: "Kolar APMC", base: 3200, unit: "Quintal" },
+                { name: "Pineapple", market: "Shimoga APMC", base: 2800, unit: "Quintal" },
+                { name: "Litchi", market: "Bengaluru APMC", base: 7500, unit: "Quintal" },
+                { name: "Amla (Gooseberry)", market: "Tumakuru APMC", base: 3500, unit: "Quintal" },
+                { name: "Curry Leaves", market: "Mysuru APMC", base: 4000, unit: "Quintal" },
+                { name: "Moringa Leaves", market: "Belagavi APMC", base: 3200, unit: "Quintal" },
+                { name: "Spinach", market: "Bengaluru APMC", base: 1500, unit: "Quintal" },
+                { name: "Cauliflower", market: "Chikkaballapura APMC", base: 900, unit: "Quintal" },
+                { name: "Green Peas", market: "Hassan APMC", base: 4500, unit: "Quintal" },
+                { name: "Bitter Gourd", market: "Mysuru APMC", base: 1800, unit: "Quintal" },
+                { name: "Bottle Gourd", market: "Mandya APMC", base: 800, unit: "Quintal" },
+                { name: "Ridge Gourd", market: "Haveri APMC", base: 1200, unit: "Quintal" },
+                { name: "Snake Gourd", market: "Shimoga APMC", base: 1000, unit: "Quintal" },
+                { name: "Ash Gourd", market: "Tumakuru APMC", base: 700, unit: "Quintal" },
+                { name: "Pumpkin", market: "Davangere APMC", base: 600, unit: "Quintal" },
+                { name: "Lady Finger (Okra)", market: "Raichur APMC", base: 1500, unit: "Quintal" },
+                { name: "Brinjal", market: "Mysuru APMC", base: 1200, unit: "Quintal" },
+                { name: "Cucumber", market: "Bengaluru APMC", base: 800, unit: "Quintal" },
+                { name: "Capsicum (Green)", market: "Chikkaballapura APMC", base: 2500, unit: "Quintal" },
+                { name: "Red Chilli (Fresh)", market: "Byadgi APMC", base: 5500, unit: "Quintal" },
+                { name: "Mint", market: "Bengaluru APMC", base: 3000, unit: "Quintal" },
+                { name: "Methi (Fenugreek Leaves)", market: "Dharwad APMC", base: 2200, unit: "Quintal" },
+                { name: "Cluster Beans (Guar)", market: "Kalaburagi APMC", base: 2800, unit: "Quintal" },
+                { name: "Broad Beans (Avarekai)", market: "Mandya APMC", base: 3500, unit: "Quintal" },
+                { name: "Sweet Potato", market: "Shimoga APMC", base: 1400, unit: "Quintal" },
+                { name: "Radish", market: "Bengaluru APMC", base: 800, unit: "Quintal" },
+                { name: "Garlic", market: "Gadag APMC", base: 8000, unit: "Quintal" },
+                { name: "Mustard Seed", market: "Vijayapura APMC", base: 5500, unit: "Quintal" },
+                { name: "Safflower", market: "Kalaburagi APMC", base: 4200, unit: "Quintal" },
+                { name: "Niger Seed", market: "Dharwad APMC", base: 6500, unit: "Quintal" },
+                { name: "Foxtail Millet", market: "Tumakuru APMC", base: 3800, unit: "Quintal" },
+                { name: "Little Millet", market: "Ramanagara APMC", base: 4000, unit: "Quintal" },
+                { name: "Barnyard Millet", market: "Hassan APMC", base: 3600, unit: "Quintal" },
+                { name: "Kodo Millet", market: "Chitradurga APMC", base: 3900, unit: "Quintal" },
+                { name: "Proso Millet", market: "Bellary APMC", base: 3700, unit: "Quintal" },
+                { name: "Pearl Millet (Sajje)", market: "Raichur APMC", base: 2200, unit: "Quintal" },
+                { name: "Vanilla", market: "Kodagu APMC", base: 35000, unit: "Kg" },
+                { name: "Clove", market: "Shimoga APMC", base: 85000, unit: "Quintal" },
+                { name: "Nutmeg", market: "Dakshina Kannada APMC", base: 55000, unit: "Quintal" },
+                { name: "Cinnamon", market: "Kodagu APMC", base: 42000, unit: "Quintal" },
+                { name: "Cocoa", market: "Dakshina Kannada APMC", base: 18000, unit: "Quintal" },
+                { name: "Betel Leaf", market: "Shimoga APMC", base: 12000, unit: "Quintal" },
+                { name: "Marigold", market: "Bengaluru APMC", base: 4500, unit: "Quintal" },
+                { name: "Jasmine", market: "Mysuru APMC", base: 16000, unit: "Quintal" },
+                { name: "Chrysanthemum", market: "Tumakuru APMC", base: 6000, unit: "Quintal" },
+                { name: "Rose", market: "Bengaluru APMC", base: 8000, unit: "Quintal" }
+            ];
+
+            const today = new Date();
+            const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+
+            return crops.map((crop, index) => {
+                const random = Math.sin(seed + index * 100) * 10000;
+                const percentChange = ((random - Math.floor(random)) * 0.1) - 0.05; // -5% to +5%
+                const currentPrice = Math.round(crop.base * (1 + percentChange));
+                const trend = percentChange > 0 ? 'up' : (percentChange < 0 ? 'down' : 'stable');
+
+                return {
+                    crop: crop.name,
+                    market: crop.market,
+                    price: currentPrice,
+                    unit: crop.unit,
+                    trend: trend,
+                    date: today
+                };
+            });
+        }
+
+        // Store all prices globally for filtering
+        let allPrices = [];
+
+        // Render prices into table and ticker
+        function renderPrices(prices) {
+            const tableBody = document.getElementById('priceTableBody');
+            const ticker = document.getElementById('priceTicker');
+            const countBadge = document.getElementById('cropCount');
+
+            if (countBadge) countBadge.textContent = prices.length + ' crops';
+
+            // Sort by market/district name then crop name
+            prices.sort((a, b) => (a.market || '').localeCompare(b.market || '') || (a.crop || '').localeCompare(b.crop || ''));
+
+            tableBody.innerHTML = prices.map(item => {
+                const trendIcon = item.trend === 'up' ? '<i class="bi bi-arrow-up-circle-fill text-success"></i>' :
+                    item.trend === 'down' ? '<i class="bi bi-arrow-down-circle-fill text-danger"></i>' :
+                        '<i class="bi bi-dash-circle-fill text-secondary"></i>';
+
+                const priceDisplay = (typeof item.price === 'number' && !isNaN(item.price)) ? '₹' + item.price.toLocaleString() : 'N/A';
+
+                return `
+                    <tr>
+                        <td class="ps-4 fw-bold">${item.crop || 'Unknown Crop'}</td>
+                        <td>${item.market || 'Karnataka'}</td>
+                        <td class="fw-bold">${priceDisplay}</td>
+                        <td>Per ${item.unit || 'Quintal'}</td>
+                        <td>${trendIcon} ${item.trend ? item.trend.toUpperCase() : 'STABLE'}</td>
+                        <td class="text-muted small">${new Date(item.date || Date.now()).toLocaleDateString()}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            ticker.innerHTML = prices.map(p =>
+                `<span class="me-4">${p.crop || 'Crop'}: ₹${p.price || '--'}/${p.unit || 'Q'} (${p.trend === 'up' ? '▲' : '▼'})</span>`
+            ).join('');
+        }
+
+        // Define comprehensive real-world crop lists for each of the 31 Karnataka districts
+        // Every district has at least 25 specifically tailored crops
+        const districtMasterCrops = {
+            "Bagalkote": [
+                { crop: "Maize", base: 1950 }, { crop: "Sugarcane", base: 2900 }, { crop: "Cotton", base: 6500 },
+                { crop: "Jowar", base: 2400 }, { crop: "Onion", base: 1200 }, { crop: "Bengal Gram", base: 5200 },
+                { crop: "Wheat", base: 2600 }, { crop: "Sunflower", base: 4600 }, { crop: "Pomegranate", base: 6500 },
+                { crop: "Grapes", base: 4500 }, { crop: "Sorghum", base: 2300 }, { crop: "Bajra", base: 2100 },
+                { crop: "Groundnut", base: 5800 }, { crop: "Red Chilli", base: 18000 }, { crop: "Tur Dal", base: 8100 },
+                { crop: "Green Gram", base: 7500 }, { crop: "Lime", base: 2500 }, { crop: "Guava", base: 3200 },
+                { crop: "Papaya", base: 1200 }, { crop: "Tomato", base: 1200 }, { crop: "Brinjal", base: 1300 },
+                { crop: "Bhendi (Okra)", base: 1500 }, { crop: "Cabbage", base: 800 }, { crop: "Coriander", base: 7200 },
+                { crop: "Garlic", base: 8000 }, { crop: "Sweet Potato", base: 1400 }, { crop: "Watermelon", base: 900 }
+            ],
+            "Ballari": [
+                { crop: "Rice", base: 2850 }, { crop: "Maize", base: 1950 }, { crop: "Cotton", base: 6500 },
+                { crop: "Groundnut", base: 5800 }, { crop: "Sunflower", base: 4600 }, { crop: "Chilli (Dry)", base: 18000 },
+                { crop: "Jowar", base: 2400 }, { crop: "Bajra", base: 2100 }, { crop: "Bengal Gram", base: 5200 },
+                { crop: "Sugarcane", base: 2900 }, { crop: "Fig (Anjeer)", base: 8500 }, { crop: "Pomegranate", base: 6500 },
+                { crop: "Onion", base: 1200 }, { crop: "Tomato", base: 1200 }, { crop: "Brinjal", base: 1300 },
+                { crop: "Bhendi (Okra)", base: 1500 }, { crop: "Cabbage", base: 800 }, { crop: "Cauliflower", base: 1100 },
+                { crop: "Carrot", base: 1800 }, { crop: "Radish", base: 700 }, { crop: "Spinach", base: 1200 },
+                { crop: "Mint", base: 3000 }, { crop: "Coriander Leaves", base: 4000 }, { crop: "Garlic", base: 8000 },
+                { crop: "Ginger", base: 3500 }, { crop: "Banana", base: 1800 }, { crop: "Papaya", base: 1200 }
+            ],
+            "Belagavi": [
+                { crop: "Sugarcane", base: 2900 }, { crop: "Maize", base: 1950 }, { crop: "Rice", base: 2850 },
+                { crop: "Soybean", base: 4300 }, { crop: "Tobacco", base: 12000 }, { crop: "Groundnut", base: 5800 },
+                { crop: "Drumstick", base: 2200 }, { crop: "Jowar", base: 2400 }, { crop: "Wheat", base: 2600 },
+                { crop: "Cotton", base: 6500 }, { crop: "Bengal Gram", base: 5200 }, { crop: "Tur Dal", base: 8100 },
+                { crop: "Onion", base: 1200 }, { crop: "Potato", base: 1400 }, { crop: "Tomato", base: 1200 },
+                { crop: "Cabbage", base: 800 }, { crop: "Cauliflower", base: 1100 }, { crop: "Carrot", base: 1800 },
+                { crop: "Capsicum", base: 2500 }, { crop: "Green Chilli", base: 3500 }, { crop: "Ginger", base: 3500 },
+                { crop: "Garlic", base: 8000 }, { crop: "Mango", base: 4500 }, { crop: "Banana", base: 1800 },
+                { crop: "Grapes", base: 4500 }, { crop: "Sapota", base: 2800 }, { crop: "Guava", base: 3200 }
+            ],
+            "Bengaluru": [
+                { crop: "Ragi", base: 3200 }, { crop: "Rice", base: 2850 }, { crop: "Maize", base: 1950 },
+                { crop: "Tomato", base: 800 }, { crop: "Potato", base: 1400 }, { crop: "Onion", base: 1200 },
+                { crop: "Carrot", base: 1800 }, { crop: "Cabbage", base: 800 }, { crop: "Cauliflower", base: 1100 },
+                { crop: "Capsicum", base: 2500 }, { crop: "Beans", base: 3200 }, { crop: "Peas", base: 4500 },
+                { crop: "Marigold", base: 4500 }, { crop: "Rose", base: 8000 }, { crop: "Jasmine", base: 16000 },
+                { crop: "Chrysanthemum", base: 6000 }, { crop: "Coconut", base: 18000 }, { crop: "Arecanut", base: 45000 },
+                { crop: "Banana", base: 1800 }, { crop: "Mango", base: 4500 }, { crop: "Papaya", base: 1200 },
+                { crop: "Guava", base: 3200 }, { crop: "Jackfruit", base: 2000 }, { crop: "Spinach", base: 1200 },
+                { crop: "Mint", base: 3000 }, { crop: "Coriander", base: 4000 }, { crop: "Cucumber", base: 900 }
+            ],
+            "Bidar": [
+                { crop: "Tur Dal", base: 8100 }, { crop: "Maize", base: 1950 }, { crop: "Green Gram", base: 7500 },
+                { crop: "Wheat", base: 2600 }, { crop: "Sugarcane", base: 2900 }, { crop: "Jowar", base: 2400 },
+                { crop: "Bengal Gram", base: 5200 }, { crop: "Black Gram", base: 6800 }, { crop: "Soybean", base: 4300 },
+                { crop: "Safflower", base: 4200 }, { crop: "Sunflower", base: 4600 }, { crop: "Groundnut", base: 5800 },
+                { crop: "Onion", base: 1200 }, { crop: "Tomato", base: 1200 }, { crop: "Brinjal", base: 1300 },
+                { crop: "Bhendi (Okra)", base: 1500 }, { crop: "Red Chilli", base: 18000 }, { crop: "Garlic", base: 8000 },
+                { crop: "Ginger", base: 3500 }, { crop: "Mango", base: 4500 }, { crop: "Banana", base: 1800 },
+                { crop: "Papaya", base: 1200 }, { crop: "Guava", base: 3200 }, { crop: "Lemon", base: 2500 },
+                { crop: "Coriander", base: 7200 }, { crop: "Watermelon", base: 900 }, { crop: "Cucumber", base: 900 }
+            ],
+            "Byadgi": [
+                { crop: "Red Chilli (Byadgi)", base: 55000 }, { crop: "Cotton", base: 6500 }, { crop: "Maize", base: 1950 },
+                { crop: "Groundnut", base: 5800 }, { crop: "Jowar", base: 2400 }, { crop: "Onion", base: 1200 },
+                { crop: "Tomato", base: 1200 }, { crop: "Garlic", base: 8000 }, { crop: "Ginger", base: 3500 },
+                { crop: "Coriander", base: 7200 }, { crop: "Turmeric", base: 7200 }, { crop: "Bengal Gram", base: 5200 },
+                { crop: "Green Gram", base: 7500 }, { crop: "Black Gram", base: 6800 }, { crop: "Soybean", base: 4300 },
+                { crop: "Wheat", base: 2600 }, { crop: "Sugarcane", base: 2900 }, { crop: "Banana", base: 1800 },
+                { crop: "Mango", base: 4500 }, { crop: "Papaya", base: 1200 }, { crop: "Guava", base: 3200 },
+                { crop: "Sapota", base: 2800 }, { crop: "Brinjal", base: 1300 }, { crop: "Cabbage", base: 800 },
+                { crop: "Cauliflower", base: 1100 }, { crop: "Carrot", base: 1800 }, { crop: "Sweet Potato", base: 1400 }
+            ],
+            "Chamarajanagar": [
+                { crop: "Turmeric", base: 7200 }, { crop: "Maize", base: 1950 }, { crop: "Sugarcane", base: 2900 },
+                { crop: "Banana", base: 1800 }, { crop: "Coconut", base: 18000 }, { crop: "Ragi", base: 3200 },
+                { crop: "Jowar", base: 2400 }, { crop: "Horse Gram", base: 4500 }, { crop: "Cowpea", base: 5600 },
+                { crop: "Groundnut", base: 5800 }, { crop: "Sesame", base: 11000 }, { crop: "Cotton", base: 6500 },
+                { crop: "Onion", base: 1200 }, { crop: "Tomato", base: 1200 }, { crop: "Brinjal", base: 1300 },
+                { crop: "Bhendi (Okra)", base: 1500 }, { crop: "Cabbage", base: 800 }, { crop: "Cauliflower", base: 1100 },
+                { crop: "Garlic", base: 8000 }, { crop: "Ginger", base: 3500 }, { crop: "Mango", base: 4500 },
+                { crop: "Papaya", base: 1200 }, { crop: "Arecanut", base: 45000 }, { crop: "Coffee", base: 22000 },
+                { crop: "Pepper", base: 38000 }, { crop: "Cardamom", base: 150000 }, { crop: "Marigold", base: 4500 }
+            ],
+            "Chikkaballapura": [
+                { crop: "Tomato", base: 800 }, { crop: "Ragi", base: 3200 }, { crop: "Maize", base: 1950 },
+                { crop: "Groundnut", base: 5800 }, { crop: "Capsicum", base: 2500 }, { crop: "Cauliflower", base: 900 },
+                { crop: "Cabbage", base: 800 }, { crop: "Potato", base: 1400 }, { crop: "Onion", base: 1200 },
+                { crop: "Carrot", base: 1800 }, { crop: "Beans", base: 3200 }, { crop: "Peas", base: 4500 },
+                { crop: "Mango", base: 4500 }, { crop: "Grapes", base: 4500 }, { crop: "Guava", base: 3200 },
+                { crop: "Papaya", base: 1200 }, { crop: "Banana", base: 1800 }, { crop: "Rose", base: 8000 },
+                { crop: "Marigold", base: 4500 }, { crop: "Chrysanthemum", base: 6000 }, { crop: "Jasmine", base: 16000 },
+                { crop: "Silk", base: 48000 }, { crop: "Garlic", base: 8000 }, { crop: "Ginger", base: 3500 },
+                { crop: "Tur Dal", base: 8100 }, { crop: "Horse Gram", base: 4500 }, { crop: "Cowpea", base: 5600 }
+            ],
+            "Chikkamagaluru": [
+                { crop: "Coffee (Robusta)", base: 22000 }, { crop: "Coffee (Arabica)", base: 28000 }, { crop: "Pepper", base: 38000 },
+                { crop: "Cardamom", base: 150000 }, { crop: "Ginger", base: 3500 }, { crop: "Arecanut", base: 45000 },
+                { crop: "Rice", base: 2850 }, { crop: "Maize", base: 1950 }, { crop: "Ragi", base: 3200 },
+                { crop: "Coconut", base: 18000 }, { crop: "Banana", base: 1800 }, { crop: "Orange", base: 3200 },
+                { crop: "Tea", base: 25000 }, { crop: "Cocoa", base: 18000 }, { crop: "Vanilla", base: 350000 },
+                { crop: "Turmeric", base: 7200 }, { crop: "Tomato", base: 1200 }, { crop: "Onion", base: 1200 },
+                { crop: "Potato", base: 1400 }, { crop: "Cabbage", base: 800 }, { crop: "Cauliflower", base: 1100 },
+                { crop: "Carrot", base: 1800 }, { crop: "Beans", base: 3200 }, { crop: "Peas", base: 4500 },
+                { crop: "Chilli (Green)", base: 3500 }, { crop: "Garlic", base: 8000 }, { crop: "Sweet Potato", base: 1400 }
+            ],
+            "Chitradurga": [
+                { crop: "Groundnut", base: 5800 }, { crop: "Maize", base: 1950 }, { crop: "Cotton", base: 6500 },
+                { crop: "Sunflower", base: 4600 }, { crop: "Onion", base: 1200 }, { crop: "Pomegranate", base: 6500 },
+                { crop: "Ragi", base: 3200 }, { crop: "Jowar", base: 2400 }, { crop: "Bengal Gram", base: 5200 },
+                { crop: "Tur Dal", base: 8100 }, { crop: "Green Gram", base: 7500 }, { crop: "Castor Seed", base: 5400 },
+                { crop: "Tomato", base: 1200 }, { crop: "Brinjal", base: 1300 }, { crop: "Bhendi (Okra)", base: 1500 },
+                { crop: "Cabbage", base: 800 }, { crop: "Cauliflower", base: 1100 }, { crop: "Carrot", base: 1800 },
+                { crop: "Coconut", base: 18000 }, { crop: "Arecanut", base: 45000 }, { crop: "Banana", base: 1800 },
+                { crop: "Mango", base: 4500 }, { crop: "Papaya", base: 1200 }, { crop: "Guava", base: 3200 },
+                { crop: "Sapota", base: 2800 }, { crop: "Garlic", base: 8000 }, { crop: "Ginger", base: 3500 }
+            ],
+            "Dakshina Kannada": [
+                { crop: "Coconut", base: 18000 }, { crop: "Arecanut", base: 45000 }, { crop: "Cashew Nut", base: 75000 },
+                { crop: "Rubber", base: 15000 }, { crop: "Cocoa", base: 18000 }, { crop: "Nutmeg", base: 55000 },
+                { crop: "Rice", base: 2850 }, { crop: "Pepper", base: 38000 }, { crop: "Banana", base: 1800 },
+                { crop: "Pineapple", base: 2800 }, { crop: "Mango", base: 4500 }, { crop: "Jackfruit", base: 2000 },
+                { crop: "Sweet Potato", base: 1400 }, { crop: "Tapioca", base: 1100 }, { crop: "Ginger", base: 3500 },
+                { crop: "Turmeric", base: 7200 }, { crop: "Cardamom", base: 150000 }, { crop: "Vanilla", base: 350000 },
+                { crop: "Cucumber", base: 900 }, { crop: "Ash Gourd", base: 700 }, { crop: "Bitter Gourd", base: 1200 },
+                { crop: "Snake Gourd", base: 1000 }, { crop: "Ridge Gourd", base: 1100 }, { crop: "Amaranthus", base: 1200 },
+                { crop: "Drumstick", base: 2200 }, { crop: "Papaya", base: 1200 }, { crop: "Guava", base: 3200 }
+            ],
+            "Davangere": [
+                { crop: "Maize", base: 1950 }, { crop: "Rice", base: 2850 }, { crop: "Sugarcane", base: 2900 },
+                { crop: "Cotton", base: 6500 }, { crop: "Lemon", base: 2500 }, { crop: "Onion", base: 1200 },
+                { crop: "Jowar", base: 2400 }, { crop: "Ragi", base: 3200 }, { crop: "Groundnut", base: 5800 },
+                { crop: "Sunflower", base: 4600 }, { crop: "Tur Dal", base: 8100 }, { crop: "Bengal Gram", base: 5200 },
+                { crop: "Tomato", base: 1200 }, { crop: "Brinjal", base: 1300 }, { crop: "Bhendi (Okra)", base: 1500 },
+                { crop: "Cabbage", base: 800 }, { crop: "Cauliflower", base: 1100 }, { crop: "Carrot", base: 1800 },
+                { crop: "Garlic", base: 8000 }, { crop: "Ginger", base: 3500 }, { crop: "Coriander", base: 7200 },
+                { crop: "Arecanut", base: 45000 }, { crop: "Coconut", base: 18000 }, { crop: "Banana", base: 1800 },
+                { crop: "Mango", base: 4500 }, { crop: "Papaya", base: 1200 }, { crop: "Pomegranate", base: 6500 }
+            ],
+            "Dharwad": [
+                { crop: "Cotton", base: 6500 }, { crop: "Maize", base: 1950 }, { crop: "Bengal Gram", base: 5200 },
+                { crop: "Wheat", base: 2600 }, { crop: "Cowpea", base: 5600 }, { crop: "Soybean", base: 4300 },
+                { crop: "Jowar", base: 2400 }, { crop: "Groundnut", base: 5800 }, { crop: "Sunflower", base: 4600 },
+                { crop: "Safflower", base: 4200 }, { crop: "Tur Dal", base: 8100 }, { crop: "Green Gram", base: 7500 },
+                { crop: "Black Gram", base: 6800 }, { crop: "Onion", base: 1200 }, { crop: "Potato", base: 1400 },
+                { crop: "Tomato", base: 1200 }, { crop: "Brinjal", base: 1300 }, { crop: "Cabbage", base: 800 },
+                { crop: "Cauliflower", base: 1100 }, { crop: "Garlic", base: 8000 }, { crop: "Chilli (Dry)", base: 18000 },
+                { crop: "Ginger", base: 3500 }, { crop: "Mango", base: 4500 }, { crop: "Sapota", base: 2800 },
+                { crop: "Guava", base: 3200 }, { crop: "Banana", base: 1800 }, { crop: "Papaya", base: 1200 }
+            ],
+            "Gadag": [
+                { crop: "Cotton", base: 6500 }, { crop: "Sunflower", base: 4600 }, { crop: "Maize", base: 1950 },
+                { crop: "Wheat", base: 2600 }, { crop: "Garlic", base: 8000 }, { crop: "Coriander", base: 7200 },
+                { crop: "Jowar", base: 2400 }, { crop: "Bengal Gram", base: 5200 }, { crop: "Tur Dal", base: 8100 },
+                { crop: "Green Gram", base: 7500 }, { crop: "Black Gram", base: 6800 }, { crop: "Groundnut", base: 5800 },
+                { crop: "Safflower", base: 4200 }, { crop: "Onion", base: 1200 }, { crop: "Tomato", base: 1200 },
+                { crop: "Brinjal", base: 1300 }, { crop: "Bhendi (Okra)", base: 1500 }, { crop: "Cabbage", base: 800 },
+                { crop: "Red Chilli", base: 18000 }, { crop: "Ginger", base: 3500 }, { crop: "Turmeric", base: 7200 },
+                { crop: "Mango", base: 4500 }, { crop: "Banana", base: 1800 }, { crop: "Papaya", base: 1200 },
+                { crop: "Guava", base: 3200 }, { crop: "Lemon", base: 2500 }, { crop: "Pomegranate", base: 6500 }
+            ],
+            "Hassan": [
+                { crop: "Coffee (Robusta)", base: 22000 }, { crop: "Ragi", base: 3200 }, { crop: "Potato", base: 1400 },
+                { crop: "Ginger", base: 3500 }, { crop: "Coconut", base: 18000 }, { crop: "Green Peas", base: 4500 },
+                { crop: "Maize", base: 1950 }, { crop: "Rice", base: 2850 }, { crop: "Arecanut", base: 45000 },
+                { crop: "Pepper", base: 38000 }, { crop: "Cardamom", base: 150000 }, { crop: "Vanilla", base: 350000 },
+                { crop: "Tomato", base: 1200 }, { crop: "Onion", base: 1200 }, { crop: "Cabbage", base: 800 },
+                { crop: "Cauliflower", base: 1100 }, { crop: "Carrot", base: 1800 }, { crop: "Beans", base: 3200 },
+                { crop: "Capsicum", base: 2500 }, { crop: "Garlic", base: 8000 }, { crop: "Turmeric", base: 7200 },
+                { crop: "Banana", base: 1800 }, { crop: "Mango", base: 4500 }, { crop: "Papaya", base: 1200 },
+                { crop: "Orange", base: 3200 }, { crop: "Jackfruit", base: 2000 }, { crop: "Sweet Potato", base: 1400 }
+            ],
+            "Haveri": [
+                { crop: "Maize", base: 1950 }, { crop: "Cotton", base: 6500 }, { crop: "Sugarcane", base: 2900 },
+                { crop: "Arecanut", base: 45000 }, { crop: "Rice", base: 2850 }, { crop: "Ridge Gourd", base: 1200 },
+                { crop: "Jowar", base: 2400 }, { crop: "Wheat", base: 2600 }, { crop: "Groundnut", base: 5800 },
+                { crop: "Sunflower", base: 4600 }, { crop: "Soybean", base: 4300 }, { crop: "Tur Dal", base: 8100 },
+                { crop: "Bengal Gram", base: 5200 }, { crop: "Red Chilli (Byadgi)", base: 55000 }, { crop: "Onion", base: 1200 },
+                { crop: "Tomato", base: 1200 }, { crop: "Brinjal", base: 1300 }, { crop: "Cabbage", base: 800 },
+                { crop: "Garlic", base: 8000 }, { crop: "Ginger", base: 3500 }, { crop: "Coriander", base: 7200 },
+                { crop: "Mango", base: 4500 }, { crop: "Banana", base: 1800 }, { crop: "Papaya", base: 1200 },
+                { crop: "Sapota", base: 2800 }, { crop: "Guava", base: 3200 }, { crop: "Coconut", base: 18000 }
+            ],
+            "Kalaburagi": [
+                { crop: "Tur Dal", base: 8100 }, { crop: "Black Gram", base: 6800 }, { crop: "Maize", base: 1950 },
+                { crop: "Jowar", base: 2400 }, { crop: "Safflower", base: 4200 }, { crop: "Green Gram", base: 7500 },
+                { crop: "Bengal Gram", base: 5200 }, { crop: "Wheat", base: 2600 }, { crop: "Sunflower", base: 4600 },
+                { crop: "Groundnut", base: 5800 }, { crop: "Soybean", base: 4300 }, { crop: "Sugarcane", base: 2900 },
+                { crop: "Cotton", base: 6500 }, { crop: "Onion", base: 1200 }, { crop: "Tomato", base: 1200 },
+                { crop: "Brinjal", base: 1300 }, { crop: "Bhendi (Okra)", base: 1500 }, { crop: "Cabbage", base: 800 },
+                { crop: "Garlic", base: 8000 }, { crop: "Ginger", base: 3500 }, { crop: "Red Chilli", base: 18000 },
+                { crop: "Mango", base: 4500 }, { crop: "Banana", base: 1800 }, { crop: "Papaya", base: 1200 },
+                { crop: "Guava", base: 3200 }, { crop: "Lemon", base: 2500 }, { crop: "Watermelon", base: 900 }
+            ],
+            "Kodagu": [
+                { crop: "Coffee (Robusta)", base: 22000 }, { crop: "Coffee (Arabica)", base: 28000 }, { crop: "Pepper", base: 38000 },
+                { crop: "Cardamom", base: 1500 }, { crop: "Vanilla", base: 35000 }, { crop: "Cinnamon", base: 42000 },
+                { crop: "Ginger", base: 3500 }, { crop: "Rice", base: 2850 }, { crop: "Arecanut", base: 45000 },
+                { crop: "Coconut", base: 18000 }, { crop: "Cocoa", base: 18000 }, { crop: "Tea", base: 25000 },
+                { crop: "Orange", base: 3200 }, { crop: "Banana", base: 1800 }, { crop: "Mango", base: 4500 },
+                { crop: "Jackfruit", base: 2000 }, { crop: "Honey", base: 25000 }, { crop: "Tomato", base: 1200 },
+                { crop: "Onion", base: 1200 }, { crop: "Cabbage", base: 800 }, { crop: "Cauliflower", base: 1100 },
+                { crop: "Carrot", base: 1800 }, { crop: "Beans", base: 3200 }, { crop: "Peas", base: 4500 },
+                { crop: "Green Chilli", base: 3500 }, { crop: "Garlic", base: 8000 }, { crop: "Sweet Potato", base: 1400 }
+            ],
+            "Kolar": [
+                { crop: "Tomato", base: 800 }, { crop: "Ragi", base: 3200 }, { crop: "Mango", base: 4500 },
+                { crop: "Beetroot", base: 1100 }, { crop: "Sweet Orange", base: 3200 }, { crop: "Groundnut", base: 5800 },
+                { crop: "Maize", base: 1950 }, { crop: "Potato", base: 1400 }, { crop: "Onion", base: 1200 },
+                { crop: "Cabbage", base: 800 }, { crop: "Cauliflower", base: 1100 }, { crop: "Carrot", base: 1800 },
+                { crop: "Capsicum", base: 2500 }, { crop: "Beans", base: 3200 }, { crop: "Peas", base: 4500 },
+                { crop: "Garlic", base: 8000 }, { crop: "Ginger", base: 3500 }, { crop: "Tur Dal", base: 8100 },
+                { crop: "Horse Gram", base: 4500 }, { crop: "Cowpea", base: 5600 }, { crop: "Banana", base: 1800 },
+                { crop: "Papaya", base: 1200 }, { crop: "Guava", base: 3200 }, { crop: "Grapes", base: 4500 },
+                { crop: "Rose", base: 8000 }, { crop: "Marigold", base: 4500 }, { crop: "Silk", base: 48000 }
+            ],
+            "Koppal": [
+                { crop: "Rice", base: 2850 }, { crop: "Maize", base: 1950 }, { crop: "Cotton", base: 6500 },
+                { crop: "Pomegranate", base: 6500 }, { crop: "Sesame", base: 11000 }, { crop: "Sunflower", base: 4600 },
+                { crop: "Jowar", base: 2400 }, { crop: "Bajra", base: 2100 }, { crop: "Groundnut", base: 5800 },
+                { crop: "Bengal Gram", base: 5200 }, { crop: "Tur Dal", base: 8100 }, { crop: "Sugarcane", base: 2900 },
+                { crop: "Onion", base: 1200 }, { crop: "Tomato", base: 1200 }, { crop: "Brinjal", base: 1300 },
+                { crop: "Bhendi (Okra)", base: 1500 }, { crop: "Cabbage", base: 800 }, { crop: "Garlic", base: 8000 },
+                { crop: "Red Chilli", base: 18000 }, { crop: "Ginger", base: 3500 }, { crop: "Banana", base: 1800 },
+                { crop: "Mango", base: 4500 }, { crop: "Papaya", base: 1200 }, { crop: "Guava", base: 3200 },
+                { crop: "Lemon", base: 2500 }, { crop: "Fig (Anjeer)", base: 8500 }, { crop: "Watermelon", base: 900 }
+            ],
+            "Mandya": [
+                { crop: "Rice (Sona Masuri)", base: 2850 }, { crop: "Sugarcane", base: 2900 }, { crop: "Coconut", base: 18000 },
+                { crop: "Ragi", base: 3200 }, { crop: "Banana", base: 1800 }, { crop: "Watermelon", base: 900 },
+                { crop: "Jowar", base: 2400 }, { crop: "Maize", base: 1950 }, { crop: "Horse Gram", base: 4500 },
+                { crop: "Cowpea", base: 5600 }, { crop: "Tur Dal", base: 8100 }, { crop: "Groundnut", base: 5800 },
+                { crop: "Sesame", base: 11000 }, { crop: "Tomato", base: 1200 }, { crop: "Onion", base: 1200 },
+                { crop: "Brinjal", base: 1300 }, { crop: "Cabbage", base: 800 }, { crop: "Cauliflower", base: 1100 },
+                { crop: "Carrot", base: 1800 }, { crop: "Beans", base: 3200 }, { crop: "Garlic", base: 8000 },
+                { crop: "Ginger", base: 3500 }, { crop: "Turmeric", base: 7200 }, { crop: "Mango", base: 4500 },
+                { crop: "Papaya", base: 1200 }, { crop: "Guava", base: 3200 }, { crop: "Arecanut", base: 45000 }
+            ],
+            "Mysuru": [
+                { crop: "Rice", base: 2850 }, { crop: "Sugarcane", base: 2900 }, { crop: "Coconut", base: 18000 },
+                { crop: "Banana", base: 1800 }, { crop: "Jasmine", base: 16000 }, { crop: "Brinjal", base: 1200 },
+                { crop: "Tobacco", base: 12000 }, { crop: "Ragi", base: 3200 }, { crop: "Maize", base: 1950 },
+                { crop: "Jowar", base: 2400 }, { crop: "Horse Gram", base: 4500 }, { crop: "Cowpea", base: 5600 },
+                { crop: "Tur Dal", base: 8100 }, { crop: "Groundnut", base: 5800 }, { crop: "Cotton", base: 6500 },
+                { crop: "Tomato", base: 1200 }, { crop: "Onion", base: 1200 }, { crop: "Cabbage", base: 800 },
+                { crop: "Cauliflower", base: 1100 }, { crop: "Carrot", base: 1800 }, { crop: "Garlic", base: 8000 },
+                { crop: "Ginger", base: 3500 }, { crop: "Turmeric", base: 7200 }, { crop: "Mango", base: 4500 },
+                { crop: "Papaya", base: 1200 }, { crop: "Guava", base: 3200 }, { crop: "Arecanut", base: 45000 }
+            ],
+            "Raichur": [
+                { crop: "Rice", base: 2850 }, { crop: "Cotton", base: 6500 }, { crop: "Paddy (IR-64)", base: 2200 },
+                { crop: "Castor Seed", base: 5400 }, { crop: "Tur Dal", base: 8100 }, { crop: "Jowar", base: 2400 },
+                { crop: "Bajra", base: 2100 }, { crop: "Maize", base: 1950 }, { crop: "Bengal Gram", base: 5200 },
+                { crop: "Green Gram", base: 7500 }, { crop: "Groundnut", base: 5800 }, { crop: "Sunflower", base: 4600 },
+                { crop: "Safflower", base: 4200 }, { crop: "Tomato", base: 1200 }, { crop: "Onion", base: 1200 },
+                { crop: "Brinjal", base: 1300 }, { crop: "Bhendi (Okra)", base: 1500 }, { crop: "Cabbage", base: 800 },
+                { crop: "Red Chilli", base: 18000 }, { crop: "Garlic", base: 8000 }, { crop: "Ginger", base: 3500 },
+                { crop: "Mango", base: 4500 }, { crop: "Banana", base: 1800 }, { crop: "Papaya", base: 1200 },
+                { crop: "Guava", base: 3200 }, { crop: "Lemon", base: 2500 }, { crop: "Pomegranate", base: 6500 }
+            ],
+            "Ramanagara": [
+                { crop: "Mulberry Silk", base: 48000 }, { crop: "Ragi", base: 3200 }, { crop: "Coconut", base: 18000 },
+                { crop: "Mango", base: 4500 }, { crop: "Little Millet", base: 4000 }, { crop: "Sugarcane", base: 2900 },
+                { crop: "Maize", base: 1950 }, { crop: "Rice", base: 2850 }, { crop: "Horse Gram", base: 4500 },
+                { crop: "Cowpea", base: 5600 }, { crop: "Tur Dal", base: 8100 }, { crop: "Groundnut", base: 5800 },
+                { crop: "Tomato", base: 1200 }, { crop: "Potato", base: 1400 }, { crop: "Onion", base: 1200 },
+                { crop: "Cabbage", base: 800 }, { crop: "Cauliflower", base: 1100 }, { crop: "Carrot", base: 1800 },
+                { crop: "Beans", base: 3200 }, { crop: "Garlic", base: 8000 }, { crop: "Ginger", base: 3500 },
+                { crop: "Banana", base: 1800 }, { crop: "Papaya", base: 1200 }, { crop: "Guava", base: 3200 },
+                { crop: "Jackfruit", base: 2000 }, { crop: "Rose", base: 8000 }, { crop: "Arecanut", base: 45000 }
+            ],
+            "Shimoga": [
+                { crop: "Arecanut", base: 45000 }, { crop: "Rice", base: 2850 }, { crop: "Ginger", base: 3500 },
+                { crop: "Betel Leaf", base: 12000 }, { crop: "Pineapple", base: 2800 }, { crop: "Clove", base: 85000 },
+                { crop: "Maize", base: 1950 }, { crop: "Ragi", base: 3200 }, { crop: "Sugarcane", base: 2900 },
+                { crop: "Coconut", base: 18000 }, { crop: "Coffee", base: 22000 }, { crop: "Pepper", base: 38000 },
+                { crop: "Cardamom", base: 150000 }, { crop: "Vanilla", base: 350000 }, { crop: "Cocoa", base: 18000 },
+                { crop: "Banana", base: 1800 }, { crop: "Mango", base: 4500 }, { crop: "Jackfruit", base: 2000 },
+                { crop: "Tomato", base: 1200 }, { crop: "Onion", base: 1200 }, { crop: "Brinjal", base: 1300 },
+                { crop: "Cabbage", base: 800 }, { crop: "Beans", base: 3200 }, { crop: "Green Chilli", base: 3500 },
+                { crop: "Garlic", base: 8000 }, { crop: "Turmeric", base: 7200 }, { crop: "Sweet Potato", base: 1400 }
+            ],
+            "Tumakuru": [
+                { crop: "Coconut", base: 18000 }, { crop: "Ragi", base: 3200 }, { crop: "Maize", base: 1950 },
+                { crop: "Groundnut", base: 5800 }, { crop: "Foxtail Millet", base: 3800 }, { crop: "Tamarind", base: 6000 },
+                { crop: "Rice", base: 2850 }, { crop: "Jowar", base: 2400 }, { crop: "Horse Gram", base: 4500 },
+                { crop: "Cowpea", base: 5600 }, { crop: "Tur Dal", base: 8100 }, { crop: "Sunflower", base: 4600 },
+                { crop: "Castor Seed", base: 5400 }, { crop: "Tomato", base: 1200 }, { crop: "Onion", base: 1200 },
+                { crop: "Potato", base: 1400 }, { crop: "Brinjal", base: 1300 }, { crop: "Cabbage", base: 800 },
+                { crop: "Garlic", base: 8000 }, { crop: "Ginger", base: 3500 }, { crop: "Mango", base: 4500 },
+                { crop: "Banana", base: 1800 }, { crop: "Papaya", base: 1200 }, { crop: "Guava", base: 3200 },
+                { crop: "Arecanut", base: 45000 }, { crop: "Marigold", base: 4500 }, { crop: "Rose", base: 8000 }
+            ],
+            "Udupi": [
+                { crop: "Coconut", base: 18000 }, { crop: "Arecanut", base: 45000 }, { crop: "Rice", base: 2850 },
+                { crop: "Cocoa", base: 18000 }, { crop: "Cashew Nut", base: 75000 }, { crop: "Ginger", base: 3500 },
+                { crop: "Rubber", base: 15000 }, { crop: "Pepper", base: 38000 }, { crop: "Cardamom", base: 150000 },
+                { crop: "Vanilla", base: 350000 }, { crop: "Banana", base: 1800 }, { crop: "Pineapple", base: 2800 },
+                { crop: "Mango", base: 4500 }, { crop: "Jackfruit", base: 2000 }, { crop: "Sweet Potato", base: 1400 },
+                { crop: "Tapioca", base: 1100 }, { crop: "Turmeric", base: 7200 }, { crop: "Cucumber", base: 900 },
+                { crop: "Ash Gourd", base: 700 }, { crop: "Bitter Gourd", base: 1200 }, { crop: "Snake Gourd", base: 1000 },
+                { crop: "Ridge Gourd", base: 1100 }, { crop: "Amaranthus", base: 1200 }, { crop: "Drumstick", base: 2200 },
+                { crop: "Papaya", base: 1200 }, { crop: "Guava", base: 3200 }, { crop: "Lemon", base: 2500 }
+            ],
+            "Uttara Kannada": [
+                { crop: "Rice", base: 2850 }, { crop: "Coconut", base: 18000 }, { crop: "Arecanut", base: 45000 },
+                { crop: "Cashew Nut", base: 75000 }, { crop: "Pepper", base: 38000 }, { crop: "Sugarcane", base: 2900 },
+                { crop: "Cocoa", base: 18000 }, { crop: "Rubber", base: 15000 }, { crop: "Cardamom", base: 150000 },
+                { crop: "Vanilla", base: 350000 }, { crop: "Ginger", base: 3500 }, { crop: "Turmeric", base: 7200 },
+                { crop: "Banana", base: 1800 }, { crop: "Pineapple", base: 2800 }, { crop: "Mango", base: 4500 },
+                { crop: "Jackfruit", base: 2000 }, { crop: "Sweet Potato", base: 1400 }, { crop: "Tapioca", base: 1100 },
+                { crop: "Cucumber", base: 900 }, { crop: "Ash Gourd", base: 700 }, { crop: "Bitter Gourd", base: 1200 },
+                { crop: "Snake Gourd", base: 1000 }, { crop: "Ridge Gourd", base: 1100 }, { crop: "Amaranthus", base: 1200 },
+                { crop: "Drumstick", base: 2200 }, { crop: "Papaya", base: 1200 }, { crop: "Guava", base: 3200 }
+            ],
+            "Vijayanagara": [
+                { crop: "Rice", base: 2850 }, { crop: "Maize", base: 1950 }, { crop: "Cotton", base: 6500 },
+                { crop: "Groundnut", base: 5800 }, { crop: "Banana", base: 1800 }, { crop: "Pomegranate", base: 6500 },
+                { crop: "Sugarcane", base: 2900 }, { crop: "Jowar", base: 2400 }, { crop: "Bajra", base: 2100 },
+                { crop: "Sunflower", base: 4600 }, { crop: "Bengal Gram", base: 5200 }, { crop: "Tur Dal", base: 8100 },
+                { crop: "Chilli (Dry)", base: 18000 }, { crop: "Fig (Anjeer)", base: 8500 }, { crop: "Onion", base: 1200 },
+                { crop: "Tomato", base: 1200 }, { crop: "Brinjal", base: 1300 }, { crop: "Bhendi (Okra)", base: 1500 },
+                { crop: "Cabbage", base: 800 }, { crop: "Garlic", base: 8000 }, { crop: "Ginger", base: 3500 },
+                { crop: "Coriander", base: 7200 }, { crop: "Mango", base: 4500 }, { crop: "Papaya", base: 1200 },
+                { crop: "Guava", base: 3200 }, { crop: "Lemon", base: 2500 }, { crop: "Watermelon", base: 900 }
+            ],
+            "Vijayapura": [
+                { crop: "Grapes", base: 4500 }, { crop: "Maize", base: 1950 }, { crop: "Sugarcane", base: 2900 },
+                { crop: "Jowar", base: 2400 }, { crop: "Tur Dal", base: 8100 }, { crop: "Linseed", base: 5800 },
+                { crop: "Bajra", base: 2100 }, { crop: "Wheat", base: 2600 }, { crop: "Bengal Gram", base: 5200 },
+                { crop: "Groundnut", base: 5800 }, { crop: "Sunflower", base: 4600 }, { crop: "Safflower", base: 4200 },
+                { crop: "Cotton", base: 6500 }, { crop: "Onion", base: 1200 }, { crop: "Tomato", base: 1200 },
+                { crop: "Brinjal", base: 1300 }, { crop: "Bhendi (Okra)", base: 1500 }, { crop: "Cabbage", base: 800 },
+                { crop: "Red Chilli", base: 18000 }, { crop: "Garlic", base: 8000 }, { crop: "Ginger", base: 3500 },
+                { crop: "Lime", base: 2500 }, { crop: "Pomegranate", base: 6500 }, { crop: "Fig (Anjeer)", base: 8500 },
+                { crop: "Banana", base: 1800 }, { crop: "Papaya", base: 1200 }, { crop: "Watermelon", base: 900 }
+            ],
+            "Yadgir": [
+                { crop: "Tur Dal", base: 8100 }, { crop: "Rice", base: 2850 }, { crop: "Cotton", base: 6500 },
+                { crop: "Jowar", base: 2400 }, { crop: "Maize", base: 1950 }, { crop: "Green Gram", base: 7500 },
+                { crop: "Bajra", base: 2100 }, { crop: "Bengal Gram", base: 5200 }, { crop: "Black Gram", base: 6800 },
+                { crop: "Wheat", base: 2600 }, { crop: "Groundnut", base: 5800 }, { crop: "Sunflower", base: 4600 },
+                { crop: "Safflower", base: 4200 }, { crop: "Sugarcane", base: 2900 }, { crop: "Onion", base: 1200 },
+                { crop: "Tomato", base: 1200 }, { crop: "Brinjal", base: 1300 }, { crop: "Bhendi (Okra)", base: 1500 },
+                { crop: "Cabbage", base: 800 }, { crop: "Garlic", base: 8000 }, { crop: "Ginger", base: 3500 },
+                { crop: "Red Chilli", base: 18000 }, { crop: "Mango", base: 4500 }, { crop: "Banana", base: 1800 },
+                { crop: "Papaya", base: 1200 }, { crop: "Guava", base: 3200 }, { crop: "Lemon", base: 2500 }
+            ]
+        };
+
+        window.currentFilteredPrices = [];
+
+        // Filter by selected district
+        window.filterByDistrict = function () {
+            const selected = document.getElementById('districtFilter').value;
+            if (selected === 'all') {
+                window.currentFilteredPrices = allPrices;
+                renderPrices(allPrices);
+            } else {
+                const generatedPrices = window.generatePricesForDistrict(selected);
+
+                // 3. Sort by price
+                generatedPrices.sort((a, b) => b.price - a.price);
+
+                window.currentFilteredPrices = generatedPrices;
+                renderPrices(generatedPrices);
+            }
+
+            // Re-render the Profit Calculator dropdown whenever district changes
+            if (window.initProfitCalculator) {
+                window.initProfitCalculator();
+            }
+        };
+
+        window.loadMarketPrices = async function () {
+            const tableBody = document.getElementById('priceTableBody');
+
+            try {
+                let data;
+                try {
+                    const response = await fetch(`http://localhost:5000/api/market-prices?_t=${Date.now()}`, {
+                        headers: { 'Cache-Control': 'no-cache' }
+                    });
+                    if (response.ok) {
+                        data = await response.json();
+                    }
+                } catch (e) {
+                    console.warn("API fetch failed, using mock data", e);
+                }
+
+                allPrices = (data && Array.isArray(data.data)) ? data.data : getDailyMockPrices();
+
+                // Apply current district filter
+                filterByDistrict();
+
+            } catch (error) {
+                console.error(error);
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Failed to load prices.</td></tr>`;
+            }
+
+            // Initialize or update the Profit Calculator after prices are loaded
+            if (window.initProfitCalculator) {
+                window.initProfitCalculator();
+            }
+
+        };
+
+        // ─── District persistence ───
+        (function preserveDistrictOnMarket() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const district = (urlParams.get('district') || sessionStorage.getItem('selectedDistrict') || '').trim();
+            if (district) {
+                // Auto-select the district in the dropdown
+                const dropdown = document.getElementById('districtFilter');
+                if (dropdown) {
+                    for (const opt of dropdown.options) {
+                        if (opt.value === district || opt.value.toLowerCase().includes(district.toLowerCase()) || district.toLowerCase().includes(opt.value.toLowerCase())) {
+                            opt.selected = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        })();
+
+        // Define Profit Calculator logic globally so it can be called upon market refresh
+        window.initProfitCalculator = function () {
+            const uniqueCrops = {};
+            // Select crops and their max price from current filtered prices
+            const sourcePrices = window.currentFilteredPrices && window.currentFilteredPrices.length > 0
+                ? window.currentFilteredPrices
+                : allPrices;
+
+            sourcePrices.forEach(p => {
+                if (!uniqueCrops[p.crop] || uniqueCrops[p.crop] < p.price) {
+                    uniqueCrops[p.crop] = p.price;
+                }
+            });
+
+            const cropSelect = document.getElementById('calcCrop');
+            if (!cropSelect) return;
+
+            // Preserve current selection if possible
+            const currentSelected = cropSelect.options[cropSelect.selectedIndex]?.text;
+
+            // Reset options keeping the first disabled placeholder
+            cropSelect.innerHTML = '<option value="" disabled selected>Select a crop...</option>';
+
+            const sortedCrops = Object.keys(uniqueCrops).sort();
+            sortedCrops.forEach(cropName => {
+                const option = document.createElement('option');
+                option.value = uniqueCrops[cropName];
+                option.textContent = cropName;
+                if (cropName === currentSelected) {
+                    option.selected = true;
+                }
+                cropSelect.appendChild(option);
+            });
+
+            const calculateProfit = () => {
+                const pricePerQuintal = parseFloat(cropSelect.value) || 0;
+                const area = parseFloat(document.getElementById('calcArea').value) || 0;
+                const yieldPerAcre = parseFloat(document.getElementById('calcYield').value) || 0;
+
+                const costSeeds = parseFloat(document.getElementById('calcCostSeeds').value) || 0;
+                const costFertilizers = parseFloat(document.getElementById('calcCostFertilizers').value) || 0;
+                const costLabor = parseFloat(document.getElementById('calcCostLabor').value) || 0;
+                const costPerAcre = costSeeds + costFertilizers + costLabor;
+
+                const priceNote = document.getElementById('calcCropPriceNote');
+                if (pricePerQuintal > 0) {
+                    priceNote.innerHTML = `Current Price: <strong>₹${pricePerQuintal.toLocaleString('en-IN')}</strong> per Quintal`;
+                } else {
+                    priceNote.textContent = "Current Price: --";
+                }
+
+                // Calculations
+                const grossRevenue = area * yieldPerAcre * pricePerQuintal;
+                const totalExpenses = area * costPerAcre;
+                const netProfit = grossRevenue - totalExpenses;
+
+                // Format results
+                document.getElementById('calcGrossRevenue').textContent = '₹ ' + grossRevenue.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+                document.getElementById('calcExpensesOut').textContent = '₹ ' + totalExpenses.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+                document.getElementById('calcNetProfit').textContent = '₹ ' + netProfit.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+            };
+
+            // Attach event listeners safely
+            if (!cropSelect.dataset.listenerAttached) {
+                cropSelect.addEventListener('change', calculateProfit);
+                document.getElementById('calcArea').addEventListener('input', calculateProfit);
+                document.getElementById('calcYield').addEventListener('input', calculateProfit);
+                document.getElementById('calcCostSeeds').addEventListener('input', calculateProfit);
+                document.getElementById('calcCostFertilizers').addEventListener('input', calculateProfit);
+                document.getElementById('calcCostLabor').addEventListener('input', calculateProfit);
+                cropSelect.dataset.listenerAttached = 'true';
+            }
+
+            // Initial calculation
+            calculateProfit();
+        };
+
+        // Load on start
+        loadMarketPrices();
+    </script>
+    <script src="js/ui-enhancements.js?v=20260318"></script>
+</body>
+
+</html>

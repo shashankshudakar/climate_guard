@@ -1,0 +1,51 @@
+soil_type,rainfall_level,temperature_range,recommended_crop
+Alluvial,Very High,25-30,Rice
+Alluvial,High,25-30,Rice
+Alluvial,Moderate,25-32,Sugarcane
+Alluvial,Low,28-35,Maize
+Alluvial,Very High,27-32,Coconut
+Alluvial,High,20-30,Banana
+Alluvial,Moderate,20-28,Wheat
+Black,Low,28-35,Cotton
+Black,Moderate,25-33,Maize
+Black,Low,25-35,Sunflower
+Black,Low to Moderate,28-35,Pulses
+Black,Moderate,25-32,Sugarcane
+Black,Low,30-38,Sorghum
+Black,Very Low,28-35,Groundnut
+Red,Low,28-33,Ragi
+Red,Moderate,25-30,Maize
+Red,Low,25-35,Pulses
+Red,High,22-28,Ginger
+Red,Moderate,20-30,Turmeric
+Red,Low,28-35,Groundnut
+Red,Low to Moderate,25-30,Sunflower
+Laterite,Very High,20-28,Coffee
+Laterite,Very High,18-25,Tea
+Laterite,Very High,25-32,Coconut
+Laterite,High,25-30,Ginger
+Laterite,Very High,22-30,Cocoa
+Laterite,High,25-30,Arecanut
+Laterite,Moderate,22-28,Pepper
+Clay-Loam,Moderate,25-30,Rice
+Clay-Loam,Moderate,25-32,Sugarcane
+Clay-Loam,High,25-28,Rice
+Clay-Loam,Low,28-35,Maize
+Clay-Loam,Moderate,20-30,Turmeric
+Sandy Loam,Moderate,22-30,Ginger
+Sandy Loam,Low,25-32,Ragi
+Sandy Loam,Low,28-35,Groundnut
+Sandy Loam,Moderate,25-30,Maize
+Sandy Loam,High,25-30,Paddy
+Loam,High,22-28,Coffee
+Loam,Moderate,25-30,Maize
+Loam,High,20-28,Ginger
+Loam,Moderate,25-32,Sugarcane
+Loam,Low,25-30,Pulses
+Silty-Loam,Moderate,25-30,Rice
+Silty-Loam,Moderate,20-28,Ragi
+Silty-Loam,High,22-28,Ginger
+Silty-Loam,Low,28-32,Maize
+River Basins,High,25-30,Rice
+River Basins,High,25-30,Sugarcane
+River Basins,Moderate,25-30,Banana

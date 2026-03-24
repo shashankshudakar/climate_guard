@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClimateGuard | Settings</title>
+  <link rel="icon" href="assets/logo.png" type="image/png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/theme.js">
+  </script>
+  <style>
+    #editProfileFormContainer .form-label,
+    #editProfileFormContainer .form-control,
+    #editProfileFormContainer .form-control::placeholder {
+      color: #1a5c37;
+    }
+
+    html.cg-dark #editProfileFormContainer .form-label,
+    html.cg-dark #editProfileFormContainer .form-control,
+    html.cg-dark #editProfileFormContainer .form-control::placeholder {
+      color: #e2e8f0;
+    }
+
+    .btn-edit-profile {
+      border: none;
+      color: #ffffff;
+      font-weight: 600;
+      background: linear-gradient(135deg, #1f8f55 0%, #27c36a 100%);
+      box-shadow: 0 8px 18px rgba(31, 143, 85, 0.28);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    }
+
+    .btn-edit-profile:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(31, 143, 85, 0.35);
+      filter: brightness(1.02);
+    }
+
+    .btn-edit-profile:focus-visible {
+      box-shadow: 0 0 0 0.25rem rgba(39, 195, 106, 0.35);
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/ui-enhancements.css?v=20260318">
+</head>
+
+<body class="bg-light">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+    <div class="container">
+      <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="index.html">
+        <img src="assets/logo.png?v=3" alt="ClimateGuard Logo" width="40" height="40" class="rounded-circle shadow-sm">
+        <span>ClimateGuard</span>
+      </a>
+
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <button id="langToggleBtn" class="btn btn-sm btn-outline-light rounded-pill px-3 me-2"
+        style="font-size: 0.8rem; border-color: rgba(255,255,255,0.3);">Language</button>
+      <button id="themeToggleBtn" class="theme-toggle-btn" title="Switch to Dark Mode">
+
+      </button>
+      <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle hide-caret"
+        id="userProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="assets/user_avatar.png" alt="User" class="user-profile-img">
+      </a>
+      <ul class="dropdown-menu dropdown-menu-end dropdown-menu-premium" aria-labelledby="userProfileDropdown">
+        <li>
+          <h6 class="dropdown-header-premium">User Account</h6>
+        </li>
+        <li id="loginMenuItem">
+          <a class="dropdown-item dropdown-item-premium" href="login.html">
+            <i class="bi bi-key me-2">
+            </i>Login</a>
+        </li>
+        <li id="registerMenuItem">
+          <a class="dropdown-item dropdown-item-premium" href="register.html">
+            <i class="bi bi-person-plus me-2">
+            </i>Register</a>
+        </li>
+        <li id="profileMenuItem" style="display:none;">
+          <a class="dropdown-item dropdown-item-premium" href="profile.html">
+            <i class="bi bi-person-circle me-2">
+            </i>My Profile</a>
+        </li>
+        <li id="settingsMenuItem" style="display:none;">
+          <a class="dropdown-item dropdown-item-premium" href="settings.html">
+            <i class="bi bi-gear me-2">
+            </i>Settings</a>
+        </li>
+        <li id="authDivider" style="display:none;">
+          <hr class="dropdown-divider opacity-10">
+        </li>
+        <li id="logoutMenuItem" style="display:none;">
+          <a class="dropdown-item dropdown-item-premium text-danger" href="#" onclick="handleLogout()">
+            <span data-i18n="nav-logout">
+              <span></span> Logout</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    </div>
+  </nav>
+  <script src="js/profile_manager.js">
+  </script>
+  <script src="js/api.js" type="module">
+  </script>
+  <main class="container my-5">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <h3 class="fw-bold mb-3">
+          <span data-i18n="settings-title">Settings</span>
+        </h3>
+        <p class="text-muted mb-4">
+          <span data-i18n="settings-desc">Manage your account preferences and profile details.</span>
+        </p>
+        <!-- Edit Profile Section -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">
+              <span data-i18n="edit-profile">Edit Profile</span>
+            </h5>
+            <button type="button" id="enableEditProfileBtn" class="btn btn-sm btn-edit-profile">
+              <i class="bi bi-pencil-square me-1" aria-hidden="true"></i>
+              <span data-i18n="btn-edit"> Edit</span>
+            </button>
+          </div>
+          <div id="editProfileFormContainer" style="display:none;">
+            <div class="mb-3">
+              <label class="form-label">
+                <span data-i18n="full-name">Full Name</span>
+              </label>
+              <input type="text" id="settingName" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">
+                <span data-i18n="email-opt">Email (Optional)</span>
+              </label>
+              <input type="email" id="settingEmail" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">District</label>
+              <select id="settingDistrict" class="form-select">
+                <option value="" disabled selected>Select District</option>
+                <option value="Bagalkote">Bagalkote</option>
+                <option value="Ballari">Ballari</option>
+                <option value="Belagavi">Belagavi</option>
+                <option value="Bengaluru Rural">Bengaluru Rural</option>
+                <option value="Bengaluru Urban">Bengaluru Urban</option>
+                <option value="Bidar">Bidar</option>
+                <option value="Chamarajanagar">Chamarajanagar</option>
+                <option value="Chikballapur">Chikballapur</option>
+                <option value="Chikmagalur">Chikmagalur</option>
+                <option value="Chitradurga">Chitradurga</option>
+                <option value="Dakshina Kannada">Dakshina Kannada</option>
+                <option value="Davanagere">Davanagere</option>
+                <option value="Dharwad">Dharwad</option>
+                <option value="Gadag">Gadag</option>
+                <option value="Hassan">Hassan</option>
+                <option value="Haveri">Haveri</option>
+                <option value="Kalaburagi">Kalaburagi</option>
+                <option value="Kodagu">Kodagu</option>
+                <option value="Kolar">Kolar</option>
+                <option value="Koppal">Koppal</option>
+                <option value="Mandya">Mandya</option>
+                <option value="Mysuru">Mysuru</option>
+                <option value="Raichur">Raichur</option>
+                <option value="Ramanagara">Ramanagara</option>
+                <option value="Shimoga">Shimoga</option>
+                <option value="Tumakuru">Tumakuru</option>
+                <option value="Udupi">Udupi</option>
+                <option value="Uttara Kannada">Uttara Kannada</option>
+                <option value="Vijayanagara">Vijayanagara</option>
+                <option value="Vijayapura">Vijayapura</option>
+                <option value="Yadgir">Yadgir</option>
+              </select>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">
+                <span data-i18n="mobile-number">Mobile Number</span>
+              </label>
+              <div class="input-group">
+                <input type="tel" id="settingPhone" class="form-control" inputmode="numeric" maxlength="10"
+                  pattern="\d{10}" placeholder="Enter 10-digit mobile number">
+                <button class="btn btn-outline-success" type="button" id="sendOtpBtn" style="display:none;">Verify New
+                  Number</button>
+              </div>
+            </div>
+            <!-- OTP Section (Hidden by default) -->
+            <div id="otpSection" class="mb-3 p-3 bg-white rounded border border-success border-opacity-50"
+              style="display: none;">
+              <label class="form-label fw-bold text-success">
+                <span data-i18n="otp-sent-label">Enter Verification Code</span>
+              </label>
+              <input type="text" id="settingOtpInput" class="form-control mb-2" placeholder="Enter 4-digit OTP"
+                maxlength="4">
+              <span id="otpMessage" class="form-text mt-0 d-block">
+              </span>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <small>
+                  <a href="#" id="resendOtpLink" class="text-success text-decoration-none fw-bold"
+                    style="pointer-events: none; opacity: 0.5;">
+                    <span data-i18n="resend-otp">Resend OTP</span>
+                    <span id="resendTimer">
+                    </span>
+                  </a>
+                </small>
+                <button id="verifyOtpBtn" type="button" class="btn btn-success btn-sm px-4">
+                  <span data-i18n="verify-otp">Verify</span>
+                </button>
+              </div>
+            </div>
+
+            <hr class="my-4">
+            <h6 class="fw-bold mb-3">Change Password (Optional)</h6>
+            <div class="mb-3">
+              <label class="form-label">Current Password</label>
+              <input type="password" id="settingCurrentPassword" class="form-control"
+                placeholder="Enter current password to change">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">New Password</label>
+              <input type="password" id="settingNewPassword" class="form-control" placeholder="Enter new password">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Confirm New Password</label>
+              <input type="password" id="settingConfirmPassword" class="form-control"
+                placeholder="Confirm new password">
+            </div>
+          </div>
+          <button id="saveProfileBtn" class="btn btn-primary" style="display:none;">
+            <span data-i18n="save-profile">Save Profile</span>
+          </button>
+          <button id="cancelEditProfileBtn" class="btn btn-outline-secondary ms-2" style="display:none;">
+            <span data-i18n="cancel">Cancel</span>
+          </button>
+        </div>
+        <hr class="my-4">
+        <h5 class="fw-bold mb-3">
+          <span data-i18n="app-preferences">App Preferences</span>
+        </h5>
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" type="checkbox" id="alertsToggle" checked>
+          <label class="form-check-label" for="alertsToggle">
+            <span data-i18n="enable-alerts">Enable SMS/App Alerts</span>
+          </label>
+        </div>
+        <button id="saveSettingsBtn" class="btn btn-success">
+          <span data-i18n="save-alerts">Save Alerts Info</span>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import api from './js/api.js';
+    document.addEventListener('DOMContentLoaded', function () {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+      const alertsToggle = document.getElementById('alertsToggle');
+      const saveBtn = document.getElementById('saveSettingsBtn');
+
+      const nameInput = document.getElementById('settingName');
+      const emailInput = document.getElementById('settingEmail');
+      const phoneInput = document.getElementById('settingPhone');
+      const districtSelect = document.getElementById('settingDistrict');
+
+      const currentPassInput = document.getElementById('settingCurrentPassword');
+      const newPassInput = document.getElementById('settingNewPassword');
+      const confirmPassInput = document.getElementById('settingConfirmPassword');
+
+      const saveProfileBtn = document.getElementById('saveProfileBtn');
+      const cancelEditProfileBtn = document.getElementById('cancelEditProfileBtn');
+      const enableEditProfileBtn = document.getElementById('enableEditProfileBtn');
+      const sendOtpBtn = document.getElementById('sendOtpBtn');
+      const editProfileFormContainer = document.getElementById('editProfileFormContainer');
+      const otpSection = document.getElementById('otpSection');
+
+      if (!currentUser) {
+        if (alertsToggle) alertsToggle.disabled = true;
+        if (saveBtn) saveBtn.disabled = true;
+        if (enableEditProfileBtn) {
+          enableEditProfileBtn.addEventListener('click', () => {
+            window.location.href = 'login.html';
+          });
+        }
+        if (saveProfileBtn) saveProfileBtn.disabled = true;
+        if (cancelEditProfileBtn) cancelEditProfileBtn.disabled = true;
+        if (nameInput) nameInput.disabled = true;
+        if (emailInput) emailInput.disabled = true;
+        if (phoneInput) phoneInput.disabled = true;
+        if (currentPassInput) currentPassInput.disabled = true;
+        if (newPassInput) newPassInput.disabled = true;
+        if (confirmPassInput) confirmPassInput.disabled = true;
+        return;
+      }
+
+      if (typeof currentUser.alerts_enabled === 'boolean') {
+        alertsToggle.checked = currentUser.alerts_enabled;
+      }
+
+      // Populate Profile Data
+      function normalizePhone(value) {
+        const digits = (value || '').replace(/[^0-9]/g, '');
+        if (digits.length >= 10) {
+          return digits.slice(-10);
+        }
+        return digits;
+      }
+
+      if (nameInput) nameInput.value = currentUser.name || '';
+      if (emailInput) emailInput.value = currentUser.email || '';
+      if (phoneInput) phoneInput.value = normalizePhone(currentUser.phone);
+      if (districtSelect && currentUser.district) districtSelect.value = currentUser.district;
+      let originalPhone = normalizePhone(currentUser.phone);
+      let isMobileVerified = true;
+      let generatedOTP = null;
+      let resendInterval = null;
+
+      // Enable Edit Mode
+      enableEditProfileBtn.addEventListener('click', () => {
+        editProfileFormContainer.style.display = 'block';
+        enableEditProfileBtn.style.display = 'none';
+        saveProfileBtn.style.display = 'inline-block';
+        cancelEditProfileBtn.style.display = 'inline-block';
+      });
+
+      // Cancel Edit Mode
+      cancelEditProfileBtn.addEventListener('click', () => {
+        editProfileFormContainer.style.display = 'none';
+        nameInput.value = currentUser.name || '';
+        emailInput.value = currentUser.email || '';
+        phoneInput.value = originalPhone || '';
+        if (districtSelect && currentUser.district) districtSelect.value = currentUser.district;
+
+        if (currentPassInput) currentPassInput.value = '';
+        if (newPassInput) newPassInput.value = '';
+        if (confirmPassInput) confirmPassInput.value = '';
+
+        sendOtpBtn.style.display = 'none';
+        otpSection.style.display = 'none';
+        enableEditProfileBtn.style.display = 'inline-block';
+        saveProfileBtn.style.display = 'none';
+        cancelEditProfileBtn.style.display = 'none';
+      });
+
+      // Detect mobile change
+      phoneInput.addEventListener('input', () => {
+        phoneInput.value = normalizePhone(phoneInput.value);
+        const currentVal = phoneInput.value.trim();
+        if (currentVal !== originalPhone) {
+          isMobileVerified = false;
+          sendOtpBtn.style.display = 'block';
+          saveProfileBtn.disabled = true;
+          sendOtpBtn.disabled = false;
+          sendOtpBtn.innerHTML = 'Verify New Number';
+          sendOtpBtn.classList.remove('btn-success');
+          sendOtpBtn.classList.add('btn-outline-success');
+        } else {
+          isMobileVerified = true;
+          sendOtpBtn.style.display = 'none';
+          otpSection.style.display = 'none';
+          saveProfileBtn.disabled = false;
+          sendOtpBtn.disabled = false;
+          sendOtpBtn.innerHTML = 'Verify New Number';
+          sendOtpBtn.classList.remove('btn-success');
+          sendOtpBtn.classList.add('btn-outline-success');
+        }
+      });
+
+      // Timer logic for resend
+      function startResendTimer() {
+        const resendLink = document.getElementById('resendOtpLink');
+        const timerSpan = document.getElementById('resendTimer');
+        let timeLeft = 30;
+        resendLink.style.pointerEvents = 'none';
+        resendLink.style.opacity = '0.5';
+        if (resendInterval) clearInterval(resendInterval);
+        resendInterval = setInterval(() => {
+          timeLeft--;
+          timerSpan.textContent = ` (${timeLeft}s)`;
+          if (timeLeft <= 0) {
+            clearInterval(resendInterval);
+            timerSpan.textContent = '';
+            resendLink.style.pointerEvents = 'auto';
+            resendLink.style.opacity = '1';
+          }
+        }, 1000);
+      }
+
+      // Trigger OTP Send
+      function triggerOtpSend() {
+        const phoneStr = normalizePhone(phoneInput.value);
+        phoneInput.value = phoneStr;
+        if (phoneStr.length !== 10) {
+          alert("Please enter a valid 10-digit mobile number.");
+          return;
+        }
+        generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
+        otpSection.style.display = 'block';
+        const msg = document.getElementById('otpMessage');
+        msg.textContent = 'OTP has been sent to your new mobile number.';
+        msg.className = 'form-text text-muted mt-0 d-block';
+        sendOtpBtn.disabled = true;
+        startResendTimer();
+        
+        // Send real SMS via TextBee API
+        const smsMessage = `🛡️ ClimateGuard Verification Code: ${generatedOTP}\n\nPlease enter this code to verify your new mobile number.`;
+        
+        api.sendSms(phoneStr, smsMessage)
+          .then(() => {
+            console.log(`✅ Verification SMS sent to ${phoneStr}`);
+          })
+          .catch(err => {
+            console.error('❌ Failed to send verification SMS:', err);
+            msg.textContent = '⚠️ Failed to send SMS. Please check your connection or try again.';
+            msg.className = 'form-text text-danger mt-0 fw-bold';
+            sendOtpBtn.disabled = false;
+          });
+      }
+
+      sendOtpBtn.addEventListener('click', triggerOtpSend);
+      document.getElementById('resendOtpLink').addEventListener('click', (e) => {
+        e.preventDefault();
+        triggerOtpSend();
+      });
+
+      // Verify OTP
+      document.getElementById('verifyOtpBtn').addEventListener('click', () => {
+        const enteredOTP = document.getElementById('settingOtpInput').value.trim();
+        const msg = document.getElementById('otpMessage');
+        if (enteredOTP === generatedOTP) {
+          isMobileVerified = true;
+          saveProfileBtn.disabled = false;
+          otpSection.style.display = 'none';
+          document.getElementById('settingOtpInput').value = '';
+          sendOtpBtn.disabled = true;
+          sendOtpBtn.classList.remove('btn-outline-success');
+          sendOtpBtn.classList.add('btn-success');
+          sendOtpBtn.innerHTML = 'Verified ?';
+          if (resendInterval) clearInterval(resendInterval);
+          document.getElementById('resendOtpLink').style.pointerEvents = 'none';
+          document.getElementById('resendOtpLink').style.opacity = '0';
+          alert("Mobile number successfully verified! You can now save your profile.");
+        } else {
+          msg.textContent = '? Invalid OTP. Please try again.';
+          msg.className = 'form-text text-danger mt-0 fw-bold';
+          document.getElementById('settingOtpInput').value = '';
+        }
+      });
+
+      // Save Profile changes
+      saveProfileBtn.addEventListener('click', async () => {
+        if (!isMobileVerified) {
+          alert('? Please verify your new mobile number with OTP before saving.');
+          return;
+        }
+        const newName = nameInput.value.trim();
+        const newEmail = emailInput.value.trim();
+        const newPhone = normalizePhone(phoneInput.value.trim());
+
+        if (!newName || !newPhone) {
+          alert("Name and Mobile Number cannot be empty.");
+          return;
+        }
+
+        const currentPass = currentPassInput ? currentPassInput.value : '';
+        const newPass = newPassInput ? newPassInput.value : '';
+        const confirmPass = confirmPassInput ? confirmPassInput.value : '';
+
+        if (newPass) {
+          if (!currentPass) {
+            alert("Current password is required to set a new password.");
+            return;
+          }
+          if (newPass !== confirmPass) {
+            alert("Passwords do not match.");
+            return;
+          }
+        }
+
+        try {
+          const updateProps = {
+            name: newName,
+            email: newEmail,
+            phone: newPhone,
+            district: districtSelect ? districtSelect.value : (currentUser.district || ''),
+            alerts_enabled: alertsToggle.checked,
+            avatar: currentUser.avatar
+          };
+
+          if (newPass) {
+            updateProps.current_password = currentPass;
+            updateProps.new_password = newPass;
+          }
+
+          const data = await api.updateProfile(updateProps);
+          localStorage.setItem('currentUser', JSON.stringify(data.user));
+
+          // Sync with 'users' list if present
+          const users = JSON.parse(localStorage.getItem('users')) || [];
+          const uIdx = users.findIndex(u => u.name === currentUser.name || u.phone === currentUser.phone);
+          if (uIdx !== -1) {
+            users[uIdx] = { ...users[uIdx], ...data.user };
+            localStorage.setItem('users', JSON.stringify(users));
+          }
+
+          saveProfileBtn.textContent = 'Saved!';
+          saveProfileBtn.classList.remove('btn-primary');
+          saveProfileBtn.classList.add('btn-success');
+          setTimeout(() => {
+            saveProfileBtn.textContent = 'Save Profile';
+            saveProfileBtn.classList.remove('btn-success');
+            saveProfileBtn.classList.add('btn-primary');
+            editProfileFormContainer.style.display = 'none';
+            enableEditProfileBtn.style.display = 'inline-block';
+            saveProfileBtn.style.display = 'none';
+            cancelEditProfileBtn.style.display = 'none';
+
+            if (currentPassInput) currentPassInput.value = '';
+            if (newPassInput) newPassInput.value = '';
+            if (confirmPassInput) confirmPassInput.value = '';
+          }, 2000);
+        } catch (error) {
+          alert(error.message || 'Failed to update profile');
+        }
+      });
+
+      // Save Alerts Toggle changes
+      saveBtn.addEventListener('click', async function () {
+        const isEnabled = alertsToggle.checked;
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+        
+        try {
+          const updateProps = {
+            name: currentUser.name,
+            phone: currentUser.phone,
+            district: currentUser.district || '',
+            alerts_enabled: isEnabled,
+            avatar: currentUser.avatar,
+            email: currentUser.email || ''
+          };
+
+          const data = await api.updateProfile(updateProps);
+          
+          // Update local state
+          currentUser.alerts_enabled = isEnabled;
+          localStorage.setItem('currentUser', JSON.stringify(data.user));
+          
+          alert('Alert settings saved successfully to your profile.');
+        } catch (error) {
+          console.error('Failed to save alert settings:', error);
+          alert('Error: ' + (error.message || 'Failed to sync settings with server.'));
+        } finally {
+          saveBtn.disabled = false;
+          saveBtn.textContent = 'Save Alerts Info';
+        }
+      });
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+  </script>
+  <script src="js/i18n.js?v=8" type="module">
+  </script>
+  <script src="js/ui-enhancements.js?v=20260318"></script>
+</body>
+
+</html>

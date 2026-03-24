@@ -1,0 +1,219 @@
+/* 
+   ClimateGuard Auth Enhancements
+   Theme: Nature + Climate (Modern UI/UX)
+*/
+
+:root {
+  --primary-green: #2ecc71;
+  --secondary-green: #27ae60;
+  --accent-blue: #3498db;
+  --dark-green: #0a2e1a;
+  --mist-white: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-shadow: 0 8px 32px 0 rgba(10, 46, 26, 0.2);
+  --glow-color: rgba(46, 204, 113, 0.4);
+}
+
+/* Background Animation */
+.auth-bg-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 50%, #e1f5fe 100%);
+  overflow: hidden;
+}
+
+.auth-bg-animation::before {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: radial-gradient(circle at 30% 30%, rgba(46, 204, 113, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 70% 70%, rgba(52, 152, 219, 0.1) 0%, transparent 40%);
+  animation: bgRotate 20s linear infinite;
+}
+
+@keyframes bgRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Dark Mode Background */
+html.cg-dark .auth-bg-animation {
+  background: linear-gradient(135deg, #0a2e1a 0%, #071a10 50%, #0a192e 100%);
+}
+
+html.cg-dark .auth-bg-animation::before {
+  background: radial-gradient(circle at 30% 30%, rgba(46, 204, 113, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 70% 70%, rgba(52, 152, 219, 0.05) 0%, transparent 40%);
+}
+
+/* Card Enhancement */
+.auth-card {
+  background: var(--mist-white) !important;
+  backdrop-filter: blur(15px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(15px) saturate(180%) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 24px !important;
+  box-shadow: var(--glass-shadow) !important;
+  padding: 2.5rem !important;
+  animation: authFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+html.cg-dark .auth-card {
+  background: rgba(10, 46, 26, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4) !important;
+}
+
+@keyframes authFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Typography */
+.auth-card h3 {
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--dark-green);
+  margin-bottom: 2rem !important;
+}
+
+html.cg-dark .auth-card h3 {
+  color: #fff;
+}
+
+/* Input Enhancements */
+.auth-card .form-control {
+  background: rgba(255, 255, 255, 0.5) !important;
+  border: 1px solid rgba(46, 204, 113, 0.2) !important;
+  border-radius: 12px !important;
+  padding: 0.75rem 1.25rem !important;
+  transition: all 0.3s ease !important;
+  color: #1a2a22 !important;
+}
+
+html.cg-dark .auth-card .form-control {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+}
+
+.auth-card .form-control:focus {
+  background: #fff !important;
+  border-color: var(--primary-green) !important;
+  box-shadow: 0 0 0 4px var(--glow-color) !important;
+  transform: translateY(-2px);
+}
+
+html.cg-dark .auth-card .form-control:focus {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Button Enhancements */
+.login-btn,
+.register-btn {
+  padding: 0.85rem !important;
+  font-weight: 700 !important;
+  border-radius: 12px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  border: none !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-btn {
+  background: linear-gradient(135deg, var(--primary-green), var(--secondary-green)) !important;
+  box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3) !important;
+}
+
+.register-btn {
+  background: linear-gradient(135deg, #6f42c1, #8e44ad) !important;
+  box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3) !important;
+}
+
+.login-btn:hover,
+.register-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  filter: brightness(1.1);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
+}
+
+.login-btn:active,
+.register-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Loading Spinner */
+.visual-spinner {
+  display: inline-block;
+  width: 1.2rem;
+  height: 1.2rem;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 0.8s linear infinite;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Floating label simulation (Using labels if they exist, or just placeholder motion) */
+/* We'll use a CSS-only trick if we can add labels, otherwise we focus on focus states */
+
+/* Language and Theme Toggle positioning */
+.auth-top-actions {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  z-index: 10;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .auth-card {
+    padding: 1.5rem !important;
+    margin: 1rem;
+    border-radius: 20px !important;
+  }
+}
+
+/* Custom Scrollbar for registration */
+.register-page::-webkit-scrollbar {
+  width: 8px;
+}
+
+.register-page::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.register-page::-webkit-scrollbar-thumb {
+  background: var(--secondary-green);
+  border-radius: 4px;
+}

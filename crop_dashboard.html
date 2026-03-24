@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClimateGuard | My Crop Dashboard</title>
+    <link rel="icon" href="assets/logo.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <script src="js/theme.js"></script>
+    <script type="module" src="js/i18n.js?v=8"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .crop-hero{background:linear-gradient(135deg,#1b5e20,#388e3c,#4caf50);color:#fff;padding:2rem 0;}
+        .stage-dot{width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;margin-bottom:4px;transition:all .3s;}
+        .stage-dot.active{box-shadow:0 0 0 4px rgba(25,135,84,.3);transform:scale(1.15);}
+        .stage-connector{height:3px;flex:1;margin-top:20px;}
+        .week-card{border-radius:12px;transition:transform .2s,box-shadow .2s;}
+        .week-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.1);}
+        .week-card.current-week{border:2px solid #198754;background:linear-gradient(135deg,#f0fdf4,#dcfce7);}
+        .week-card.past-week{opacity:.7;}
+        .tracker-card{border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(25,135,84,.15);background:#fff;}
+        @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+    </style>
+<link rel="stylesheet" href="css/ui-enhancements.css?v=20260318">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="index.html">
+                <img src="assets/logo.png?v=3" alt="Logo" width="40" height="40" class="rounded-circle shadow-sm"><span>ClimateGuard</span></a>
+            <div class="navbar-nav me-auto">
+                <a class="nav-link" href="farmer_dashboard.html" id="navAgriLink" data-i18n="nav-agriguard">🛡️ AgriGuard</a>
+                <a class="nav-link" href="market_dashboard.html" id="navMarketLink">💰 Market Prices</a>
+                <a class="nav-link active" href="crop_dashboard.html" data-i18n="nav-my-crops">🌾 My Crops</a>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button id="langToggleBtn" class="btn btn-sm btn-outline-light rounded-pill px-3 me-2"
+                    style="font-size: 0.8rem; border-color: rgba(255,255,255,0.3);">Language</button>
+                <button id="themeToggleBtn" class="theme-toggle-btn" title="Switch to Dark Mode"><i
+                        class="bi bi-moon-stars"></i></button>
+                <div class="dropdown">
+
+                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle hide-caret"
+                        id="userProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="assets/user_avatar.png" alt="User" class="user-profile-img">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-premium"
+                        aria-labelledby="userProfileDropdown">
+                        <li>
+                            <h6 class="dropdown-header-premium" data-i18n="user-account">User Account</h6>
+                        </li>
+                        <li id="loginMenuItem"><a class="dropdown-item dropdown-item-premium" href="login.html"><i
+                                    class="bi bi-key me-2"></i><span data-i18n="nav-login">Login</span></a></li>
+                        <li id="registerMenuItem"><a class="dropdown-item dropdown-item-premium" href="register.html"><i
+                                    class="bi bi-person-plus me-2"></i><span data-i18n="nav-register">Register</span></a></li>
+                        <li id="profileMenuItem" style="display:none;"><a class="dropdown-item dropdown-item-premium"
+                                href="profile.html"><i class="bi bi-person-circle me-2"></i><span data-i18n="nav-profile">My Profile</span></a></li>
+                        <li id="settingsMenuItem" style="display:none;"><a class="dropdown-item dropdown-item-premium"
+                                href="settings.html"><i class="bi bi-gear me-2"></i><span data-i18n="nav-settings">Settings</span></a></li>
+                        <li id="authDivider" style="display:none;">
+                            <hr class="dropdown-divider opacity-10">
+                        </li>
+                        
+                        <li id="logoutMenuItem" style="display:none;"><a
+                                class="dropdown-item dropdown-item-premium text-danger" href="#"
+                                onclick="handleLogout()"><span>🚪</span> <span data-i18n="nav-logout">Logout</span></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="crop-hero">
+        <div class="container">
+            <h2 class="fw-bold mb-1" data-i18n="crop-growth-dashboard">🌾 My Crop Growth Dashboard</h2>
+            <p class="mb-0 opacity-75" data-i18n="crop-growth-subtitle">Track your crops from sowing to harvest with week-by-week guidance</p>
+        </div>
+    </div>
+
+    <!-- Farm Details Modal -->
+    <div class="modal fade" id="farmDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius:16px;overflow:hidden;">
+                <div class="modal-header" style="background:linear-gradient(135deg,#198754,#2e7d32);border:none;">
+                    <h5 class="modal-title text-white"><span data-i18n="start-growing">🌱 Start Growing</span> <span id="modalCropName" class="fw-bold"></span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);">
+                    <p class="text-muted small" data-i18n="enter-farm-details">Enter your farm details for personalized day-by-day crop guidance:</p>
+                    <input type="hidden" id="modalCropKey"><input type="hidden" id="modalCropMaturityDays">
+                    <div class="mb-3"><label class="form-label fw-semibold" data-i18n="farm-name">🚜 Farm Name</label><input type="text" id="farmNameInput" class="form-control" value="My Farm"></div>
+                    <div class="mb-3"><label class="form-label fw-semibold" data-i18n="farm-land-size">📍 Farm Land Size (Acres)</label><input type="number" id="farmAcresInput" class="form-control" min="0.1" step="0.1" value="2"></div>
+                    <div class="mb-3"><label class="form-label fw-semibold" data-i18n="water-facility">💧 Water Facility</label>
+                        <select id="waterFacilityInput" class="form-select">
+                            <option value="drip" data-i18n="water-drip">Drip Irrigation</option><option value="sprinkler" data-i18n="water-sprinkler">Sprinkler</option>
+                            <option value="canal" data-i18n="water-canal">Canal / Channel</option><option value="borewell" data-i18n="water-borewell">Borewell</option>
+                            <option value="well" data-i18n="water-open-well">Open Well</option><option value="rainfed" selected data-i18n="water-rainfed">Rainfed (No Irrigation)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3"><label class="form-label fw-semibold" data-i18n="planned-sowing-date">📅 Planned Sowing Date</label><input type="date" id="sowingDateInput" class="form-control"></div>
+                </div>
+                <div class="modal-footer" style="background:#f0fdf4;border:none;">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="cancel">Cancel</button>
+                    <button type="button" class="btn btn-success fw-bold" onclick="submitCropSelection()" data-i18n="start-growing">🌱 Start Growing</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container my-4">
+        <div id="emptyState" class="text-center py-5" style="display:none;">
+            <div style="font-size:4rem;">🌱</div>
+            <h4 class="text-muted mt-3" data-i18n="no-crops-tracked">No crops being tracked yet</h4>
+            <p class="text-muted" id="emptyStateHint"></p>
+        </div>
+        <div id="trackedCropsContainer"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/profile_manager.js"></script>
+    <script>
+        const t = (key) => (window.i18n ? window.i18n.t(key) : key);
+        const tFormat = (key, params = {}) => {
+            let out = t(key);
+            Object.entries(params).forEach(([k, v]) => {
+                out = out.replaceAll(`{${k}}`, v);
+            });
+            return out;
+        };
+
+        const formatCropName = (key) => {
+            const translated = t(key);
+            if (translated && translated !== key) return translated;
+            return key.charAt(0).toUpperCase() + key.slice(1);
+        };
+
+        function setEmptyStateHint() {
+            const hint = document.getElementById('emptyStateHint');
+            if (!hint) return;
+            const link = `<a href="farmer_dashboard.html" class="text-success fw-bold">${t('AgriGuard Dashboard')}</a>`;
+            hint.innerHTML = tFormat('Go to {link} and click "{action}" on any recommended crop.', {
+                link,
+                action: t('Start Growing')
+            });
+        }
+
+        const cropInfo={
+            'sugarcane': { icon: '🎋',gradient:'linear-gradient(135deg,#fff9c4,#f9a825)',season:'Year Round',water:'High',maturity:'10-12 months',tip:'Plant ratoon crop after harvest.'},
+            'banana': { icon: '🍌',gradient:'linear-gradient(135deg,#fff9c4,#fbc02d)',season:'Year Round',water:'High',maturity:'10-14 months',tip:'Desuckering and propping are critical.'},
+            'coconut': { icon: '🥥',gradient:'linear-gradient(135deg,#e8f5e9,#66bb6a)',season:'Year Round',water:'Moderate',maturity:'5-7 years',tip:'Regular irrigation during dry months.'},
+            'rice': { icon: '🌾',gradient:'linear-gradient(135deg,#e8f5e9,#66bb6a)',season:'Kharif',water:'High',maturity:'3-4 months',tip:'Maintain 5cm water in paddy field.'},
+            'paddy': { icon: '🌾',gradient:'linear-gradient(135deg,#e8f5e9,#66bb6a)',season:'Kharif',water:'High',maturity:'3-4 months',tip:'Same as rice cultivation.'},
+            'maize': { icon: '🌽',gradient:'linear-gradient(135deg,#fff9c4,#ffb74d)',season:'Kharif/Rabi',water:'Moderate',maturity:'3-4 months',tip:'Earthing up prevents lodging.'},
+            'cotton': { icon: '☁️',gradient:'linear-gradient(135deg,#f3e5f5,#ce93d8)',season:'Kharif',water:'Moderate',maturity:'5-6 months',tip:'Monitor for bollworm.'},
+            'wheat': { icon: '🌾',gradient:'linear-gradient(135deg,#fff3e0,#ffb74d)',season:'Rabi',water:'Moderate',maturity:'4-5 months',tip:'First irrigation at crown root stage.'},
+            'ragi': { icon: '🌾',gradient:'linear-gradient(135deg,#efebe9,#a1887f)',season:'Kharif',water:'Low',maturity:'3-4 months',tip:'Drought tolerant millet crop.'},
+            'groundnut': { icon: '🥜',gradient:'linear-gradient(135deg,#fff3e0,#ffcc80)',season:'Kharif/Rabi',water:'Moderate',maturity:'4-5 months',tip:'Apply gypsum at flowering.'},
+            'coffee': { icon: '☕',gradient:'linear-gradient(135deg,#efebe9,#8d6e63)',season:'Year Round',water:'Moderate',maturity:'3-4 years',tip:'50% shade is ideal for arabica.'},
+            'pulses': { icon: '🫘',gradient:'linear-gradient(135deg,#e8f5e9,#81c784)',season:'Rabi/Kharif',water:'Low',maturity:'2-3 months',tip:'Pulses fix their own nitrogen.'},
+            'ginger': { icon: '🫚',gradient:'linear-gradient(135deg,#fff3e0,#ffe0b2)',season:'Kharif',water:'Moderate',maturity:'7-8 months',tip:'Mulch heavily for best results.'},
+            'sunflower': { icon: '🌻',gradient:'linear-gradient(135deg,#fff9c4,#fdd835)',season:'Kharif/Rabi',water:'Moderate',maturity:'3-4 months',tip:'Bee pollination improves seed set.'},
+            'turmeric': { icon: '🟡',gradient:'linear-gradient(135deg,#fff9c4,#f9a825)',season:'Kharif',water:'Moderate',maturity:'7-8 months',tip:'Rotate with legumes after turmeric.'},
+            'sorghum': { icon: '🌾',gradient:'linear-gradient(135deg,#efebe9,#bcaaa4)',season:'Kharif/Rabi',water:'Low',maturity:'3-4 months',tip:'Excellent drought-tolerant crop.'},
+            'arecanut': { icon: '🌴',gradient:'linear-gradient(135deg,#e8f5e9,#66bb6a)',season:'Year Round',water:'Moderate',maturity:'5-7 years',tip:'Regular irrigation during dry months.'},
+            'pepper': { icon: '🌶️',gradient:'linear-gradient(135deg,#ffebee,#ef5350)',season:'Kharif',water:'Moderate',maturity:'7-8 months',tip:'Train on support standards.'},
+            'tea': { icon: '🍵',gradient:'linear-gradient(135deg,#e8f5e9,#4caf50)',season:'Year Round',water:'High',maturity:'3+ years',tip:'Prune for best leaf quality.'},
+            'cocoa': { icon: '🍫',gradient:'linear-gradient(135deg,#efebe9,#795548)',season:'Year Round',water:'Moderate',maturity:'3-4 years',tip:'Needs 50% shade.'},
+            'millets': { icon: '🌾',gradient:'linear-gradient(135deg,#f1f8e9,#aed581)',season:'Kharif',water:'Low',maturity:'2-3 months',tip:'Hardy crops needing minimal water.'},
+            'bajra': { icon: '🌾',gradient:'linear-gradient(135deg,#f1f8e9,#aed581)',season:'Kharif',water:'Low',maturity:'2-3 months',tip:'Excellent for arid regions.'},
+            'jute': { icon: '🧶',gradient:'linear-gradient(135deg,#e8f5e9,#81c784)',season:'Kharif',water:'High',maturity:'4-5 months',tip:'Needs warm humid climate.'}
+        };
+        const cropMaturityDaysMap={'rice':120,'maize':100,'cotton':155,'sugarcane':336,'wheat':130,'ragi':100,'groundnut':130,'coffee':365,'coconut':365,'pulses':85,'ginger':225,'sunflower':100,'banana':336,'turmeric':225,'sorghum':100,'tea':365,'cocoa':365,'arecanut':365,'pepper':365,'paddy':120,'millets':75,'bajra':75,'jute':130};
+        let cropLifecycleData=null;
+
+        fetch('data/crop_lifecycle.json').then(r=>r.json()).then(d=>{cropLifecycleData=d;}).catch(()=>{}).finally(()=>{
+            loadTrackedCrops();
+        });
+        setEmptyStateHint();
+        window.addEventListener('languageChanged', () => {
+            setEmptyStateHint();
+            loadTrackedCrops();
+        });
+
+        // Check URL params for crop to add
+        const urlParams=new URLSearchParams(window.location.search);
+        const cropToAdd=urlParams.get('crop');
+        const districtParam=urlParams.get('district')||'';
+        const soilParam=urlParams.get('soil')||'';
+
+        if(cropToAdd){
+            // Script is at bottom of body, DOM is already ready — just use setTimeout
+            setTimeout(()=>{
+                const cu=JSON.parse(localStorage.getItem('currentUser'));
+                if(!cu){alert(t('Please login to track crops.'));return;}
+                const key=cropToAdd.toLowerCase();
+                document.getElementById('modalCropKey').value=key;
+                document.getElementById('modalCropName').textContent=formatCropName(key);
+                document.getElementById('modalCropMaturityDays').value=cropMaturityDaysMap[key]||120;
+                document.getElementById('sowingDateInput').value=new Date().toISOString().split('T')[0];
+                new bootstrap.Modal(document.getElementById('farmDetailsModal')).show();
+            },400);
+        }
+
+        function submitCropSelection(){
+            const cu=JSON.parse(localStorage.getItem('currentUser'));
+            if(!cu)return alert(t('Please login first.'));
+            const body={username:cu.name,crop:document.getElementById('modalCropKey').value,district:districtParam,soilType:soilParam,
+                farmAcres:document.getElementById('farmAcresInput').value,waterFacility:document.getElementById('waterFacilityInput').value,
+                farmName:document.getElementById('farmNameInput').value,sowingDate:document.getElementById('sowingDateInput').value,
+                maturityDays:document.getElementById('modalCropMaturityDays').value};
+            fetch('http://localhost:5000/api/crop-tracker/select',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+            .then(r=>r.json()).then(data=>{
+                if(data.error){alert(data.error);}
+                else{bootstrap.Modal.getInstance(document.getElementById('farmDetailsModal')).hide();window.history.replaceState({},'','crop_dashboard.html');loadTrackedCrops();}
+            }).catch(e=>{console.error(e);alert(t('Failed to save.'));});
+        }
+
+        function removeCropTracker(cropId){
+            const cu=JSON.parse(localStorage.getItem('currentUser'));
+            if(!cu||!confirm(t('Remove this crop from your tracker?')))return;
+            fetch(`http://localhost:5000/api/crop-tracker/${encodeURIComponent(cu.name)}/${cropId}`,{method:'DELETE'})
+            .then(r=>r.json()).then(()=>loadTrackedCrops()).catch(e=>console.error(e));
+        }
+
+        function loadTrackedCrops(){
+            const cu=JSON.parse(localStorage.getItem('currentUser'));
+            const container=document.getElementById('trackedCropsContainer');
+            const empty=document.getElementById('emptyState');
+            console.log('[CropDash] loadTrackedCrops called, currentUser:', cu);
+            if(!cu){
+                empty.style.display='';
+                empty.innerHTML=`<div style="font-size:4rem;">🔑</div><h4 class="text-muted mt-3">${t('Please Login')}</h4><p class="text-muted"><a href="login.html" class="text-success fw-bold">${t('Login')}</a> ${t('to track your crops.')}</p>`;
+                container.innerHTML='';
+                return;
+            }
+            const url = `http://localhost:5000/api/crop-tracker/${encodeURIComponent(cu.name)}?t=${Date.now()}`;
+            console.log('[CropDash] Fetching:', url);
+            fetch(url)
+            .then(r=>r.json()).then(data=>{
+                console.log('[CropDash] API response:', data);
+                const crops=data.crops||[];
+                if(crops.length===0){empty.style.display='';container.innerHTML='';return;}
+                empty.style.display='none';
+                container.innerHTML=crops.map(e=>renderTrackedCrop(e)).join('');
+            }).catch(err=>{console.error('[CropDash] Fetch error:', err);container.innerHTML=`<div class="alert alert-danger">${t('Could not connect to server. Make sure backend is running on port 5000.')}</div>`;});
+        }
+
+        function getDynamicWeatherAdvice(crop, condition, temp) {
+            const conditionLower = (condition || '').toLowerCase();
+            const adviceLabel = t('Weather Advisory');
+            if (conditionLower.includes('rain') || conditionLower.includes('drizzle')) {
+                return `🌧️ <b>${adviceLabel}:</b> ${tFormat('Expected rain ({temp}Â°C). Delay fertilizer application to prevent runoff. Ensure field drainage is clear.', { temp })}`;
+            }
+            if (conditionLower.includes('storm') || conditionLower.includes('thunder')) {
+                return `⛈️ <b>${adviceLabel}:</b> ${t('Storms expected. Postpone spraying and secure any loose farm equipment.')}`;
+            }
+            if (temp > 35) {
+                return `🔥 <b>${adviceLabel}:</b> ${tFormat('High heat ({temp}Â°C). Increase irrigation frequency to prevent heat stress. Spraying should be done early morning or late evening.', { temp })}`;
+            }
+            if (temp < 10 && (crop === 'rice' || crop === 'cotton')) {
+                return `❄️ <b>${adviceLabel}:</b> ${tFormat('Low temperature ({temp}Â°C) may slow growth. Delay sowing or consider light irrigation to protect crops from frost.', { temp })}`;
+            }
+            if (conditionLower.includes('cloud') || conditionLower.includes('overcast')) {
+                return `⛅ <b>${adviceLabel}:</b> ${tFormat('Overcast ({temp}Â°C). Good conditions for applying soil amendments. Watch for fungal diseases due to lower sunlight.', { temp })}`;
+            }
+            return `☀️ <b>${adviceLabel}:</b> ${tFormat('Fair weather ({temp}Â°C). Ideal conditions for standard scheduled activities like weeding or harvesting.', { temp })}`;
+        }
+
+        async function fetchWeatherAdvice(district, crop, elementId) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            if (!district) {
+                el.innerHTML = `<div style="font-size:0.85rem;color:#666;">📍 ${t('Weather Advisory')}: ${t('District not set.')}</div>`;
+                return;
+            }
+            try {
+                const res = await fetch(`http://localhost:5000/api/weather/${encodeURIComponent(district)}`);
+                if (!res.ok) throw new Error(`API failed with status ${res.status}`);
+                const data = await res.json();
+                const temp = Math.round(data.current.temp_c);
+                const condition = data.current.condition.text;
+                
+                const advice = getDynamicWeatherAdvice(crop, condition, temp);
+                el.innerHTML = `<div style="font-size:0.85rem;color:#1565c0;background-color:#e3f2fd;padding:10px;border-radius:8px;border-left:4px solid #1976d2;">
+                                    ${advice}
+                                </div>`;
+            } catch (err) {
+                console.error('[CropDash] Weather error:', err);
+                el.innerHTML = `<div style="font-size:0.85rem;color:#999;">📍 ${t('Weather Advisory')}: ${t('Weather data unavailable right now.')}</div>`;
+            }
+        }
+
+        function renderTrackedCrop(entry){
+            const info=cropInfo[entry.crop]||{icon:'🌱',gradient:'linear-gradient(135deg,#c8e6c9,#4caf50)',season:'Unknown',maturity:'-',tip:'Monitor growth.'};
+            const sowing=new Date(entry.sowingDate),today=new Date();
+            const daysSince=Math.max(0,Math.floor((today-sowing)/864e5));
+            const totalDays=entry.maturityDays||120,pct=Math.min(100,Math.round((daysSince/totalDays)*100));
+            const totalWk=Math.ceil(totalDays/7),curWk=Math.min(totalWk,Math.ceil(daysSince/7)||1);
+            const daysLeft=Math.max(0,totalDays-daysSince),harvestDate=new Date(sowing.getTime()+totalDays*864e5);
+            const barColor=pct>=90?'#ff9800':pct>=60?'#4caf50':'#2196f3';
+            const lc=cropLifecycleData?cropLifecycleData[entry.crop]:null;
+            let stage={name:'Growing',icon:'🌿'},act={activity:'Monitor crop growth and maintain irrigation.',tip:'Check soil moisture regularly.'};
+            if(lc){for(const s of lc.stages){if(s.weeks.includes(curWk)){stage=s;break;}}const wks=Object.keys(lc.weeklyGuide).map(Number).sort((a,b)=>a-b);let bw=wks[0];for(const w of wks){if(w<=curWk)bw=w;}act=lc.weeklyGuide[bw]||act;}
+            const stages=lc?lc.stages:[{name:'Preparation',icon:'🌍'},{name:'Sowing',icon:'🌱'},{name:'Growth',icon:'🌿'},{name:'Flowering',icon:'🌸'},{name:'Maturity',icon:'🌾'},{name:'Harvest',icon:'🚜'}];
+            const si=stages.findIndex(s=>s.name===stage.name);
+            const stageHtml=stages.map((s,i)=>{
+                const active=i===si,done=i<si;
+                const bg=active?'#198754':done?'#a5d6a7':'#e0e0e0',cl=active?'#fff':done?'#2e7d32':'#999';
+                const conn=i<stages.length-1?`<div class="stage-connector" style="background:${done||active?'#a5d6a7':'#e0e0e0'};"></div>`:'';
+                const stageLabel = t(s.name);
+                return `<div style="text-align:center;flex:0 0 auto;"><div class="stage-dot ${active?'active':''}" style="background:${bg};color:${cl};">${s.icon}</div><div style="font-size:.65rem;color:${active?'#198754':'#999'};font-weight:${active?'700':'400'};">${stageLabel}</div></div>${conn}`;
+            }).join('');
+            let weeklyHtml='';
+            if(lc){const gw=Object.keys(lc.weeklyGuide).map(Number).sort((a,b)=>a-b);weeklyHtml=gw.map(w=>{
+                const g=lc.weeklyGuide[w],isCur=curWk===w||(curWk>w&&(gw.find(x=>x>w)||999)>curWk),isPast=w<curWk&&!isCur;
+                return `<div class="col-md-6 col-lg-4"><div class="week-card p-3 mb-2 ${isCur?'current-week':''} ${isPast?'past-week':''}" style="background:${isCur?'':'#fff'};border:1px solid #e0e0e0;"><div class="d-flex justify-content-between mb-1"><span class="fw-bold" style="color:${isCur?'#198754':'#666'};font-size:.8rem;">${t('Week')} ${w}</span>${isCur?`<span class="badge bg-success" style="font-size:.6rem;animation:pulse 1.5s infinite;">● ${t('NOW')}</span>`:''}${isPast?`<span class="badge bg-secondary" style="font-size:.6rem;">✓ ${t('Done')}</span>`:''}</div><div style="font-size:.82rem;color:#333;">${t(g.activity)}</div><div style="font-size:.72rem;color:#f57c00;margin-top:4px;">💡 ${t(g.tip)}</div></div></div>`;
+            }).join('');}
+            const wl={drip:t('Drip Irrigation'),sprinkler:t('Sprinkler'),canal:t('Canal / Channel'),borewell:t('Borewell'),well:t('Open Well'),rainfed:t('Rainfed')};
+            
+            const weatherAdviceId = `weather-advice-${entry.id}`;
+            // Kick off weather fetch
+            setTimeout(() => fetchWeatherAdvice(entry.district, entry.crop, weatherAdviceId), 100);
+
+            return `<div class="tracker-card mb-4"><div class="row g-0">
+                <div class="col-md-2" style="background:${info.gradient};display:flex;align-items:center;justify-content:center;min-height:140px;"><div style="text-align:center;"><div style="font-size:3rem;">${info.icon}</div><div style="color:#fff;font-weight:700;font-size:1.2rem;text-shadow:0 1px 3px rgba(0,0,0,.4);">${formatCropName(entry.crop)}</div></div></div>
+                <div class="col-md-10"><div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3"><div><h5 class="fw-bold mb-1">${entry.farmName} <span class="badge bg-success">📍  ${entry.district||t('Unknown')}</span></h5><div class="text-muted">${entry.farmAcres} ${t('acres')} Â· ${wl[entry.waterFacility]||entry.waterFacility} Â· ${t(entry.soilType||'Mixed')} ${t('soil')}</div></div><button onclick="removeCropTracker('${entry.id}')" class="btn btn-outline-danger btn-sm">✖ ${t('Remove')}</button></div>
+                    <div class="mb-3"><div class="d-flex justify-content-between mb-1"><span class="fw-bold" style="color:${barColor};">${tFormat('Day {day} of {total}',{day:daysSince,total:totalDays})}</span><span class="text-muted">${daysLeft>0?tFormat('{days} days to harvest',{days:daysLeft}):t('🎉 Harvest Ready!')}</span></div><div class="progress" style="height:10px;border-radius:5px;"><div class="progress-bar" style="width:${pct}%;background:${barColor};border-radius:5px;" role="progressbar"></div></div><div class="d-flex justify-content-between mt-1"><small class="text-muted">${t('Sowed')}: ${sowing.toLocaleDateString(i18n.currentLang === 'kn' ? 'kn-IN' : 'en-IN',{day:'numeric',month:'short',year:'numeric'})}</small><small class="text-muted">${t('Harvest')}: ~${harvestDate.toLocaleDateString(i18n.currentLang === 'kn' ? 'kn-IN' : 'en-IN',{day:'numeric',month:'short',year:'numeric'})}</small></div></div>
+                    <div class="d-flex align-items-start justify-content-center mb-3 px-2" style="gap:0;">${stageHtml}</div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6"><div style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-radius:12px;padding:16px;height:100%;"><div style="font-size:.75rem;color:#2e7d32;font-weight:700;">${t('CURRENT STAGE')} ${stage.icon}</div><div style="font-size:1.1rem;font-weight:600;color:#1b5e20;">${t(stage.name)}</div><div style="font-size:.8rem;color:#388e3c;">${t('Week')} ${curWk} ${t('of')} ${totalWk}</div></div></div>
+                        <div class="col-md-6"><div style="background:linear-gradient(135deg,#fff3e0,#ffe0b2);border-radius:12px;padding:16px;height:100%;display:flex;flex-direction:column;justify-content:space-between;"><div style="font-size:.75rem;color:#e65100;font-weight:700;">📍  ${t("THIS WEEK'S ACTIVITY")}</div><div style="font-size:.85rem;color:#333;margin-top:4px;">${t(act.activity)}</div><div style="font-size:.75rem;color:#f57c00;margin-top:4px;margin-bottom:8px;">💡 ${t(act.tip)}</div><div id="${weatherAdviceId}"></div></div></div>
+                    </div>
+                    <details class="mb-2"><summary class="fw-bold text-success" style="cursor:pointer;font-size:.9rem;">📅 ${t('View Full Week-by-Week Guide')}</summary><div class="row g-2 mt-2">${weeklyHtml||`<div class="col-12 text-muted">${t('Detailed guide not available.')}</div>`}</div></details>
+                </div></div>
+            </div></div>`;
+        }
+    </script>
+<script src="js/ui-enhancements.js?v=20260318"></script>
+</body>
+</html>
+

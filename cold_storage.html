@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cold Storage Finder | ClimateGuard</title>
+    <link rel="icon" href="assets/logo.png" type="image/png">
+    
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        #map {
+            height: calc(100vh - 120px);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+        .storage-sidebar {
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .facility-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        .facility-card:hover { transform: translateY(-3px); border-color: #198754 !important; cursor: pointer; }
+        .facility-card.active { border: 2px solid #198754 !important; background: rgba(25, 135, 84, 0.05); }
+        .badge-gov { background: #e7f1ff; color: #0d6efd; border: 1px solid #0d6efd; }
+        .badge-priv { background: #f0fff4; color: #198754; border: 1px solid #198754; }
+        .capacity-bar { height: 8px; border-radius: 4px; }
+        
+        /* Live Pulsating Dot */
+        .live-dot { height: 8px; width: 8px; background-color: #198754; border-radius: 50%; display: inline-block; margin-right: 5px; animation: pulse-live 1.5s infinite; }
+        @keyframes pulse-live {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(25, 135, 84, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0); }
+        }
+        
+        /* Dark Mode Support */
+        html.cg-dark .facility-card:hover { background-color: #1a2a1f; }
+        html.cg-dark .facility-card.active { background-color: #0f1f15; }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navbar (Same as dashboard) -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success mb-4">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="index.html">
+                <img src="assets/logo.png?v=3" alt="Logo" width="40" height="40" class="rounded-circle shadow-sm">
+                <span>ClimateGuard</span>
+            </a>
+            <div class="navbar-nav me-auto">
+                <a class="nav-link" href="farmer_dashboard.html">🛡️ AgriGuard</a>
+                <a class="nav-link active" href="cold_storage.html">❄️ Cold Storage</a>
+                <a class="nav-link" href="market_dashboard.html">💰 Market Prices</a>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button id="themeToggleBtn" class="theme-toggle-btn"><i class="bi bi-moon-stars"></i></button>
+                <a href="profile.html"><img src="assets/user_avatar.png" alt="User" class="user-profile-img"></a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-4 pb-4">
+        <div class="row g-4">
+            <!-- Sidebar: Filters & List -->
+            <div class="col-lg-4">
+                <div class="storage-sidebar">
+                    <div class="card shadow-sm border-0 p-3 mb-3">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-search me-2"></i>Find Storage</h5>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Select Crop</label>
+                            <select id="cropFilter" class="form-select border-0 bg-light">
+                                <option value="all">All Crops</option>
+                                <option value="maize">Maize</option>
+                                <option value="rice">Rice</option>
+                                <option value="sugarcane">Sugarcane</option>
+                                <option value="ginger">Ginger</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Search Location</label>
+                            <div class="input-group">
+                                <input type="text" id="locationSearch" class="form-control border-0 bg-light" placeholder="Enter district...">
+                                <button class="btn btn-outline-success border-0 bg-light" id="useMyLocation">
+                                    <i class="bi bi-crosshair"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button class="btn btn-success w-100 py-2" id="filterBtn">Apply Filters</button>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold mb-0 text-success"><i class="bi bi-geo-fill me-2"></i>Available Facilities</h6>
+                        <span id="refreshLabel" class="badge bg-light text-muted border py-1 px-2" style="font-size: 0.65rem;">
+                            <span class="live-dot"></span>Daily Sync Active
+                        </span>
+                    </div>
+                    <!-- Facility List -->
+                <div id="facilityList" class="flex-grow-1 overflow-auto pe-2" style="max-height: 50vh;">
+                    <div class="text-center py-5 text-muted">
+                        <div class="spinner-border spinner-border-sm mb-2"></div>
+                        <p>Searching for nearby facilities...</p>
+                    </div>
+                </div>
+
+                <!-- Market Trends Section (New) -->
+                <div class="mt-4 pt-3 border-top">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold mb-0 text-success"><i class="bi bi-graph-up-arrow me-2"></i>District Market Trends</h6>
+                        <span id="marketDistrictBadge" class="badge bg-light text-success border">All Karnataka</span>
+                    </div>
+                    <div id="marketPricesContainer" class="bg-light rounded p-2" style="max-height: 200px; overflow-y: auto; font-size: 0.85rem;">
+                        <p class="text-muted text-center small my-3">Select a facility to see local market prices</p>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- Map View -->
+            <div class="col-lg-8">
+                <div id="map"></div>
+                <div class="mt-3 d-flex gap-3 justify-content-center">
+                    <div class="d-flex align-items-center gap-2 small">
+                        <span class="badge badge-gov rounded-circle" style="width:12px; height:12px; padding:0;">&nbsp;</span> Government
+                    </div>
+                    <div class="d-flex align-items-center gap-2 small">
+                        <span class="badge badge-priv rounded-circle" style="width:12px; height:12px; padding:0;">&nbsp;</span> Private
+                    </div>
+                    <div class="d-flex align-items-center gap-2 small">
+                        <span class="badge bg-danger rounded-circle" style="width:12px; height:12px; padding:0;">&nbsp;</span> Full Space
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="js/theme.js"></script>
+    <script src="js/cold_storage.js"></script>
+</body>
+</html>

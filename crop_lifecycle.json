@@ -1,0 +1,352 @@
+{
+  "rice": {
+    "totalWeeks": 16,
+    "stages": [
+      { "name": "Soil Preparation", "weeks": [1, 2], "icon": "🌍" },
+      { "name": "Sowing / Transplanting", "weeks": [3, 4], "icon": "🌱" },
+      { "name": "Vegetative Growth", "weeks": [5, 6, 7, 8], "icon": "🌿" },
+      { "name": "Flowering / Panicle", "weeks": [9, 10, 11], "icon": "🌸" },
+      { "name": "Grain Filling", "weeks": [12, 13, 14], "icon": "🌾" },
+      { "name": "Harvest", "weeks": [15, 16], "icon": "🚜" }
+    ],
+    "weeklyGuide": {
+      "1": { "activity": "Land preparation — plough field 2-3 times, level the soil, flood with 5cm water.", "tip": "Add farmyard manure (FYM) 5 tons/acre before final ploughing." },
+      "2": { "activity": "Prepare nursery beds. Soak seeds 24hrs, incubate 48hrs. Sow pre-germinated seeds.", "tip": "Treat seeds with fungicide to prevent blast disease." },
+      "3": { "activity": "Transplant 21-day-old seedlings at 20×15cm spacing. Maintain 2-3cm water.", "tip": "Plant 2-3 seedlings per hill for optimal tillering." },
+      "4": { "activity": "Apply 1st dose of urea (1/3 of total N). Keep field flooded.", "tip": "Gap fill any dead hills within 7 days of transplanting." },
+      "5": { "activity": "First weeding — manual or herbicide. Monitor for stem borer.", "tip": "Use cono-weeder between rows to save labour." },
+      "6": { "activity": "Apply 2nd dose of urea. Check for brown plant hopper.", "tip": "Avoid excess nitrogen — it attracts pests." },
+      "7": { "activity": "Second weeding. Apply potash if deficient. Maintain 5cm water.", "tip": "Install light traps to monitor insect populations." },
+      "8": { "activity": "Maximum tillering stage. Scout for leaf folder and blast.", "tip": "Spray neem-based pesticide if pest threshold is crossed." },
+      "9": { "activity": "Panicle initiation — critical water stage. Apply final urea dose.", "tip": "Do NOT drain field during this stage — yield loss risk." },
+      "10": { "activity": "Flowering begins. Maintain consistent water level.", "tip": "Avoid pesticide spraying during flowering (harms pollinators)." },
+      "11": { "activity": "Grain formation. Monitor for neck blast and sheath blight.", "tip": "Apply fungicide if disease symptoms appear on flag leaf." },
+      "12": { "activity": "Grain filling stage. Gradually reduce water.", "tip": "Potash application now improves grain weight." },
+      "13": { "activity": "Grains hardening. Drain field completely.", "tip": "Check grain moisture — harvest at 20-22% moisture." },
+      "14": { "activity": "Final field drying. Prepare harvesting equipment.", "tip": "Arrange labour/combine harvester in advance." },
+      "15": { "activity": "Harvest when 80% of grains are golden-yellow.", "tip": "Harvest in morning to reduce shattering losses." },
+      "16": { "activity": "Threshing, drying to 14% moisture, and storage.", "tip": "Store in moisture-proof bags. Use hermetic storage if available." }
+    }
+  },
+  "maize": {
+    "totalWeeks": 14,
+    "stages": [
+      { "name": "Soil Preparation", "weeks": [1, 2], "icon": "🌍" },
+      { "name": "Sowing", "weeks": [3], "icon": "🌱" },
+      { "name": "Vegetative Growth", "weeks": [4, 5, 6, 7], "icon": "🌿" },
+      { "name": "Tasseling / Silking", "weeks": [8, 9, 10], "icon": "🌸" },
+      { "name": "Grain Filling", "weeks": [11, 12], "icon": "🌽" },
+      { "name": "Harvest", "weeks": [13, 14], "icon": "🚜" }
+    ],
+    "weeklyGuide": {
+      "1": { "activity": "Deep ploughing. Incorporate crop residue. Apply basal FYM.", "tip": "Soil test before planting — maize is a heavy feeder." },
+      "2": { "activity": "Fine tilth preparation. Form ridges/furrows. Apply basal DAP + potash.", "tip": "Treat seeds with Thiram for seedling disease prevention." },
+      "3": { "activity": "Sow seeds at 60×20cm spacing, 5cm depth. Use seed drill for uniformity.", "tip": "Sow with onset of monsoon for rainfed; irrigate if summer crop." },
+      "4": { "activity": "Germination and emergence. Thin to 1 plant/hill if needed.", "tip": "Gap fill within 7-10 days after emergence." },
+      "5": { "activity": "First weeding. Apply 1st top-dress of nitrogen (urea).", "tip": "Weed-free first 30 days is critical for yield." },
+      "6": { "activity": "Knee-high stage. Earthing up around plants. Second weeding.", "tip": "Earthing up prevents lodging (falling) during wind/rain." },
+      "7": { "activity": "Apply 2nd top-dress of nitrogen. Monitor for fall armyworm.", "tip": "Spray Emamectin Benzoate if armyworm visible in whorl." },
+      "8": { "activity": "Tasseling begins. Critical irrigation stage.", "tip": "Water stress during tasseling reduces yield by 50%." },
+      "9": { "activity": "Silking stage. Pollen shedding. Maintain soil moisture.", "tip": "Do NOT spray pesticides — protect pollination." },
+      "10": { "activity": "Cob formation. Monitor for cob borer and ear rot.", "tip": "Remove and destroy infected cobs to prevent spread." },
+      "11": { "activity": "Grain filling. Reduce irrigation gradually.", "tip": "Potash helps grain weight and quality." },
+      "12": { "activity": "Grain drying on plant. Check husk colour (brown = ready).", "tip": "Harvest at 25% grain moisture for mechanical harvesting." },
+      "13": { "activity": "Harvest cobs. Dry in sun for 3-4 days.", "tip": "Stack cobs vertically to improve air circulation." },
+      "14": { "activity": "Shell, clean, and store at 12% moisture.", "tip": "Use airtight containers to prevent storage pests." }
+    }
+  },
+  "cotton": {
+    "totalWeeks": 22,
+    "stages": [
+      { "name": "Soil Preparation", "weeks": [1, 2], "icon": "🌍" },
+      { "name": "Sowing", "weeks": [3, 4], "icon": "🌱" },
+      { "name": "Vegetative Growth", "weeks": [5, 6, 7, 8, 9], "icon": "🌿" },
+      { "name": "Squaring / Flowering", "weeks": [10, 11, 12, 13], "icon": "🌸" },
+      { "name": "Boll Development", "weeks": [14, 15, 16, 17, 18], "icon": "☁️" },
+      { "name": "Harvest (Picking)", "weeks": [19, 20, 21, 22], "icon": "🚜" }
+    ],
+    "weeklyGuide": {
+      "1": { "activity": "Deep ploughing after previous crop harvest. Soil solarization.", "tip": "Black soil retains moisture — avoid over-irrigation." },
+      "2": { "activity": "Apply FYM + basal NPK. Form ridges and furrows.", "tip": "Treat seed with Imidacloprid for sucking pest protection." },
+      "3": { "activity": "Sow Bt cotton seeds at 90×60cm spacing.", "tip": "Plant refuge crop (non-Bt) at 20% area as per regulation." },
+      "4": { "activity": "Germination. Gap filling. Light irrigation if dry.", "tip": "Avoid waterlogging — cotton roots are sensitive." },
+      "5": { "activity": "Thinning to one plant/spot. First weeding.", "tip": "Interculture between rows using bullock-drawn or power weeder." },
+      "6": { "activity": "Apply 1st urea top-dress. Monitor for jassids and aphids.", "tip": "Install yellow sticky traps for whitefly monitoring." },
+      "7": { "activity": "Second weeding. Earthing up. Apply micronutrients (Zn, Fe).", "tip": "Foliar spray of 0.5% ZnSO4 improves boll retention." },
+      "8": { "activity": "Pinching (topping) at 12-15 node stage. Monitor growth.", "tip": "Topping redirects energy from height to boll production." },
+      "9": { "activity": "Apply 2nd nitrogen top-dress. Irrigate if rainless >10 days.", "tip": "Excess nitrogen causes rank growth and attracts pests." },
+      "10": { "activity": "Square (flower bud) formation begins. Scout for bollworms.", "tip": "Use pheromone traps — 8/acre for bollworm monitoring." },
+      "11": { "activity": "Flowering starts. Apply potash for boll development.", "tip": "Critical water requirement period — ensure moisture." },
+      "12": { "activity": "Peak flowering. Monitor American bollworm closely.", "tip": "Spray neem oil or Bt-based biopesticide if needed." },
+      "13": { "activity": "Late flowering. Remove and destroy damaged squares.", "tip": "Use hand-picking of larvae if infestation is moderate." },
+      "14": { "activity": "Boll formation starts. Reduce nitrogen.", "tip": "Excess N at this stage causes boll shedding." },
+      "15": { "activity": "Boll development. Monitor for pink bollworm.", "tip": "Keep field clean — destroy fallen bolls to break pest cycle." },
+      "16": { "activity": "Bolls maturing. Irrigate sparingly.", "tip": "Stop irrigation 2-3 weeks before expected first picking." },
+      "17": { "activity": "First bolls opening. Prepare for picking.", "tip": "Pick only fully opened bolls — avoid immature ones." },
+      "18": { "activity": "Continue boll maturation. Watch for staining from rain.", "tip": "Cover harvested cotton — wet cotton grades lower." },
+      "19": { "activity": "First picking — pick white, fully open bolls.", "tip": "Pick in dry weather. Sort by grade during picking." },
+      "20": { "activity": "Second picking — 15-20 days after first.", "tip": "Avoid mixing good lint with stained or immature kapas." },
+      "21": { "activity": "Third picking if needed. Final harvesting.", "tip": "Remove crop residue after harvest to reduce pest carryover." },
+      "22": { "activity": "Clean field. Plan for next season crop rotation.", "tip": "Rotate with legumes (pulses) to restore soil nitrogen." }
+    }
+  },
+  "sugarcane": {
+    "totalWeeks": 48,
+    "stages": [
+      { "name": "Soil Preparation", "weeks": [1, 2, 3], "icon": "🌍" },
+      { "name": "Planting", "weeks": [4, 5], "icon": "🌱" },
+      { "name": "Germination", "weeks": [6, 7, 8, 9], "icon": "🌿" },
+      { "name": "Tillering", "weeks": [10, 11, 12, 13, 14, 15], "icon": "🌿" },
+      { "name": "Grand Growth", "weeks": [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30], "icon": "🎋" },
+      { "name": "Maturity / Ripening", "weeks": [31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42], "icon": "🎋" },
+      { "name": "Harvest", "weeks": [43, 44, 45, 46, 47, 48], "icon": "🚜" }
+    ],
+    "weeklyGuide": {
+      "1": { "activity": "Deep ploughing (30cm). Level the field. Apply FYM (10 tons/acre).", "tip": "Good land preparation is key — sugarcane stays 12+ months." },
+      "4": { "activity": "Plant 3-budded setts in furrows at 90cm spacing. Apply basal fertilizer.", "tip": "Treat setts in fungicide solution for 15 minutes before planting." },
+      "6": { "activity": "Germination starts. Light irrigation every 7 days.", "tip": "Avoid standing water during germination." },
+      "10": { "activity": "Tillering phase. Apply first nitrogen top-dress.", "tip": "Earthing up promotes more tillers and prevents lodging." },
+      "16": { "activity": "Grand growth begins. Increase irrigation frequency.", "tip": "This phase uses 70% of total water requirement." },
+      "20": { "activity": "Propping to prevent lodging. Apply potash.", "tip": "Tie canes in groups of 4-5 using dry leaves." },
+      "30": { "activity": "Cane elongation continues. Monitor for top borer.", "tip": "Remove and destroy borer-infested shoots." },
+      "35": { "activity": "Maturity starts. Reduce irrigation. Stop nitrogen.", "tip": "Withholding water increases sugar content in cane." },
+      "43": { "activity": "Harvest when brix reading is 20+. Cut at ground level.", "tip": "Harvest early morning. Send to mill within 24 hours." },
+      "48": { "activity": "Ratoon management — apply FYM and irrigate for next crop.", "tip": "Good ratoon management can yield 3 successive harvests." }
+    }
+  },
+  "wheat": {
+    "totalWeeks": 18,
+    "stages": [
+      { "name": "Soil Preparation", "weeks": [1, 2], "icon": "🌍" },
+      { "name": "Sowing", "weeks": [3], "icon": "🌱" },
+      { "name": "Vegetative / Tillering", "weeks": [4, 5, 6, 7, 8], "icon": "🌿" },
+      { "name": "Jointing / Booting", "weeks": [9, 10, 11], "icon": "🌾" },
+      { "name": "Heading / Flowering", "weeks": [12, 13, 14], "icon": "🌸" },
+      { "name": "Grain Filling / Harvest", "weeks": [15, 16, 17, 18], "icon": "🚜" }
+    ],
+    "weeklyGuide": {
+      "1": { "activity": "Plough field 2-3 times. Apply FYM and basal NPK.", "tip": "Wheat needs fine, well-prepared seedbed." },
+      "3": { "activity": "Sow seeds at 22.5cm row spacing. Irrigate immediately.", "tip": "Optimal sowing temp: 20-25°C. Late sowing reduces yield." },
+      "4": { "activity": "First irrigation at crown root stage (21 days).", "tip": "This is the most critical irrigation — don't skip." },
+      "6": { "activity": "Apply 1st urea top-dress. First weeding.", "tip": "Use herbicide before crop canopy closes." },
+      "9": { "activity": "2nd irrigation at jointing. Apply remaining nitrogen.", "tip": "Nitrogen after jointing goes to grain protein." },
+      "12": { "activity": "Flowering. 3rd irrigation. Monitor for rust.", "tip": "Spray fungicide if yellow/brown rust appears." },
+      "15": { "activity": "Grain filling. Final irrigation if needed.", "tip": "Terminal heat stress reduces grain weight." },
+      "17": { "activity": "Harvest when grain moisture is 12-14%. Stalks turn golden.", "tip": "Delayed harvest causes shattering losses." },
+      "18": { "activity": "Threshing and storage at 12% moisture.", "tip": "Clean and fumigate storage before filling." }
+    }
+  },
+  "ragi": {
+    "totalWeeks": 14,
+    "stages": [
+      { "name": "Soil Preparation", "weeks": [1, 2], "icon": "🌍" },
+      { "name": "Sowing / Transplanting", "weeks": [3], "icon": "🌱" },
+      { "name": "Vegetative Growth", "weeks": [4, 5, 6, 7], "icon": "🌿" },
+      { "name": "Earhead Formation", "weeks": [8, 9, 10], "icon": "🌸" },
+      { "name": "Grain Filling", "weeks": [11, 12], "icon": "🌾" },
+      { "name": "Harvest", "weeks": [13, 14], "icon": "🚜" }
+    ],
+    "weeklyGuide": {
+      "1": { "activity": "Plough and prepare seedbed. Apply FYM 2 tons/acre.", "tip": "Ragi tolerates poor soils but responds well to FYM." },
+      "3": { "activity": "Transplant 25-day nursery seedlings or direct sow.", "tip": "Spacing: 30×10cm. Transplanting gives better yields." },
+      "4": { "activity": "Gap filling. First weeding at 20 days.", "tip": "Early weed removal is crucial — ragi is a slow starter." },
+      "6": { "activity": "Apply urea top-dress. Second weeding at 40 days.", "tip": "Finger millet doesn't need heavy fertilization." },
+      "8": { "activity": "Earhead emergence. Ensure soil moisture.", "tip": "One irrigation at this stage significantly boosts yield." },
+      "11": { "activity": "Grain filling. Monitor for blast disease.", "tip": "Spray Tricyclazole if neck blast symptoms appear." },
+      "13": { "activity": "Harvest when earheads bend and grains harden.", "tip": "Sun-dry for 3-4 days before threshing." },
+      "14": { "activity": "Threshing, winnowing, and storage.", "tip": "Ragi stores very well — up to 10 years in dry conditions." }
+    }
+  },
+  "groundnut": {
+    "totalWeeks": 18,
+    "stages": [
+      { "name": "Soil Preparation", "weeks": [1, 2], "icon": "🌍" },
+      { "name": "Sowing", "weeks": [3], "icon": "🌱" },
+      { "name": "Vegetative Growth", "weeks": [4, 5, 6, 7], "icon": "🌿" },
+      { "name": "Flowering / Pegging", "weeks": [8, 9, 10, 11], "icon": "🌸" },
+      { "name": "Pod Development", "weeks": [12, 13, 14, 15], "icon": "🥜" },
+      { "name": "Harvest", "weeks": [16, 17, 18], "icon": "🚜" }
+    ],
+    "weeklyGuide": {
+      "1": { "activity": "Plough and harrow. Apply gypsum 200 kg/acre.", "tip": "Gypsum is essential for groundnut — provides calcium and sulphur." },
+      "3": { "activity": "Sow kernels at 30×10cm. Treat seeds with Rhizobium + Trichoderma.", "tip": "Sow at 5cm depth. Inoculation boosts nitrogen fixation." },
+      "5": { "activity": "First weeding at 20 days. Apply urea if poor growth.", "tip": "Groundnut fixes its own nitrogen — minimal urea needed." },
+      "8": { "activity": "Flowering begins. Apply gypsum at flowering (top-dress).", "tip": "Gypsum at flowering dramatically improves pod filling." },
+      "10": { "activity": "Pegging stage — pegs enter soil. Earthing up.", "tip": "Loose soil around plants helps pegs penetrate easily." },
+      "12": { "activity": "Pod formation underground. Maintain soil moisture.", "tip": "Water stress now causes empty pods." },
+      "15": { "activity": "Pods maturing. Check by sampling and cracking open.", "tip": "Inside of shell turns dark when mature." },
+      "17": { "activity": "Harvest — uproot plants, stack inverted for sun drying.", "tip": "Harvest at 70-80% pod maturity for best quality." },
+      "18": { "activity": "Strip pods, dry to 8% moisture, grade and store.", "tip": "Store in gunny bags in dry, ventilated space." }
+    }
+  },
+  "coffee": {
+    "totalWeeks": 52,
+    "stages": [
+      { "name": "Preparation / Nursery", "weeks": [1, 2, 3, 4], "icon": "🌍" },
+      { "name": "Transplanting", "weeks": [5, 6, 7, 8], "icon": "🌱" },
+      { "name": "Establishment", "weeks": [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], "icon": "🌿" },
+      { "name": "Canopy Development", "weeks": [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40], "icon": "☕" },
+      { "name": "Berry Development", "weeks": [41, 42, 43, 44, 45, 46, 47, 48], "icon": "🫐" },
+      { "name": "Harvest / Processing", "weeks": [49, 50, 51, 52], "icon": "🚜" }
+    ],
+    "weeklyGuide": {
+      "1": { "activity": "Prepare nursery beds. Sow coffee seeds in sand beds.", "tip": "Use shade net nursery. Seeds take 45-60 days to germinate." },
+      "5": { "activity": "Transplant 6-month seedlings to main field at 6×6ft spacing.", "tip": "Plant during monsoon onset. Provide temporary shade." },
+      "10": { "activity": "Establish shade trees (Silver Oak/Dadap). Weed around plants.", "tip": "50% shade is ideal for arabica; 30% for robusta." },
+      "20": { "activity": "First pruning to shape. Apply FYM + NPK.", "tip": "Training young coffee plants determines future yield." },
+      "30": { "activity": "Canopy spreading. Regular mulching. Borer monitoring.", "tip": "White stem borer: paint trunk with lime + copper sulphate." },
+      "41": { "activity": "Berry formation after blossom showers. Apply potash.", "tip": "Coffee berries take 8-9 months to ripen after flowering." },
+      "49": { "activity": "Selective picking of ripe red cherries. Process same day.", "tip": "Only pick fully ripe cherries — green ones reduce quality." },
+      "52": { "activity": "Final picking. Prune handled branches. Prepare for next cycle.", "tip": "Wet processing produces better grade than dry processing." }
+    }
+  },
+  "coconut": {
+    "totalWeeks": 52,
+    "stages": [
+      { "name": "Pit Preparation", "weeks": [1, 2, 3, 4], "icon": "🌍" },
+      { "name": "Planting", "weeks": [5, 6], "icon": "🌱" },
+      { "name": "Establishment (Year 1)", "weeks": [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26], "icon": "🌿" },
+      { "name": "Growth Phase", "weeks": [27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52], "icon": "🥥" }
+    ],
+    "weeklyGuide": {
+      "1": { "activity": "Dig pits 1m×1m×1m at 7.5m triangular spacing.", "tip": "Dig pits 1-2 months before planting for weathering." },
+      "5": { "activity": "Plant 10-12 month seedlings. Fill pit with topsoil + FYM + sand.", "tip": "Plant with onset of monsoon. Don't bury the collar region." },
+      "10": { "activity": "Basin irrigation every 4 days. Weed regularly in basin.", "tip": "Young palms need consistent water — drought kills." },
+      "20": { "activity": "Apply NPK in 2 splits. Mulch the basin with coconut husk.", "tip": "Green manure cover crop between palms improves soil." },
+      "30": { "activity": "Intercrop with banana/pineapple for income while palm grows.", "tip": "First harvest only after 5-7 years — intercropping sustains income." },
+      "40": { "activity": "Continue fertilization. Monitor for rhinoceros beetle.", "tip": "Place naphthalene balls in leaf axils to repel beetles." },
+      "52": { "activity": "End of Year 1. Plant is established. Continue care routines.", "tip": "Patience is key — coconut is a 60+ year investment." }
+    }
+  },
+  "pulses": {
+    "totalWeeks": 12,
+    "stages": [
+      { "name": "Soil Preparation", "weeks": [1, 2], "icon": "🌍" },
+      { "name": "Sowing", "weeks": [3], "icon": "🌱" },
+      { "name": "Vegetative Growth", "weeks": [4, 5, 6], "icon": "🌿" },
+      { "name": "Flowering / Pod Formation", "weeks": [7, 8, 9], "icon": "🌸" },
+      { "name": "Pod Maturity", "weeks": [10, 11], "icon": "🫘" },
+      { "name": "Harvest", "weeks": [12], "icon": "🚜" }
+    ],
+    "weeklyGuide": {
+      "1": { "activity": "Light ploughing. Apply FYM. No heavy nitrogen needed.", "tip": "Pulses fix their own nitrogen — excess N harms nodulation." },
+      "3": { "activity": "Sow inoculated seed at 30×10cm spacing.", "tip": "Treat with Rhizobium culture for free nitrogen fixation." },
+      "4": { "activity": "Germination. Thin if overcrowded.", "tip": "One weeding at 20 days is usually sufficient." },
+      "7": { "activity": "Flowering begins. One irrigation if soil is dry.", "tip": "Excess water during flowering causes flower drop." },
+      "9": { "activity": "Pod filling. Monitor for pod borer (Helicoverpa).", "tip": "Hand-pick larvae or spray neem if infestation is high." },
+      "11": { "activity": "Pods dry on plant. Leaves turn yellow and drop.", "tip": "Harvest when 80% pods are dry and brown." },
+      "12": { "activity": "Uproot, sun-dry, thresh, and clean seed.", "tip": "Store in airtight containers to prevent bruchid infestation." }
+    }
+  },
+  "ginger": {
+    "totalWeeks": 32,
+    "stages": [
+      { "name": "Soil Preparation", "weeks": [1, 2], "icon": "🌍" },
+      { "name": "Planting", "weeks": [3, 4], "icon": "🌱" },
+      { "name": "Sprouting", "weeks": [5, 6, 7, 8], "icon": "🌿" },
+      { "name": "Active Growth", "weeks": [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], "icon": "🫚" },
+      { "name": "Rhizome Bulking", "weeks": [21, 22, 23, 24, 25, 26, 27, 28], "icon": "🫚" },
+      { "name": "Harvest", "weeks": [29, 30, 31, 32], "icon": "🚜" }
+    ],
+    "weeklyGuide": {
+      "1": { "activity": "Prepare raised beds 1m wide. Incorporate FYM heavily.", "tip": "Ginger needs loose, well-drained soil — raised beds prevent rot." },
+      "3": { "activity": "Cut seed rhizomes (25-50g pieces with 2 buds). Treat with Mancozeb.", "tip": "Shade-dry treated rhizomes for 3 days before planting." },
+      "5": { "activity": "Sprouting begins (3-4 weeks after planting). Mulch with green leaves.", "tip": "First mulch at planting, second at 40 days, third at 90 days." },
+      "9": { "activity": "Active growth. First weeding + earthing up. Apply 1st urea dose.", "tip": "Mulch heavily — ginger needs moist but not waterlogged soil." },
+      "14": { "activity": "Rapid growth. 2nd top-dress. Monitor for shoot borer.", "tip": "Spray Dimethoate if shoot borer damage exceeds 5%." },
+      "20": { "activity": "Rhizome development. Apply potash. Reduce irrigation slightly.", "tip": "Potash enhances rhizome size and oil content." },
+      "25": { "activity": "Rhizome bulking. Leaves start yellowing at tips.", "tip": "Don't irrigate if leaves are yellowing — that's maturity signal." },
+      "30": { "activity": "Harvest when leaves turn yellow and dry (8-9 months).", "tip": "For fresh ginger, harvest at 6 months. For dry ginger, wait full term." },
+      "32": { "activity": "Dig carefully. Wash, dry, and store or process.", "tip": "For seed purposes, store rhizomes in pit with sand cover." }
+    }
+  },
+  "sunflower": {
+    "totalWeeks": 14,
+    "stages": [
+      { "name": "Soil Preparation", "weeks": [1, 2], "icon": "🌍" },
+      { "name": "Sowing", "weeks": [3], "icon": "🌱" },
+      { "name": "Vegetative Growth", "weeks": [4, 5, 6, 7], "icon": "🌿" },
+      { "name": "Flowering", "weeks": [8, 9, 10], "icon": "🌻" },
+      { "name": "Seed Development", "weeks": [11, 12], "icon": "🌻" },
+      { "name": "Harvest", "weeks": [13, 14], "icon": "🚜" }
+    ],
+    "weeklyGuide": {
+      "1": { "activity": "Plough and prepare seedbed. Apply basal NPK.", "tip": "Sunflower performs well after a cereal crop rotation." },
+      "3": { "activity": "Sow at 60×30cm spacing. Irrigate after sowing.", "tip": "Use hybrid seeds for better uniformity and yield." },
+      "5": { "activity": "Thinning to one plant/spot. First weeding.", "tip": "Sunflower competes poorly with weeds initially." },
+      "7": { "activity": "Apply urea top-dress. Earthing up.", "tip": "Boron deficiency is common — apply borax if needed." },
+      "8": { "activity": "Star bud stage. Critical irrigation. Place bee colonies nearby.", "tip": "Bee pollination can increase seed set by 30-40%." },
+      "10": { "activity": "Full bloom. Monitor for head rot in rainy weather.", "tip": "Ensure field drainage to prevent Sclerotinia head rot." },
+      "12": { "activity": "Back of head turns brown. Seeds harden.", "tip": "Cover heads with cloth bags if bird damage is severe." },
+      "13": { "activity": "Harvest when head is fully dry and seeds are black.", "tip": "Cut heads, sun-dry 2-3 days, then thresh." },
+      "14": { "activity": "Clean, bag, and store seeds at 8% moisture.", "tip": "Don't delay harvest — seeds shatter easily when over-dry." }
+    }
+  },
+  "banana": {
+    "totalWeeks": 48,
+    "stages": [
+      { "name": "Pit Preparation", "weeks": [1, 2], "icon": "🌍" },
+      { "name": "Planting", "weeks": [3, 4], "icon": "🌱" },
+      { "name": "Vegetative Growth", "weeks": [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28], "icon": "🌿" },
+      { "name": "Flowering / Bunch", "weeks": [29, 30, 31, 32, 33, 34, 35, 36, 37, 38], "icon": "🌸" },
+      { "name": "Fruit Development", "weeks": [39, 40, 41, 42, 43, 44, 45], "icon": "🍌" },
+      { "name": "Harvest", "weeks": [46, 47, 48], "icon": "🚜" }
+    ],
+    "weeklyGuide": {
+      "1": { "activity": "Dig pits 45×45×45cm at 1.8×1.8m spacing.", "tip": "Fill pits with topsoil + 10kg FYM + neem cake." },
+      "3": { "activity": "Plant tissue culture or sucker plantlets. Irrigate immediately.", "tip": "Use sword suckers (1-1.5kg) for planting." },
+      "8": { "activity": "Apply first NPK dose. Desuckering — remove all side suckers.", "tip": "Keep only 1 main plant per pit. Suckers steal nutrients." },
+      "16": { "activity": "Apply 2nd fertilizer dose. Mulch heavily.", "tip": "Banana is a heavy feeder — fertigation is ideal." },
+      "24": { "activity": "Pseudostem fully grown. Apply potash for flowering.", "tip": "Potash improves fruit quality and bunch weight." },
+      "30": { "activity": "Bunch emerges. Prop plant with bamboo support.", "tip": "Propping prevents toppling — bunches can weigh 25-40kg." },
+      "36": { "activity": "Remove male bud (bell) after last hand opens.", "tip": "Removing bell redirects energy to fruit filling." },
+      "42": { "activity": "Fingers filling. Apply bunch spray for cosmetic quality.", "tip": "Bunch cover with perforated polythene improves appearance." },
+      "46": { "activity": "Harvest when fingers are 75% round and light green.", "tip": "Cut bunch with 30cm stalk. Handle with care — bruises reduce value." },
+      "48": { "activity": "Ripen in chamber or ethylene. Remove and replant ratoon.", "tip": "Ratoon crop from first sucker gives harvest in 8-10 months." }
+    }
+  },
+  "turmeric": {
+    "totalWeeks": 32,
+    "stages": [
+      { "name": "Soil Preparation", "weeks": [1, 2], "icon": "🌍" },
+      { "name": "Planting", "weeks": [3, 4], "icon": "🌱" },
+      { "name": "Sprouting / Growth", "weeks": [5, 6, 7, 8, 9, 10, 11, 12], "icon": "🌿" },
+      { "name": "Active Rhizome Growth", "weeks": [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], "icon": "🟡" },
+      { "name": "Maturity", "weeks": [25, 26, 27, 28, 29, 30], "icon": "🟡" },
+      { "name": "Harvest / Curing", "weeks": [31, 32], "icon": "🚜" }
+    ],
+    "weeklyGuide": {
+      "1": { "activity": "Prepare raised beds. Incorporate 10 tons FYM/acre.", "tip": "Turmeric exhausts soil — rotate with legumes after." },
+      "3": { "activity": "Plant mother/finger rhizomes at 30×20cm. Mulch with green leaves.", "tip": "Treat rhizomes with Mancozeb + Quinalphos for 30 minutes." },
+      "6": { "activity": "Sprouting. Apply first mulch layer with leaves/straw.", "tip": "Mulching is critical — 3 applications during crop cycle." },
+      "10": { "activity": "Active growth. Apply 1st urea + potash. First weeding.", "tip": "Intercultivate carefully — rhizomes are shallow." },
+      "16": { "activity": "Peak growth. 2nd mulching. Monitor for rhizome rot.", "tip": "Drench with Mancozeb if rot symptoms appear." },
+      "20": { "activity": "Rhizome development. Apply remaining potash.", "tip": "Reduce irrigation — excess water causes rotting." },
+      "28": { "activity": "Leaves yellowing and drying. Stop irrigation.", "tip": "This is the sign of maturity (7-9 months after planting)." },
+      "31": { "activity": "Dig rhizomes carefully. Wash and sort by size.", "tip": "Fingers and mothers are processed separately." },
+      "32": { "activity": "Boil for 45 min, sun-dry 10-15 days, and polish.", "tip": "Polish by rubbing in drums for better marketplace value." }
+    }
+  },
+  "sorghum": {
+    "totalWeeks": 14,
+    "stages": [
+      { "name": "Soil Preparation", "weeks": [1, 2], "icon": "🌍" },
+      { "name": "Sowing", "weeks": [3], "icon": "🌱" },
+      { "name": "Vegetative Growth", "weeks": [4, 5, 6, 7], "icon": "🌿" },
+      { "name": "Panicle / Flowering", "weeks": [8, 9, 10], "icon": "🌸" },
+      { "name": "Grain Filling", "weeks": [11, 12], "icon": "🌾" },
+      { "name": "Harvest", "weeks": [13, 14], "icon": "🚜" }
+    ],
+    "weeklyGuide": {
+      "1": { "activity": "Plough and harrow. Apply FYM and basal fertilizer.", "tip": "Sorghum is drought-tolerant but responds to good preparation." },
+      "3": { "activity": "Sow at 45×15cm spacing. Use improved hybrid seeds.", "tip": "Seed rate: 3-4 kg/acre. Treat with Thiram." },
+      "5": { "activity": "Thinning and first weeding. Apply urea top-dress.", "tip": "Keep weed-free for first 30 days." },
+      "7": { "activity": "Second weeding. Monitor for shoot fly (rainy season crop).", "tip": "Carbofuran granules in whorl control shoot fly." },
+      "8": { "activity": "Flag leaf and panicle emergence. Irrigate if dry.", "tip": "Water at boot stage significantly improves grain yield." },
+      "10": { "activity": "Flowering and grain formation. Bird scaring if needed.", "tip": "Use scarecrows and reflective tapes for bird control." },
+      "12": { "activity": "Grain hardening. Panicle bends with weight.", "tip": "Test grain hardness by pressing with thumbnail." },
+      "13": { "activity": "Harvest earheads first, then cut stalks for fodder.", "tip": "Sorghum fodder is excellent livestock feed." },
+      "14": { "activity": "Thresh, clean, and store at 12% moisture.", "tip": "Grain can be stored 2-3 years in good conditions." }
+    }
+  }
+}

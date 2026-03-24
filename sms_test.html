@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClimateGuard - Free SMS Tester (TextBee)</title>
+    <link rel="icon" href="assets/logo.png" type="image/png">
+    <style> body { font-family: 'Inter', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; } .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); width: 100%; max-width: 450px; } h2 { margin-top: 0; color: #2c3e50; font-size: 22px; } .form-group { margin-bottom: 20px; } label { display: block; margin-bottom: 8px; font-weight: bold; color: #34495e; font-size: 14px; } input[type="text"], textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; font-family: inherit; } textarea { resize: vertical; height: 80px; } button { background-color: #27ae60; color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold; transition: background 0.3s; } button:hover { background-color: #219653; } button:disabled { background-color: #95a5a6; cursor: not-allowed; } .message-box { margin-top: 20px; padding: 15px; border-radius: 6px; display: none; font-size: 14px; } .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; } .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; } .steps { background-color: #eef2f7; padding: 15px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; color: #475569; } .steps ol { padding-left: 20px; margin: 5px 0; } code { background: #e2e8f0; padding: 2px 4px; border-radius: 4px; font-family: monospace; } </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/ui-enhancements.css?v=20260318">
+</head>
+  <body>
+    <div class="card">
+      <h2>📡 Free Climate SMS (via TextBee)</h2>
+      <div class="steps">
+        <b>100% Free Setup for India:</b>
+        <ol>
+          <li>Install <b>TextBee</b> from Play Store on your Android.</li>
+          <li>In the app, get your <b>API Key</b> and <b>Device Id</b>.</li>
+          <li>Paste them in your <code>backend/.env</code> file.</li>
+          <li>Ensure your phone has an active SMS pack (like Jio/Airtel).</li>
+        </ol>
+      </div>
+      <form id="smsForm">
+        <div class="form-group">
+          <label for="phone">Recipient Phone Number</label>
+          <input type="text" id="phone" placeholder="+919876543210" required>
+        </div>
+        <div class="form-group">
+          <label for="message">Alert Message</label>
+          <textarea id="message" placeholder="⚠️ High flood risk predicted in your area tomorrow. Please stay alert." required>
+          </textarea>
+        </div>
+        <button type="submit" id="submitBtn">Send Free SMS via Android</button>
+      </form>
+      <div id="statusBox" class="message-box">
+      </div>
+    </div>
+      <script> const form = document.getElementById('smsForm'); const submitBtn = document.getElementById('submitBtn'); const statusBox = document.getElementById('statusBox'); form.addEventListener('submit', async (e) => { e.preventDefault(); const phone = document.getElementById('phone').value.trim(); const message = document.getElementById('message').value.trim(); submitBtn.disabled = true; submitBtn.textContent = 'Queueing SMS...'; statusBox.style.display = 'none'; statusBox.className = 'message-box'; try { const response = await fetch('http://localhost:5000/api/send-sms', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone, message }) }); const result = await response.json(); if (response.ok) { statusBox.textContent = `✅ ${result.message}`; statusBox.classList.add('success'); } else { statusBox.innerHTML = `❌ ${result.error}<br>
+      <small>${result.suggestion || ''}</small>`; statusBox.classList.add('error'); } } catch (err) { statusBox.textContent = `❌ Network Error: Could not connect to backend (${err.message})`; statusBox.classList.add('error'); } finally { statusBox.style.display = 'block'; submitBtn.disabled = false; submitBtn.textContent = 'Send Free SMS via Android'; } }); </script>
+      <script src="js/ui-enhancements.js?v=20260318"></script>
+</body>
+      </html>

@@ -1,0 +1,398 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClimateGuard | Forest Dashboard</title>
+  <link rel="icon" href="assets/logo.png" type="image/png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="manifest" href="manifest.json">
+  <script src="js/theme.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    #map {
+      height: 500px;
+      width: 100%;
+      border-radius: 15px;
+      z-index: 1;
+    }
+
+    .map-section {
+      background: white;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      margin-bottom: 3rem;
+    }
+
+    .leaflet-interactive {
+      transition: fill-opacity 0.2s, stroke-width 0.2s;
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 300px;
+    }
+
+    .info-legend {
+      background: #ffffff;
+      padding: 10px 12px;
+      border-radius: 8px;
+      box-shadow: 0 0 14px rgba(0, 0, 0, 0.12);
+      font-size: 12px;
+      line-height: 1.4;
+      color: #1f2937;
+    }
+
+    .info-legend i {
+      width: 14px;
+      height: 14px;
+      display: inline-block;
+      margin-right: 8px;
+      border-radius: 2px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/ui-enhancements.css?v=20260318">
+</head>
+
+<body class="bg-light">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+    <div class="container">
+      <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="index.html"><img src="assets/logo.png?v=3"
+          alt="ClimateGuard Logo" width="40" height="40" class="rounded-circle shadow-sm"><span>ClimateGuard</span></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="navbar-nav me-auto">
+          <a class="nav-link" href="soil_dashboard.html" data-i18n="nav-soil">🟤 Soil Info</a>
+          <a class="nav-link" href="crop_info_dashboard.html" data-i18n="nav-crop-info">🌱 Crop Info</a>
+          <a class="nav-link active" href="forest_dashboard.html" data-i18n="nav-forest">🌲 Forest Info</a>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <button id="langToggleBtn" class="btn btn-sm btn-outline-light rounded-pill px-3 me-2"
+            style="font-size: 0.8rem; border-color: rgba(255,255,255,0.3);">Language</button>
+          <button id="themeToggleBtn" class="theme-toggle-btn" title="Switch to Dark Mode"><i
+              class="bi bi-moon-stars"></i></button>
+          <div class="dropdown">
+
+            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle hide-caret"
+              id="userProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="assets/user_avatar.png" alt="User" class="user-profile-img">
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-premium" aria-labelledby="userProfileDropdown">
+              <li>
+                <h6 class="dropdown-header-premium">User Account</h6>
+              </li>
+              <li id="loginMenuItem"><a class="dropdown-item dropdown-item-premium" href="login.html"><i
+                    class="bi bi-key me-2"></i>Login</a></li>
+              <li id="registerMenuItem"><a class="dropdown-item dropdown-item-premium" href="register.html"><i
+                    class="bi bi-person-plus me-2"></i>Register</a></li>
+              <li id="profileMenuItem" style="display:none;"><a class="dropdown-item dropdown-item-premium"
+                  href="profile.html"><i class="bi bi-person-circle me-2"></i>My Profile</a></li>
+              <li id="settingsMenuItem" style="display:none;"><a class="dropdown-item dropdown-item-premium"
+                  href="settings.html"><i class="bi bi-gear me-2"></i>Settings</a></li>
+              <li id="authDivider" style="display:none;">
+                <hr class="dropdown-divider opacity-10">
+              </li>
+              <li id="logoutMenuItem" style="display:none;"><a class="dropdown-item dropdown-item-premium text-danger"
+                  href="#" onclick="handleLogout()"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="container my-4">
+    <h3> <i class="bi bi-tree-fill"></i> <span data-i18n="forest-dashboard">Karnataka Forest Monitoring</span></h3>
+    <p class="text-muted"> <span data-i18n="forest-desc-long">Explore forest coverage and district insights</span></p>
+  </div>
+  <div class="container">
+    <div class="map-section">
+      <div class="row align-items-center mb-3">
+        <div class="col-md-8">
+          <h4 class="fw-bold mb-1"> <span data-i18n="state-soil-dist">State Forest Distribution</span></h4>
+          <p class="text-muted small"> <span data-i18n="state-forest-desc">Interactive district-level forest view with
+              supporting analytics.</span></p>
+        </div>
+        <div class="col-md-4 text-md-end"> <span
+            class="badge bg-success-subtle text-success border border-success-subtle p-2"> <i class="me-1">Map</i>
+            Interactive Visualization </span> </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-9">
+          <div id="map"></div>
+        </div>
+        <div class="col-lg-3">
+          <div class="p-3 bg-light rounded shadow-sm h-100">
+            <h6 class="fw-bold mb-3 border-bottom pb-2"> <span data-i18n="forest-highlights">Forest Highlights</span>
+            </h6>
+            <p class="small mb-2"><b> <span data-i18n="total-forest-area">Total Forest Area</span></b>: 38,730 sq km</p>
+            <p class="small mb-2"><b> <span data-i18n="forest-coverage">Forest Coverage</span></b>: 20.19%</p>
+            <p class="small mb-2"><b> <span data-i18n="wildlife-sanctuaries">Wildlife Sanctuaries</span></b>: 30+</p>
+            <p class="small mb-0"><b> <span data-i18n="fire-risk-index">Fire Risk Index</span></b>: <span
+                data-i18n="moderate">Moderate</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container mb-5">
+    <div class="row g-4">
+      <div class="col-12">
+        <div class="card h-100 shadow border-0 feature-card clickable-card">
+          <div class="card-body">
+            <h5 class="card-title fw-bold text-success mb-3"> <span data-i18n="all-forest-dist-title">All Forest
+                Districts</span></h5>
+            <div class="chart-wrap"> <canvas id="forestChart"></canvas> </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container mb-5">
+    <h4 class="fw-bold mb-3"> <span data-i18n="forest-insights">Forest Insights and Conservation Priorities</span></h4>
+    <p class="text-muted mb-4"> <span data-i18n="forest-insights-desc">Additional indicators to support awareness,
+        planning, and district-level monitoring.</span></p>
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="card h-100 shadow-sm border-0 feature-card">
+          <div class="card-body">
+            <h6 class="fw-bold text-success mb-3"> <span data-i18n="coverage-snapshot">Coverage Snapshot</span></h6>
+            <div class="d-flex justify-content-between small mb-2"> <span class="text-muted"> <span
+                  data-i18n="districts-tracked">Districts Tracked</span></span> <span class="fw-bold"
+                id="metricDistricts">-</span> </div>
+            <div class="d-flex justify-content-between small mb-2"> <span class="text-muted"> <span
+                  data-i18n="high-cover">High-Cover Districts (2200+)</span></span> <span class="fw-bold"
+                id="metricHighCover">-</span> </div>
+            <div class="d-flex justify-content-between small mb-2"> <span class="text-muted"> <span
+                  data-i18n="medium-cover">Medium-Cover Districts (800-2199)</span></span> <span class="fw-bold"
+                id="metricMediumCover">-</span> </div>
+            <div class="d-flex justify-content-between small"> <span class="text-muted"> <span
+                  data-i18n="low-cover">Lower-Cover Districts (<800)< /span> <span class="fw-bold"
+                      id="metricLowCover">-</span></span> </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card h-100 shadow-sm border-0 feature-card">
+          <div class="card-body">
+            <h6 class="fw-bold text-success mb-3">Peak Fire-Risk Window</h6>
+            <p class="small text-muted mb-2">Typical vigilance period in dry forest belts:</p>
+            <ul class="small text-muted mb-3">
+              <li>February to May: leaf litter ignition risk rises.</li>
+              <li>Afternoon watch: heat and low humidity increase spread.</li>
+              <li>Buffer belts: remove dry biomass near forest edges.</li>
+            </ul>
+            <p class="small mb-0"><b>Note:</b> Community patrols and early alerts reduce damage significantly.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card h-100 shadow-sm border-0 feature-card">
+          <div class="card-body">
+            <h6 class="fw-bold text-success mb-3"> <span data-i18n="top-forest-dist">Top Forest Districts by Area</span>
+            </h6>
+            <ul class="list-group list-group-flush" id="topForestDistrictsList">
+              <li class="list-group-item bg-transparent text-muted small">Loading district ranking...</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container mb-5">
+    <h4 class="fw-bold mb-3">Major Forest in Karnataka</h4>
+    <p class="text-muted mb-4">Major forest landscapes and protected forest areas across Karnataka.</p>
+    <div class="row g-4">
+      <div class="col-12">
+        <div class="card h-100 shadow border-0 feature-card forest-clickable-card overflow-hidden"
+          data-bs-toggle="modal" data-bs-target="#forestModal" data-forest-id="bandipur">
+          <div class="row g-0">
+            <div class="col-md-4"> <img
+                src="https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=800&auto=format&fit=crop"
+                class="img-fluid h-100" alt="Bandipur forest" style="object-fit: cover; min-height: 200px;"> </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title fw-bold text-success"><span data-i18n="bandipur-title">Bandipur Forest</span></h5>
+                <p class="card-text small text-muted mb-1"><b><span data-i18n="top-regions">District:</span></b> <span
+                    data-i18n="Chamarajanagar">Chamarajanagar</span></p>
+                <p class="card-text small text-muted mb-1"><b><span data-i18n="status">Status:</span></b> <span
+                    data-i18n="bandipur-status">National Park and Tiger Reserve</span></p>
+                <p class="card-text small text-muted mb-0"><b><span data-i18n="nav-forest">Forest Type:</span></b> <span
+                    data-i18n="bandipur-type">Dry deciduous and moist deciduous</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="card h-100 shadow border-0 feature-card forest-clickable-card overflow-hidden"
+          data-bs-toggle="modal" data-bs-target="#forestModal" data-forest-id="nagarhole">
+          <div class="row g-0">
+            <div class="col-md-4"> <img
+                src="https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=800&auto=format&fit=crop"
+                class="img-fluid h-100" alt="Nagarhole forest" style="object-fit: cover; min-height: 200px;"> </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title fw-bold text-success"><span data-i18n="nagarhole-title">Nagarhole Forest</span>
+                </h5>
+                <p class="card-text small text-muted mb-1"><b><span data-i18n="top-regions">Districts:</span></b> <span
+                    data-i18n="Mysuru, Kodagu">Mysuru, Kodagu</span></p>
+                <p class="card-text small text-muted mb-1"><b><span data-i18n="status">Status:</span></b> <span
+                    data-i18n="nagarhole-status">Rajiv Gandhi National Park and Tiger Reserve</span></p>
+                <p class="card-text small text-muted mb-0"><b><span data-i18n="nav-forest">Forest Type:</span></b> <span
+                    data-i18n="nagarhole-type">Tropical mixed and deciduous forests</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="card h-100 shadow border-0 feature-card forest-clickable-card overflow-hidden"
+          data-bs-toggle="modal" data-bs-target="#forestModal" data-forest-id="kudremukh">
+          <div class="row g-0">
+            <div class="col-md-4"> <img
+                src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=800&auto=format&fit=crop"
+                class="img-fluid h-100" alt="Kudremukh forest" style="object-fit: cover; min-height: 200px;"> </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title fw-bold text-success"><span data-i18n="kudremukh-title">Kudremukh Forest</span>
+                </h5>
+                <p class="card-text small text-muted mb-1"><b><span data-i18n="top-regions">Districts:</span></b> <span
+                    data-i18n="Chikkamagaluru, Udupi">Chikkamagaluru, Udupi</span></p>
+                <p class="card-text small text-muted mb-1"><b><span data-i18n="status">Status:</span></b> <span
+                    data-i18n="kudremukh-status">National Park (Western Ghats)</span></p>
+                <p class="card-text small text-muted mb-0"><b><span data-i18n="nav-forest">Forest Type:</span></b> <span
+                    data-i18n="kudremukh-type">Evergreen, shola and grassland mosaic</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="card h-100 shadow border-0 feature-card forest-clickable-card overflow-hidden"
+          data-bs-toggle="modal" data-bs-target="#forestModal" data-forest-id="kali">
+          <div class="row g-0">
+            <div class="col-md-4"> <img
+                src="https://images.unsplash.com/photo-1425913397330-cf8af2ff40a1?q=80&w=800&auto=format&fit=crop"
+                class="img-fluid h-100" alt="Kali forest" style="object-fit: cover; min-height: 200px;"> </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title fw-bold text-success"><span data-i18n="kali-title">Kali Forest
+                    (Dandeli-Anshi)</span></h5>
+                <p class="card-text small text-muted mb-1"><b><span data-i18n="top-regions">District:</span></b> <span
+                    data-i18n="Uttara Kannada">Uttara Kannada</span></p>
+                <p class="card-text small text-muted mb-1"><b><span data-i18n="status">Status:</span></b> <span
+                    data-i18n="kali-status">Tiger Reserve</span></p>
+                <p class="card-text small text-muted mb-0"><b><span data-i18n="nav-forest">Forest Type:</span></b> <span
+                    data-i18n="kali-type">Dense evergreen and semi-evergreen forests</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="card h-100 shadow border-0 feature-card forest-clickable-card overflow-hidden"
+          data-bs-toggle="modal" data-bs-target="#forestModal" data-forest-id="bhadra">
+          <div class="row g-0">
+            <div class="col-md-4"> <img
+                src="https://images.unsplash.com/photo-1472396961693-142e6e269027?q=80&w=800&auto=format&fit=crop"
+                class="img-fluid h-100" alt="Bhadra forest" style="object-fit: cover; min-height: 200px;"> </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title fw-bold text-success"><span data-i18n="bhadra-title">Bhadra Forest</span></h5>
+                <p class="card-text small text-muted mb-1"><b><span data-i18n="top-regions">Districts:</span></b> <span
+                    data-i18n="Chikkamagaluru, Shivamogga">Chikkamagaluru, Shivamogga</span></p>
+                <p class="card-text small text-muted mb-1"><b><span data-i18n="status">Status:</span></b> <span
+                    data-i18n="bhadra-status">Wildlife Sanctuary and Tiger Reserve</span></p>
+                <p class="card-text small text-muted mb-0"><b><span data-i18n="nav-forest">Forest Type:</span></b> <span
+                    data-i18n="bhadra-type">Moist deciduous and evergreen patches</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="card h-100 shadow border-0 feature-card forest-clickable-card overflow-hidden"
+          data-bs-toggle="modal" data-bs-target="#forestModal" data-forest-id="brt">
+          <div class="row g-0">
+            <div class="col-md-4"> <img
+                src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=800&auto=format&fit=crop"
+                class="img-fluid h-100" alt="BRT forest" style="object-fit: cover; min-height: 200px;"> </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title fw-bold text-success"><span data-i18n="brt-title">BRT Forest</span></h5>
+                <p class="card-text small text-muted mb-1"><b><span data-i18n="top-regions">District:</span></b> <span
+                    data-i18n="Chamarajanagar">Chamarajanagar</span></p>
+                <p class="card-text small text-muted mb-1"><b><span data-i18n="status">Status:</span></b> <span
+                    data-i18n="brt-status">Biligiri Ranganathaswamy Tiger Reserve</span></p>
+                <p class="card-text small text-muted mb-0"><b><span data-i18n="nav-forest">Forest Type:</span></b> <span
+                    data-i18n="brt-type">Dry deciduous to montane shola transition</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="forestModal" tabindex="-1" aria-labelledby="forestModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold" id="forestModalLabel">Forest Details</h5> <button type="button"
+            class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body pt-0"> <img id="modalForestImg" src="" class="img-fluid rounded mb-4 w-100"
+            style="height: 280px; object-fit: cover;" alt="Forest image">
+          <h3 id="modalForestTitle" class="fw-bold mb-3">Forest Name</h3>
+          <p id="modalForestDesc" class="text-muted">Description goes here.</p>
+          <div class="row g-3 mt-2">
+            <div class="col-md-6">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item bg-transparent"><b> <span data-i18n="top-regions">Districts:</span></b> <span
+                    id="modalForestDistricts"></span> </li>
+                <li class="list-group-item bg-transparent"><b> <span data-i18n="status">Status:</span></b> <span
+                    id="modalForestStatus"></span></li>
+                <li class="list-group-item bg-transparent"><b> <span data-i18n="nav-forest">Forest Type:</span></b>
+                  <span id="modalForestType"></span>
+                </li>
+                <li class="list-group-item bg-transparent"><b> <span data-i18n="approx-area">Approx. Area:</span></b>
+                  <span id="modalForestArea"></span>
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <div class="card bg-light border-0 shadow-sm p-3 h-100">
+                <h6 class="fw-bold mb-2">Key Biodiversity</h6>
+                <p id="modalForestWildlife" class="small mb-2 text-muted"></p>
+                <h6 class="fw-bold mb-2">Conservation Notes</h6>
+                <p id="modalForestConservation" class="small mb-0 text-muted"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="bg-success text-white text-center p-3 mt-5"> <span data-i18n="footer-forest">Ã‚Â© 2026 ClimateGuard |
+      Forest Monitoring</span></footer>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="js/forest.js?v=10"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/profile_manager.js"></script>
+  <script src="js/i18n.js?v=11" type="module"></script>
+  <script src="js/ui-enhancements.js?v=20260318"></script>
+</body>
+
+</html>
